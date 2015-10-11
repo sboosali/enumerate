@@ -5,6 +5,7 @@ goals
 TODO
 cbits/main
 .projectile
+sources/Data/Canonical.hs
 
 # Haskell
 dist
