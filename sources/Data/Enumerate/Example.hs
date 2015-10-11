@@ -15,9 +15,13 @@ mainWith = \case
 
 {- | (for documentation) 
 
-needs @\{\-\# LANGUAGE DeriveGeneric, DeriveAnyClass \#\-\}@
-
 demonstrates: empty type, unit type, product type, sum type, type variable.
+
+with @\{\-\# LANGUAGE DeriveGeneric, DeriveAnyClass \#\-\}@, the derivation is a one-liner: 
+
+@
+data DemoEnumerable a = ... deriving (Show,Generic,Enumerable) 
+@
 
 -}
 data DemoEnumerable a
@@ -31,8 +35,16 @@ data DemoEnumerable a
 
 @demoEnumerated = enumerated@
 
->>> demoEnumerated
-[DemoEnumerable1,DemoEnumerable2 False Nothing,DemoEnumerable2 False (Just False),DemoEnumerable2 False (Just True),DemoEnumerable2 True Nothing,DemoEnumerable2 True (Just False),DemoEnumerable2 True (Just True),DemoEnumerable3 False,DemoEnumerable3 True]
+>>> traverse print demoEnumerated
+DemoEnumerable1
+DemoEnumerable2 False Nothing
+DemoEnumerable2 False (Just False)
+DemoEnumerable2 False (Just True)
+DemoEnumerable2 True Nothing
+DemoEnumerable2 True (Just False)
+DemoEnumerable2 True (Just True)
+DemoEnumerable3 False
+DemoEnumerable3 True
 
 -}
 demoEnumerated :: [DemoEnumerable Bool] 

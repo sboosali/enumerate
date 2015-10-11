@@ -1,30 +1,26 @@
 {-# LANGUAGE ScopedTypeVariables, DefaultSignatures, TypeOperators, FlexibleInstances, FlexibleContexts, LambdaCase #-}
+{- | see the 'Enumerable' class.  
 
-{- | see 'Enumerable'.  
+see "Data.Enumerate.Example" for examples. 
 
-related:
 
-http://hackage.haskell.org/package/emgm-0.4/docs/Generics-EMGM-Functions-Enum.html
-allows infinite lists (by convention)
-too heavyweight
+background on @Generics@: 
 
-http://hackage.haskell.org/package/enumerable
-no Generic
+* <https://hackage.haskell.org/package/base-4.8.1.0/docs/GHC-Generics.html GHC.Generics>
 
-https://hackage.haskell.org/package/testing-feat-0.4.0.2/docs/Test-Feat-Class.html#t:Enumerable
-too heavyweight
 
-https://hackage.haskell.org/package/smallcheck
-too heavyweight
-Series enumerates up to some depth and can enumerated infinitely-inhabited types
+related packages:
 
-https://hackage.haskell.org/package/quickcheck
-too heavyweight
-randomness unnecessary 
+* <http://hackage.haskell.org/package/emgm-0.4/docs/Generics-EMGM-Functions-Enum.html emgm>.  allows infinite lists (by convention). too heavyweight. 
 
-http://www.haskell.org/haskellwiki/GHC.Generics
+* <http://hackage.haskell.org/package/enumerable enumerable>. no @Generic@ instance. 
 
-https://hackage.haskell.org/package/base-4.8.1.0/docs/GHC-Generics.html
+* <https://hackage.haskell.org/package/testing-feat-0.4.0.2/docs/Test-Feat-Class.html#t:Enumerable testing-feat>. too heavyweight (testing framework). 
+
+* <https://hackage.haskell.org/package/smallcheck smallcheck> too heavyweight (testing framework). Series enumerates up to some depth and can enumerated infinitely-inhabited types. 
+
+* https://hackage.haskell.org/package/quickcheck quickcheck> too heavyweight (testing framework, randomness unnecessary).
+
 
 -}
 
@@ -41,15 +37,15 @@ import           Data.Word (Word8, Word16)
 import           Data.Int (Int8, Int16)
 
 
-{- | enumerate the set of (depth first) all values in a (finitely enumerable) type.
+{- | enumerate the set of all values in a (finitely enumerable) type. enumerates depth first. 
 
-generalizes Enums to any finite/discrete type. an Enumerable is either:
+generalizes 'Enum's to any finite/discrete type. an Enumerable is either:
 
 * an Enum
 * a product of Enumerables
 * a sum of Enumerables
 
-can be implemented automatically via a 'Generic' instance.
+can be implemented automatically via its 'Generic' instance.
 
 laws:
 
@@ -186,7 +182,16 @@ instance Enumerable ... where
 boundedEnumerated :: (Bounded a, Enum a) => [a]
 boundedEnumerated = enumFromTo minBound maxBound
 
--- | may be unbounded.
+{- | for non-'Generic' Enums:
+
+@
+instance Enumerable ... where
+ 'enumerated' = enumEnumerated
+@
+
+the enum should still be bounded. 
+ 
+-}
 enumEnumerated :: (Enum a) => [a]
 enumEnumerated = enumFrom (toEnum 0)
 
