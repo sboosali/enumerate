@@ -28,8 +28,6 @@ module Data.Enumerate.Types where
 
 import           GHC.Generics
 import           Data.Proxy
--- import qualified Data.Map as Map
--- import           Data.Map (Map)
 import           Control.Arrow ((&&&))
 import           Data.List (genericLength)
 import           Data.Void (Void)

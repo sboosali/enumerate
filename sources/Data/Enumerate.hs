@@ -6,8 +6,10 @@ module Data.Enumerate
  , module Data.Enumerate.Reify
  , module Data.Enumerate.Domain 
  , module Data.Enumerate.Extra 
+ , module Data.Enumerate.Map 
  ) where 
 import Data.Enumerate.Types
 import Data.Enumerate.Reify
 import Data.Enumerate.Domain
 import Data.Enumerate.Extra 
+import Data.Enumerate.Map

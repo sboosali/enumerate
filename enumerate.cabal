@@ -24,9 +24,11 @@ library
   Data.Enumerate.Reify 
   Data.Enumerate.Domain
   Data.Enumerate.Example
+  Data.Enumerate.Map
 
  build-depends:    
      base >=4.8 && <4.9
+   , containers ==0.5.* 
    , exceptions ==0.8.*
    , MemoTrie ==0.6.*
 --   , spoon ==0.3.*
