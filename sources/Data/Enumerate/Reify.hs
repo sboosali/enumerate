@@ -33,7 +33,7 @@ reifyFunctionAt domain f = reifyFunctionAtM domain (return . f)
 
 -- | reify a (safely-)partial function into a map (which is implicitly partial, where @Map.lookup@ is like @($)@.
 reifyFunctionM :: (Enumerable a) => (forall m. MonadThrow m => a -> m b) -> [(a,b)]
-reifyFunctionM= reifyFunctionAtM enumerated
+reifyFunctionM = reifyFunctionAtM enumerated
 {-# INLINABLE reifyFunctionM #-}
 
 {- | reify a (safely-)partial function at any domain. 

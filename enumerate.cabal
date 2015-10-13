@@ -33,6 +33,7 @@ library
    , containers ==0.5.* 
    , ghc-prim==0.4.*
 
+   , semigroups ==0.17.*
    , exceptions ==0.8.*
    , MemoTrie ==0.6.*
 --   , spoon ==0.3.*

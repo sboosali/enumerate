@@ -208,3 +208,8 @@ enumEnumerated = enumFrom (toEnum 0)
 -- instance Enumerable Int64 where enumerated = boundedEnumerated
 -- instance Enumerable Word64 where enumerated = boundedEnumerated
 
+{-| see "Data.Enumerate.Reify.getJectivity" 
+
+-}
+data Jectivity = Injective | Surjective | Bijective deriving (Show,Read,Eq,Ord,Enum,Bounded)
+ 
