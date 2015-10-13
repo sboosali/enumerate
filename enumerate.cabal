@@ -26,11 +26,13 @@ library
   Data.Enumerate.Example
   Data.Enumerate.Map
   Data.CoRec
-  Data.CoRec.MemoTrie
+  -- Data.CoRec.MemoTrie
 
  build-depends:    
      base >=4.8 && <4.9
    , containers ==0.5.* 
+   , ghc-prim==0.4.*
+
    , exceptions ==0.8.*
    , MemoTrie ==0.6.*
 --   , spoon ==0.3.*
