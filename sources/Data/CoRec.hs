@@ -137,6 +137,8 @@ match hs c = handle (rmap outputs2handler hs) c
 
 -- ================================================================ --
 
+{- examples 
+
 truthyHandlers :: Rec (Handler Identity Bool) [Int, String, Bool]
 truthyHandlers 
   = (H$ \(Identity i) -> i==0)
@@ -167,4 +169,6 @@ falsyFalse' = handle truthyHandlers (column False)
 truthyOne'  = match truthyMatchers (column (1::Int))
 truthyFull' = match truthyMatchers (column "full")
 truthyTrue' = match truthyMatchers (column True)
+
+-} 
 

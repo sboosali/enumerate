@@ -31,8 +31,9 @@ the four-line @HasTrie@ instance (and a one line call to 'memo') can save both r
 
 -}
 module Data.Enumerate.Domain where 
+import Data.CoRec
 
--- import Data.MemoTrie
+import Data.MemoTrie
 
 import           GHC.Generics
 
