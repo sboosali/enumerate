@@ -26,6 +26,7 @@ library
   Data.Enumerate.Example
   Data.Enumerate.Map
   Data.CoRec
+  Data.CoRec.MemoTrie
 
  build-depends:    
      base >=4.8 && <4.9
