@@ -25,7 +25,8 @@ library
   Data.Enumerate.Domain
   Data.Enumerate.Example
   Data.Enumerate.Map
-  Data.CoRec
+  Data.Enumerate.Extra
+  -- Data.CoRec
   -- Data.CoRec.MemoTrie
 
  build-depends:    
@@ -33,7 +34,7 @@ library
    , containers ==0.5.* 
    , ghc-prim==0.4.*
 
-   , semigroups ==0.17.*
+   , semigroups ==0.16.*
    , exceptions ==0.8.*
    , MemoTrie ==0.6.*
 --   , spoon ==0.3.*
