@@ -1,7 +1,14 @@
 {-# LANGUAGE ScopedTypeVariables, DefaultSignatures, TypeOperators, FlexibleInstances, FlexibleContexts, LambdaCase #-}
-{- | see the 'Enumerable' class.  
+{- | see the 'Enumerable' class for documentation.  
 
 see "Data.Enumerate.Example" for examples. 
+
+can also help automatically derive <https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html @QuickCheck@> instances: 
+
+@
+data T = C0 | C1 () Bool SmallNatural SmallString | ...  
+instance Arbitrary T where arbitrary = elements 'enumerated' 
+@
 
 
 background on @Generics@: 
@@ -180,7 +187,7 @@ the 'cardinality' is the sum of the cardinalities of @a@ and @b@.
 instance (Enumerable a, Enumerable b) => Enumerable (Either a b) where 
  enumerated    = (Left <$> enumerated) ++ (Right <$> enumerated) 
  cardinality _ = cardinality (Proxy :: Proxy a) + cardinality (Proxy :: Proxy b)
-instance (Enumerable a) => Enumerable (Maybe a)
+instance (Enumerable a) => Enumerable (Maybe a) where 
  enumerated    = Nothing : (Just <$> enumerated)
  cardinality _ = 1 + cardinality (Proxy :: Proxy a)
 
@@ -232,10 +239,14 @@ instance Enumerable _ where
 boundedEnumerated :: (Bounded a, Enum a) => [a]
 boundedEnumerated = enumFromTo minBound maxBound
 
-{-| @boundedCardinality _ = 'maxBound' - 'minBound'@ 
+{-| behavior may be undefined when the cardinality of @a@ is larger than the cardinality of @Int@; @Int@ is at least as big as, which is at least as big as all the monomorphic types in @base@ that instantiate @Bounded@; you can check with:
+
+>>> boundedCardinality [0::Int]  -- platform specific 
+18446744073709551615
+
 -}
-boundedCardinality :: (Bounded a) => proxy a -> Integer 
-boundedCardinality _ = maxBound - minBound 
+boundedCardinality :: forall proxy a. (Bounded a, Enum a) => proxy a -> Integer 
+boundedCardinality _ = toInteger (fromEnum (maxBound::a)) - toInteger (fromEnum (minBound::a))
 
 {- | for non-'Generic' Enums:
 
