@@ -26,6 +26,7 @@ library
   Data.Enumerate.Example
   Data.Enumerate.Map
   Data.Enumerate.Extra
+  Data.Enumerate.Large 
   -- Data.CoRec
   -- Data.CoRec.MemoTrie
 
