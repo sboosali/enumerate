@@ -241,7 +241,7 @@ boundedEnumerated = enumFromTo minBound maxBound
 
 {-| behavior may be undefined when the cardinality of @a@ is larger than the cardinality of @Int@; @Int@ is at least as big as, which is at least as big as all the monomorphic types in @base@ that instantiate @Bounded@; you can check with:
 
->>> boundedCardinality [0::Int]  -- platform specific 
+>>> boundedCardinality [0::Int]  -- platform specific
 18446744073709551615
 
 -}

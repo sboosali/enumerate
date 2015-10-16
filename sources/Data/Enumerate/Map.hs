@@ -86,25 +86,36 @@ True
 isTotalM :: (Enumerable a, Ord a) => (forall m. MonadThrow m => a -> m b) -> Maybe (a -> b) 
 isTotalM f = (toFunction) (fromFunctionM f)
 
-{-| the codomain (not the range) of a total function. 
+{-| the image (not the 'codomain') of a total function. 
 
-@codomainM f = map f 'enumerated'@
-
-includes duplicates.  
-
--}
-codomain :: (Enumerable a) => (a -> b) -> [b] 
-codomain f = map f enumerated
-
-{-| the codomain (not the range) of a partial function. 
-
-@codomainM f = mapMaybe f 'enumerated'@
+@imageM f = map f 'enumerated'@
 
 includes duplicates.  
 
 -}
-codomainM :: (Enumerable a) => (forall m. MonadThrow m => a -> m b) -> [b] 
-codomainM f = mapMaybe f enumerated
+image :: (Enumerable a) => (a -> b) -> [b] 
+image f = map f enumerated
+
+{-| the image (not the 'codomain') of a partial function. 
+
+@imageM f = mapMaybe f 'enumerated'@
+
+includes duplicates.  
+
+-}
+imageM :: (Enumerable a) => (forall m. MonadThrow m => a -> m b) -> [b] 
+imageM f = mapMaybe f enumerated
+
+{-| the codomain of a function. it contains the 'image'. 
+
+@codomain _ = enumerated@ 
+
+-}
+codomain :: (Enumerable b) => (a -> b) -> [b]  
+codomain _ = enumerated 
+
+codomainM :: (Enumerable b) => (forall m. MonadThrow m => a -> m b) -> [b] 
+codomainM _ = enumerated 
 
 {-| invert a total function.
 
@@ -127,7 +138,7 @@ invert f = invertM (return.f)
 * @[]@ wherever @f@ is not surjective 
 * @(_:_)@ wherever @f@ is not injective 
 
-a @Map@ is stored internally, with as many keys as the 'codomain' of @f@. 
+a @Map@ is stored internally, with as many keys as the 'image' of @f@. 
 
 see also 'isBijective'.
 
@@ -143,7 +154,7 @@ invertM f = g
 -}
 getJectivityM :: (Enumerable a, Enumerable b, Ord a, Ord b) => (forall m. MonadThrow m => a -> m b) -> Maybe Jectivity 
 getJectivityM f
- = case isBijectiveM f of       -- TODO pick the right Monoid, who upending picks the first non-nothing 
+ = case isBijectiveM f of       -- TODO pick the right Monoid, whose append picks the first non-nothing 
     Just{}  -> Just Bijective
     Nothing -> case isInjectiveM f of
                 Just{}  -> Just Injective 
@@ -163,7 +174,7 @@ can short-circuit.
 -}
 isInjectiveM :: (Enumerable a, Ord a, Ord b) => (forall m. MonadThrow m => a -> m b) -> Maybe (b -> Maybe a)
 isInjectiveM f = do             -- TODO make it "correct by construction", rather than explicit validation 
- _bs <- isUnique (codomainM f)   -- Map.fromListWith (<>) [(b, a:|[]) | (a, b) <- Map.toList m]
+ _bs <- isUnique (imageM f)   -- Map.fromListWith (<>) [(b, a:|[]) | (a, b) <- Map.toList m]
  return g 
  where
  g = listToMaybe . invertM f
@@ -176,7 +187,8 @@ isUnique l = if length l == length s then Nothing else Just s -- TODO make effic
  where
  s = Set.fromList l
 
-{-| returns the inverse of the surjection, if surjective.
+{-| returns the inverse of the surjection, if surjective. 
+i.e. when a function's 'codomainM' equals its 'imageM'. 
 
 refines @(b -> [a])@ (i.e. invert\'s' type) to @(b -> NonEmpty a)@. 
 
@@ -185,7 +197,7 @@ can short-circuit.
 -}
 isSurjectiveM :: (Enumerable a, Enumerable b, Ord a, Ord b) => (forall m. MonadThrow m => a -> m b) -> Maybe (b -> NonEmpty a)
 isSurjectiveM f =  -- TODO make it "correct by construction", rather than explicit validation 
- if (Set.fromList enumerated) == (Set.fromList (codomainM f))
+ if (Set.fromList (codomainM f)) `Set.isSubsetOf` (Set.fromList (imageM f))  -- the reverse always holds, no need to check  
  then Just g
  else Nothing
  where
