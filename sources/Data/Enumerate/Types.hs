@@ -143,6 +143,17 @@ instance (GEnumerable (f)) => GEnumerable (M1 i t f) where
  gcardinality _ = gcardinality (Proxy :: Proxy (f))
  {-# INLINE gcardinality #-}
 
+{-| wrap any @(Bounded a, Enum a)@ to be a @Enumerable@ via 'boundedEnumerated'. 
+
+(avoids @OverlappingInstances@).    
+
+-}
+newtype WrappedBoundedEnum a = WrappedBoundedEnum { unwrapBoundedEnum :: a } 
+
+instance (Bounded a, Enum a) => Enumerable (WrappedBoundedEnum a) where 
+ enumerated    = WrappedBoundedEnum <$> boundedEnumerated
+ cardinality _ = boundedCardinality (Proxy :: Proxy a)
+
 -- base types 
 instance Enumerable Void
 instance Enumerable ()
