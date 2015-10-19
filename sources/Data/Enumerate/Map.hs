@@ -50,8 +50,15 @@ True
 -} 
 toFunction :: (Enumerable a, Ord a) => Map a b -> Maybe (a -> b)
 toFunction m = if isMapTotal m then Just f else Nothing 
- where f x = fromJust (Map.lookup x m) -- won't fail
+ where f = unsafeToFunction m -- the fromJust is safe when the map is total 
 {-# INLINABLE toFunction #-}
+
+{-| wraps 'Map.lookup' 
+
+-}
+unsafeToFunction :: (Ord a) => Map a b -> (a -> b)
+unsafeToFunction m x = fromJust (Map.lookup x m)
+{-# INLINABLE unsafeToFunction #-}
 
 {-| does the map contain every key in its domain? 
 

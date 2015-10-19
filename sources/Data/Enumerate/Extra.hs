@@ -7,7 +7,8 @@ import Control.DeepSeq (NFData(..), deepseq)
 import Control.Arrow ((&&&), (>>>))
 import System.IO.Unsafe (unsafePerformIO) 
 import Control.Exception (catches, throwIO, Handler(..), AsyncException, ArithException, ArrayException, ErrorCall, PatternMatchFail)
-
+import Data.Foldable  (traverse_)
+import Language.Haskell.TH.Syntax (Name,nameBase)
 
 
 {-| @failed = 'throwM' . 'userError'@
@@ -71,4 +72,14 @@ spoonWith :: (NFData a, MonadThrow m) => [Handler (m a)] -> a -> m a
 spoonWith handlers a = unsafePerformIO $ do 
  deepseq a (return `fmap` return a) `catches` handlers 
 {-# INLINEABLE spoonWith #-}
+
+{- | the eliminator as a function and the introducer as a string
+
+helper for declaring Show instances of datatypes without visible constructors (like @Map@
+which is shown as an list).
+
+-}
+showsPrecWith :: (Show a, Show b) => Name -> (a -> b) -> Int -> a -> ShowS
+showsPrecWith nameFrom functionInto p x = showParen (p > 10) $
+  showString (nameBase nameFrom) . showString " " . shows (functionInto x)
 

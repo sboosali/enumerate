@@ -1,9 +1,9 @@
 {-| see "Data.Enumerable.Types" for detailed documentation. 
 
-to import every symbol in this package, say run this in GHCi:
+to import every symbol in this package, run this in GHCi:
 
 @
-:m +  Data.Enumerate  Data.Enumerate.Extra  Data.Enumerate.Large
+:m +  Data.Enumerate  Data.Enumerate.Extra  Data.Enumerate.Large  Data.Enumerate.Function 
 @
 
 -}
