@@ -28,14 +28,18 @@ related packages:
 
 * https://hackage.haskell.org/package/quickcheck quickcheck> too heavyweight (testing framework, randomness unnecessary).
 
+@
 -- (for doctest) 
 >>> import qualified Data.List as List 
 >>> import qualified Data.Ord as Ord
 >>> let powerset2matrix = (List.sortBy (Ord.comparing length) . fmap Set.toList . Set.toList)
+@
 
 -}
 
 module Data.Enumerate.Types where
+
+import Data.Modular
 
 import           GHC.Generics
 import           Data.Proxy
@@ -48,6 +52,7 @@ import qualified Data.Set as Set
 import Data.Set (Set) 
 import System.Timeout
 import Control.DeepSeq (NFData,force)
+import GHC.TypeLits
 
 
 {- | enumerate the set of all values in a (finitely enumerable) type. enumerates depth first. 
@@ -231,12 +236,10 @@ instance (Enumerable a, Ord a) => Enumerable (Set a) where
  enumerated    = (Set.toList . powerSet . Set.fromList) enumerated
  cardinality _ = 2 ^ cardinality (Proxy :: Proxy a) 
 
-{-| the exponential type. 
-
-the 'cardinality' is the cardinality of @b@ raised to the cardinality @a@, i.e. @|b|^|a|@. warning: it grows quickly. 
-
--}
--- TODO 
+-- | (from the @modular-arithmetic@ package)
+instance (Integral i, Num i, KnownNat n) => Enumerable (Mod i n) where
+ enumerated    = toMod <$> [0 .. fromInteger (natVal (Proxy :: Proxy n) - 1)]
+ cardinality _ = natVal (Proxy :: Proxy n)
 
 {- | for non-'Generic' Bounded Enums:
 

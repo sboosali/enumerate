@@ -26,7 +26,6 @@ library
   Data.Enumerate.Example
   Data.Enumerate.Map
   Data.Enumerate.Extra
-  Data.Enumerate.Large 
   -- Data.CoRec
   -- Data.CoRec.MemoTrie
 
@@ -42,6 +41,7 @@ library
    , deepseq ==1.4.*
 
    , vinyl==0.5.* 
+   , modular-arithmetic==1.2.* 
 
  hs-source-dirs:      sources
  default-language:    Haskell2010
