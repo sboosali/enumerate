@@ -148,6 +148,11 @@ instance (GEnumerable (f)) => GEnumerable (M1 i t f) where
  gcardinality _ = gcardinality (Proxy :: Proxy (f))
  {-# INLINE gcardinality #-}
 
+{-| see "Data.Enumerate.Reify.getJectivity" 
+
+-}
+data Jectivity = Injective | Surjective | Bijective deriving (Show,Read,Eq,Ord,Enum,Bounded)
+
 {-| wrap any @(Bounded a, Enum a)@ to be a @Enumerable@ via 'boundedEnumerated'. 
 
 (avoids @OverlappingInstances@).    
@@ -328,9 +333,4 @@ Just [False,True]
 -}
 enumerateTimeout :: (Enumerable a, NFData a) => Int -> IO (Maybe [a])
 enumerateTimeout maxDuration = timeout maxDuration (return$ force enumerated)
-
-{-| see "Data.Enumerate.Reify.getJectivity" 
-
--}
-data Jectivity = Injective | Surjective | Bijective deriving (Show,Read,Eq,Ord,Enum,Bounded)
 

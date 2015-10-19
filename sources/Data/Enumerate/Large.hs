@@ -1,8 +1,9 @@
+{-# LANGUAGE TupleSections #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-| orphan instances for large types. 
+{-| orphan instances, of 'Enumerate', for large types, i.e. @Word32@ / @Word64@ / @Int32@ / @Int64@.
 
 (that are included for completeness, but not exported by default (i.e. by "Data.Enumerate"). 
-you probably want build-time instance-resolution errors rather than runtime non-termination). 
+you probably want build-time instance-resolution errors rather than probable runtime non-termination). 
 
 -}
 module Data.Enumerate.Large where
@@ -10,17 +11,7 @@ import Data.Enumerate.Types
 
 import           Data.Word (Word32, Word64)
 import           Data.Int (Int32, Int64)
-import           Data.Proxy
 
-
-{-| brute-force function extensionality. 
-
-warning: the size of the domain grows exponentially in the number of arguments. 
-
--}
-instance (Enumerable a, Eq b) => Eq (a -> b) where
- f == g = all ((==) <$> f <*> g) enumerated
- f /= g = any ((/=) <$> f <*> g) enumerated
 
 instance Enumerable Int32  where enumerated = boundedEnumerated; cardinality = boundedCardinality 
 instance Enumerable Word32 where enumerated = boundedEnumerated; cardinality = boundedCardinality 
