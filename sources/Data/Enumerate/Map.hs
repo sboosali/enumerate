@@ -1,7 +1,17 @@
 {-# LANGUAGE RankNTypes, LambdaCase #-}
 {-| converting between partial functions and maps.  
 
+> -- doctest
 >>> :set +m
+>>> :{
+let uppercasePartial :: (MonadThrow m) => Char -> m Char 
+    uppercasePartial c = case c of
+     'a' -> return 'A'
+     'b' -> return 'B'
+     'z' -> return 'Z'
+     _   -> failed "uppercasePartial"
+:}
+
 
 -}
 module Data.Enumerate.Map where
@@ -93,7 +103,39 @@ True
 isTotalM :: (Enumerable a, Ord a) => (forall m. MonadThrow m => a -> m b) -> Maybe (a -> b) 
 isTotalM f = (toFunction) (fromFunctionM f)
 
-{-| the image (not the 'codomain') of a total function. 
+{-| the <https://en.wikipedia.org/wiki/Partial_function#Basic_concepts domain> of a partial function 
+is the subset of the 'enumerated' input where it's defined. 
+
+i.e. when @x \`member\` (domainM f)@ then @fromJust (f x)@ is defined. 
+
+>>> domainM uppercasePartial
+['a','b','z'] 
+
+-}
+domainM :: (Enumerable a) => (forall m. MonadThrow m => a -> m b) -> [a] 
+domainM f = foldMap go enumerated
+ where
+ go a = case f a of 
+   Nothing -> [] 
+   Just{}  -> [a]
+
+{-| (right name?) 
+
+@corange _ = enumerated@ 
+
+-}
+corange :: (Enumerable a) => (a -> b) -> [a] 
+corange _ = enumerated 
+
+{-| 
+
+@corangeM _ = enumerated@ 
+
+-}
+corangeM :: (Enumerable a) => (forall m. MonadThrow m => a -> m b) -> [a] 
+corangeM _ = enumerated 
+
+{-| the image of a total function. 
 
 @imageM f = map f 'enumerated'@
 
@@ -129,6 +171,7 @@ codomainM _ = enumerated
 @(invert f) b@ is: 
 
 * @[]@ wherever @f@ is not surjective 
+* @[y]@ wherever @f@ is uniquely defined 
 * @(_:_)@ wherever @f@ is not injective 
 
 @invert f = 'invertM' (return.f)@
@@ -143,11 +186,12 @@ invert f = invertM (return.f)
 
 * @[]@ wherever @f@ is partial 
 * @[]@ wherever @f@ is not surjective 
+* @[y]@ wherever @f@ is uniquely defined 
 * @(_:_)@ wherever @f@ is not injective 
 
 a @Map@ is stored internally, with as many keys as the 'image' of @f@. 
 
-see also 'isBijective'.
+see also 'isBijectiveM'.
 
 -}
 invertM :: (Enumerable a, Ord a, Ord b) => (forall m. MonadThrow m => a -> m b) -> (b -> [a])
@@ -197,7 +241,7 @@ isUnique l = if length l == length s then Nothing else Just s -- TODO make effic
 {-| returns the inverse of the surjection, if surjective. 
 i.e. when a function's 'codomainM' equals its 'imageM'. 
 
-refines @(b -> [a])@ (i.e. invert\'s' type) to @(b -> NonEmpty a)@. 
+refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> NonEmpty a)@. 
 
 can short-circuit. 
 
@@ -212,7 +256,7 @@ isSurjectiveM f =  -- TODO make it "correct by construction", rather than explic
 
 {-| returns the inverse of the bijection, if bijective.
 
-refines @(b -> [a])@ (i.e. invert\'s' type) to @(b -> a)@. 
+refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> a)@. 
 
 can short-circuit. 
 
