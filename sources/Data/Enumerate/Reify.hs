@@ -1,6 +1,8 @@
 {-# LANGUAGE RankNTypes, LambdaCase #-}
 {-| see 'reifyFunctionAtM'.  
 
+@-- doctest@
+
 >>> :set +m
 
 -}
@@ -38,7 +40,24 @@ reifyFunctionM = reifyFunctionAtM enumerated
 
 {- | reify a (safely-)partial function at any domain. 
 
-use when your domain isn't 'Enumerable'.
+use the functions suffixed with @M@ when your function is explicitly partial, 
+i.e. of type @(forall m. MonadThrow m => a -> m b)@. 
+when inside a function arrow, like:  
+
+@
+reifyFunctionAtM :: [a] -> (forall m. MonadThrow m => a -> m b) -> [(a,b)]
+reifyFunctionAtM domain f = ... 
+@
+
+the @Rank2@ type (and non-concrete types) means that @f@ can only use 
+parametric polymorphic functions, or the methods of the @MonadThrow@ class 
+(namely 'throwM'), or methods of @MonadThrow@ superclasses (namely 'return', et cetera). 
+
+'MonadThrow' is a class from the @exceptions@ package that generalizes failibility. 
+it has instances for @Maybe@, @Either@, @[]@, @IO@, and more.     
+
+use the functions suffixed with @At@ when your domain isn't 'Enumerable', 
+or when you want to restrict the domain.
  
 the most general function in this module.
 

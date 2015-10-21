@@ -38,8 +38,7 @@ document:
 
 hyperlink: 
 	cabal haddock --with-haddock="$(HOME)/haddock/.cabal-sandbox/bin/haddock" --haddock-options="--hyperlinked-source"
-#	open dist/doc/html/$(PACKAGE)/index.html
-	open dist/doc/html/$(PACKAGE)/src/SimplePlugins.html
+	open dist/doc/html/$(PACKAGE)/index.html
 
 
 style:

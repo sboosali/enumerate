@@ -1,11 +1,13 @@
 {-# LANGUAGE RankNTypes, LambdaCase #-}
 {-| converting between partial functions and maps.  
 
-> -- doctest
+@-- doctest@
+
 >>> :set +m
+>>> :set -XLambdaCase 
 >>> :{
 let uppercasePartial :: (MonadThrow m) => Char -> m Char 
-    uppercasePartial c = case c of
+    uppercasePartial = \case
      'a' -> return 'A'
      'b' -> return 'B'
      'z' -> return 'Z'
@@ -216,11 +218,9 @@ getJectivityM f
 
 {-| returns the inverse of the injection, if injective.
 
-refines @(b -> [a])@ (i.e. invert\'s' type) to @(b -> Maybe a)@. 
+refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> Maybe a)@. 
 
 unlike 'isBijectiveM', doesn't need an @(Enumerable b)@ constraint. this helps when you want to ensure a function into an infinite type (e.g. 'show') is injective. and still reasonably efficient, given the @(Ord b)@ constraint. 
-
-can short-circuit. 
 
 -}
 isInjectiveM :: (Enumerable a, Ord a, Ord b) => (forall m. MonadThrow m => a -> m b) -> Maybe (b -> Maybe a)
@@ -229,6 +229,7 @@ isInjectiveM f = do             -- TODO make it "correct by construction", rathe
  return g 
  where
  g = listToMaybe . invertM f
+-- can short-circuit. 
 
 {-| converts the list into a set, if it has no duplicates. 
 

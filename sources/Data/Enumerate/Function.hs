@@ -5,7 +5,8 @@
 you probably want build-time instance-resolution errors rather than possible runtime non-termination). 
 
 
-> -- doctest
+@-- doctest@
+
 >>> :set -XLambdaCase 
 >>> let printMappings mappings = traverse (\mapping -> (putStrLn"") >> (traverse print) mapping) mappings >> return() 
 
@@ -179,7 +180,7 @@ where the (total) mapping:
 is equivalent to the function:
 
 @
-\case
+\\case
  LT -> False
  EQ -> False
  GT -> True
