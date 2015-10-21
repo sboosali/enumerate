@@ -4,11 +4,12 @@ module Data.Enumerate.Extra where
 import Control.Monad.Catch (MonadThrow(..), SomeException(..))
 import Control.DeepSeq (NFData(..), deepseq) 
 
+-- import Language.Haskell.TH.Syntax (Name,nameBase)
 import Control.Arrow ((&&&), (>>>))
 import System.IO.Unsafe (unsafePerformIO) 
 import Control.Exception (catches, throwIO, Handler(..), AsyncException, ArithException, ArrayException, ErrorCall, PatternMatchFail)
 import Data.Foldable  (traverse_)
--- import Language.Haskell.TH.Syntax (Name,nameBase)
+import Numeric.Natural 
 
 
 {-| @failed = 'throwM' . 'userError'@
@@ -87,3 +88,7 @@ showsPrecWith stringFrom functionInto p x = showParen (p > 10) $
 -- showsPrecWith :: (Show a, Show b) => Name -> (a -> b) -> Int -> a -> ShowS
 -- showsPrecWith nameFrom functionInto p x = showParen (p > 10) $
 --   showString (nameBase nameFrom) . showString " " . shows (functionInto x)
+
+int2natural :: Int -> Natural 
+int2natural = fromInteger . toInteger
+

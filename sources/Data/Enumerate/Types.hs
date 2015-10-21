@@ -35,6 +35,7 @@ related packages:
 -}
 
 module Data.Enumerate.Types where
+import Data.Enumerate.Extra 
 
 import Data.Modular
 
@@ -53,6 +54,7 @@ import GHC.TypeLits
 import Numeric.Natural
 import qualified Data.List as List 
 import qualified Data.Ord as Ord
+import Data.Ix
 
 
 {- | enumerate the set of all values in a (finitely enumerable) type. enumerates depth first. 
@@ -268,6 +270,8 @@ behavior may be undefined when the cardinality of @a@ is larger than the cardina
 @-- i.e. 1 + 9223372036854775807 - -9223372036854775808@
 
 works with non-zero-based Enum instances, like @Int64@ or a custom @toEnum/fromEnum@. 
+assumes the enumeration's numbering is contiguous, e.g. if @fromEnum 0@ and @fromEnum 2@ 
+both exist, then @fromEnum 1@ should exist too. 
 
 -}
 boundedCardinality :: forall proxy a. (Bounded a, Enum a) => proxy a -> Natural 
@@ -285,6 +289,23 @@ the enum should still be bounded.
 -}
 enumEnumerated :: (Enum a) => [a]
 enumEnumerated = enumFrom (toEnum 0)
+
+{- | for non-'Generic' Bounded Indexed ('Ix') types: 
+
+@
+instance Enumerable _ where
+ 'enumerated' = indexedEnumerated
+ 'cardinality' = 'indexedCardinality'
+@
+
+-}
+indexedEnumerated :: (Bounded a, Ix a) => [a]
+indexedEnumerated = range (minBound,maxBound)
+
+{- | for non-'Generic' Bounded Indexed ('Ix') types. 
+-} 
+indexedCardinality :: forall proxy a. (Bounded a, Ix a) => proxy a -> Natural 
+indexedCardinality _ = int2natural (rangeSize (minBound,maxBound::a))
 
 {-| the power set of a set of values. 
 
