@@ -6,7 +6,11 @@ see "Data.Enumerate.Example" for examples.
 can also help automatically derive <https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html @QuickCheck@> instances: 
 
 @
-data T = C0 | C1 () Bool SmallNatural SmallString | ...  
+newtype SmallNatural = ...   
+instance Enumerable SmallNatural where ...   
+newtype SmallString = ...   
+instance Enumerable SmallString where  ...   
+data T = C0 | C1 () Bool SmallNatural SmallString | C2 ...  
 instance Arbitrary T where arbitrary = elements 'enumerated' 
 @
 
@@ -28,13 +32,6 @@ related packages:
 
 * https://hackage.haskell.org/package/quickcheck quickcheck> too heavyweight (testing framework, randomness unnecessary).
 
-@
--- (for doctest) 
->>> import qualified Data.List as List 
->>> import qualified Data.Ord as Ord
->>> let powerset2matrix = (List.sortBy (Ord.comparing length) . fmap Set.toList . Set.toList)
-@
-
 -}
 
 module Data.Enumerate.Types where
@@ -53,6 +50,9 @@ import Data.Set (Set)
 import System.Timeout
 import Control.DeepSeq (NFData,force)
 import GHC.TypeLits
+import Numeric.Natural
+import qualified Data.List as List 
+import qualified Data.Ord as Ord
 
 
 {- | enumerate the set of all values in a (finitely enumerable) type. enumerates depth first. 
@@ -99,18 +99,18 @@ class Enumerable a where
  default enumerated :: (Generic a, GEnumerable (Rep a)) => [a]
  enumerated = to <$> genumerated
 
- cardinality :: proxy a -> Integer
+ cardinality :: proxy a -> Natural
  cardinality _ = genericLength (enumerated :: [a]) 
  -- overrideable for performance, but don't lie!
 
- -- default cardinality :: (Generic a, GEnumerable (Rep a)) => proxy a -> Integer
+ -- default cardinality :: (Generic a, GEnumerable (Rep a)) => proxy a -> Natural
  -- cardinality _ = gcardinality (Proxy :: Proxy (Rep a))
  -- TODO merge both methods into one that returns their pair
 
 -- | "Generic Enumerable", lifted to unary type constructors.
 class GEnumerable f where
  genumerated :: [f x]
- gcardinality :: proxy f -> Integer
+ gcardinality :: proxy f -> Natural
 
 -- | empty list 
 instance GEnumerable (V1) where
@@ -244,7 +244,7 @@ instance (Enumerable a, Ord a) => Enumerable (Set a) where
 -- | (from the @modular-arithmetic@ package)
 instance (Integral i, Num i, KnownNat n) => Enumerable (Mod i n) where
  enumerated    = toMod <$> [0 .. fromInteger (natVal (Proxy :: Proxy n) - 1)]
- cardinality _ = natVal (Proxy :: Proxy n)
+ cardinality _ = fromInteger (natVal (Proxy :: Proxy n))
 
 {- | for non-'Generic' Bounded Enums:
 
@@ -258,14 +258,20 @@ instance Enumerable _ where
 boundedEnumerated :: (Bounded a, Enum a) => [a]
 boundedEnumerated = enumFromTo minBound maxBound
 
-{-| behavior may be undefined when the cardinality of @a@ is larger than the cardinality of @Int@; @Int@ is at least as big as, which is at least as big as all the monomorphic types in @base@ that instantiate @Bounded@; you can check with:
+{-| for non-'Generic' Bounded Enums. 
 
->>> boundedCardinality [0::Int]  -- platform specific
-18446744073709551615
+behavior may be undefined when the cardinality of @a@ is larger than the cardinality of @Int@. this should be okay, as @Int@ is at least as big as @Int64@, which is at least as big as all the monomorphic types in @base@ that instantiate @Bounded@. you can double-check with:
+
+>>> boundedCardinality (const(undefined::Int))   -- platform specific
+18446744073709551616
+
+@-- i.e. 1 + 9223372036854775807 - -9223372036854775808@
+
+works with non-zero-based Enum instances, like @Int64@ or a custom @toEnum/fromEnum@. 
 
 -}
-boundedCardinality :: forall proxy a. (Bounded a, Enum a) => proxy a -> Integer 
-boundedCardinality _ = toInteger (fromEnum (maxBound::a)) - toInteger (fromEnum (minBound::a))
+boundedCardinality :: forall proxy a. (Bounded a, Enum a) => proxy a -> Natural 
+boundedCardinality _ = fromInteger (1 + (toInteger (fromEnum (maxBound::a))) - (toInteger (fromEnum (minBound::a))))
 
 {- | for non-'Generic' Enums:
 
@@ -308,10 +314,10 @@ dropEach values = Set.map dropOne values
 {-| enumerate only when the cardinality is small enough. 
 returns the cardinality when too large. 
 
->>> enumerateBelow 2 :: Either Integer [Bool] 
+>>> enumerateBelow 2 :: Either Natural [Bool] 
 Left 2
 
->>> enumerateBelow 100 :: Either Integer [Bool] 
+>>> enumerateBelow 100 :: Either Natural [Bool] 
 Right [False,True]
 
 useful when you've established that traversing a list below some length
@@ -319,7 +325,7 @@ and consuming its values is reasonable for your application.
 e.g. after benchmarking, you think you can process a billion entries within a minute. 
 
 -}
-enumerateBelow :: forall a. (Enumerable a) => Integer -> Either Integer [a] 
+enumerateBelow :: forall a. (Enumerable a) => Natural -> Either Natural [a] 
 enumerateBelow maxSize = if theSize < maxSize then Right enumerated else Left theSize 
  where 
  theSize = cardinality (Proxy :: Proxy a)
@@ -333,4 +339,12 @@ Just [False,True]
 -}
 enumerateTimeout :: (Enumerable a, NFData a) => Int -> IO (Maybe [a])
 enumerateTimeout maxDuration = timeout maxDuration (return$ force enumerated)
+
+{-| convert a power set to an isomorphic matrix, sorting the entries. 
+
+(for doctest) 
+
+-}
+powerset2matrix :: Set (Set a) -> [[a]] 
+powerset2matrix = (List.sortBy (Ord.comparing length) . fmap Set.toList . Set.toList)
 
