@@ -14,9 +14,18 @@ let uppercasePartial :: (MonadThrow m) => Char -> m Char
      _   -> failed "uppercasePartial"
 :}
 
+a (safely-)partial function is isomorphic with a @Map@: 
+
+@
+'fromFunctionM' . 'toFunctionM' = 'id' 
+'toFunctionM' . 'fromFunctionM' = 'id'
+@
+
+modulo the error thrown. 
 
 -}
 module Data.Enumerate.Map where
+import Data.Enumerate.Extra 
 import Data.Enumerate.Types
 import Data.Enumerate.Reify 
 
@@ -30,7 +39,7 @@ import           Data.Map (Map)
 import qualified Data.Set as Set
 import           Data.Set (Set)
 import           Data.Maybe (fromJust, mapMaybe, listToMaybe) 
-
+import           Control.Exception(PatternMatchFail(..)) 
 
 {- | convert a total function to a map. 
 
@@ -45,6 +54,8 @@ fromFunction f = fromFunctionM (return.f)
 {-# INLINABLE fromFunction #-}
 
 {- | convert a (safely-)partial function to a map. 
+
+wraps 'reifyFunctionM'.  
 
 -}
 fromFunctionM :: (Enumerable a, Ord a) => (forall m. MonadThrow m => a -> m b) -> Map a b
@@ -64,6 +75,25 @@ toFunction :: (Enumerable a, Ord a) => Map a b -> Maybe (a -> b)
 toFunction m = if isMapTotal m then Just f else Nothing 
  where f = unsafeToFunction m -- the fromJust is safe when the map is total 
 {-# INLINABLE toFunction #-}
+
+{- | convert a (safely-)partial function to a map. 
+
+lookup failures are 'throwM'n as a 'PatternMatchFail'. 
+
+@
+>>> let idPartial = toFunctionM (Map.fromList [(True,True)])
+>>> idPartial True
+True
+>>> idPartial False 
+*** Exception: toFunctionM
+@
+
+-} 
+toFunctionM :: (Enumerable a, Ord a) => Map a b -> (forall m. MonadThrow m => a -> m b)
+toFunctionM m = f 
+ where
+ f x = maybe (throwM (PatternMatchFail "toFunctionM")) return (Map.lookup x m)
+{-# INLINABLE toFunctionM #-}
 
 {-| wraps 'Map.lookup' 
 
