@@ -1,4 +1,4 @@
-{-# LANGUAGE TupleSections, ScopedTypeVariables, TemplateHaskell #-}
+{-# LANGUAGE TupleSections, ScopedTypeVariables #-}
 {-| orphan instances, of 'Enumerate'/'Eq'/'Show', for functions. 
 
 (that are included for completeness, but not exported by default (i.e. by "Data.Enumerate"). 
@@ -76,7 +76,7 @@ unsafeFromList [(False,unsafeFromList [(False,False),(True,False)]),(True,unsafe
 
 -}
 instance (Enumerable a, Show a, Show b) => Show (a -> b) where
- showsPrec = showsPrecWith 'unsafeFromList reifyFunction
+ showsPrec = showsPrecWith "unsafeFromList" reifyFunction
 
 
 {-| wraps 'Map.lookup' 

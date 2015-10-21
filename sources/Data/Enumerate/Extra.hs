@@ -8,7 +8,7 @@ import Control.Arrow ((&&&), (>>>))
 import System.IO.Unsafe (unsafePerformIO) 
 import Control.Exception (catches, throwIO, Handler(..), AsyncException, ArithException, ArrayException, ErrorCall, PatternMatchFail)
 import Data.Foldable  (traverse_)
-import Language.Haskell.TH.Syntax (Name,nameBase)
+-- import Language.Haskell.TH.Syntax (Name,nameBase)
 
 
 {-| @failed = 'throwM' . 'userError'@
@@ -79,7 +79,11 @@ helper for declaring Show instances of datatypes without visible constructors (l
 which is shown as an list).
 
 -}
-showsPrecWith :: (Show a, Show b) => Name -> (a -> b) -> Int -> a -> ShowS
-showsPrecWith nameFrom functionInto p x = showParen (p > 10) $
-  showString (nameBase nameFrom) . showString " " . shows (functionInto x)
 
+showsPrecWith :: (Show a, Show b) => String -> (a -> b) -> Int -> a -> ShowS
+showsPrecWith stringFrom functionInto p x = showParen (p > 10) $
+  showString stringFrom . showString " " . shows (functionInto x)
+
+-- showsPrecWith :: (Show a, Show b) => Name -> (a -> b) -> Int -> a -> ShowS
+-- showsPrecWith nameFrom functionInto p x = showParen (p > 10) $
+--   showString (nameBase nameFrom) . showString " " . shows (functionInto x)
