@@ -82,7 +82,7 @@ if your function doesn't fail under 'MonadThrow', see:
 * 'reifyFunctionAtEither'
 
 -}
-reifyFunctionAtM :: [a] -> (forall m. MonadThrow m => a -> m b) -> [(a,b)]
+reifyFunctionAtM :: [a] -> (Partial a b) -> [(a,b)]
 -- reifyFunctionAtM :: (MonadThrow m) => [a] -> (a -> m b) -> m (Map a b)
 reifyFunctionAtM domain f 
  = concatMap (bitraverse pure id)

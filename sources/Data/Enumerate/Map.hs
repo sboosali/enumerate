@@ -6,7 +6,7 @@
 >>> :set +m
 >>> :set -XLambdaCase 
 >>> :{
-let uppercasePartial :: (MonadThrow m) => Char -> m Char 
+let uppercasePartial :: (MonadThrow m) => Char -> m Char  -- Partial Char Char 
     uppercasePartial = \case
      'a' -> return 'A'
      'b' -> return 'B'
@@ -58,7 +58,7 @@ fromFunction f = fromFunctionM (return.f)
 wraps 'reifyFunctionM'.  
 
 -}
-fromFunctionM :: (Enumerable a, Ord a) => (forall m. MonadThrow m => a -> m b) -> Map a b
+fromFunctionM :: (Enumerable a, Ord a) => (Partial a b) -> Map a b
 fromFunctionM f = Map.fromList (reifyFunctionM f)
 {-# INLINABLE fromFunctionM #-}
 
@@ -89,7 +89,7 @@ True
 @
 
 -} 
-toFunctionM :: (Enumerable a, Ord a) => Map a b -> (forall m. MonadThrow m => a -> m b)
+toFunctionM :: (Enumerable a, Ord a) => Map a b -> (Partial a b)
 toFunctionM m = f 
  where
  f x = maybe (throwM (PatternMatchFail "toFunctionM")) return (Map.lookup x m)
@@ -132,7 +132,7 @@ let myNotM :: Monad m => Bool -> m Bool
 True
 
 -}
-isTotalM :: (Enumerable a, Ord a) => (forall m. MonadThrow m => a -> m b) -> Maybe (a -> b) 
+isTotalM :: (Enumerable a, Ord a) => (Partial a b) -> Maybe (a -> b) 
 isTotalM f = (toFunction) (fromFunctionM f)
 
 {-| the <https://en.wikipedia.org/wiki/Partial_function#Basic_concepts domain> of a partial function 
@@ -144,7 +144,7 @@ i.e. when @x \`member\` (domainM f)@ then @fromJust (f x)@ is defined.
 ['a','b','z'] 
 
 -}
-domainM :: (Enumerable a) => (forall m. MonadThrow m => a -> m b) -> [a] 
+domainM :: (Enumerable a) => (Partial a b) -> [a] 
 domainM f = foldMap go enumerated
  where
  go a = case f a of 
@@ -164,7 +164,7 @@ corange _ = enumerated
 @corangeM _ = enumerated@ 
 
 -}
-corangeM :: (Enumerable a) => (forall m. MonadThrow m => a -> m b) -> [a] 
+corangeM :: (Enumerable a) => (Partial a b) -> [a] 
 corangeM _ = enumerated 
 
 {-| the image of a total function. 
@@ -184,7 +184,7 @@ image f = map f enumerated
 includes duplicates.  
 
 -}
-imageM :: (Enumerable a) => (forall m. MonadThrow m => a -> m b) -> [b] 
+imageM :: (Enumerable a) => (Partial a b) -> [b] 
 imageM f = mapMaybe f enumerated
 
 {-| the codomain of a function. it contains the 'image'. 
@@ -195,7 +195,7 @@ imageM f = mapMaybe f enumerated
 codomain :: (Enumerable b) => (a -> b) -> [b]  
 codomain _ = enumerated 
 
-codomainM :: (Enumerable b) => (forall m. MonadThrow m => a -> m b) -> [b] 
+codomainM :: (Enumerable b) => (Partial a b) -> [b] 
 codomainM _ = enumerated 
 
 {-| invert a total function.
@@ -226,7 +226,7 @@ a @Map@ is stored internally, with as many keys as the 'image' of @f@.
 see also 'isBijectiveM'.
 
 -}
-invertM :: (Enumerable a, Ord a, Ord b) => (forall m. MonadThrow m => a -> m b) -> (b -> [a])
+invertM :: (Enumerable a, Ord a, Ord b) => (Partial a b) -> (b -> [a])
 invertM f = g
  where
  g b = maybe [] NonEmpty.toList (Map.lookup b m)
@@ -235,7 +235,7 @@ invertM f = g
 {-| 
 
 -}
-getJectivityM :: (Enumerable a, Enumerable b, Ord a, Ord b) => (forall m. MonadThrow m => a -> m b) -> Maybe Jectivity 
+getJectivityM :: (Enumerable a, Enumerable b, Ord a, Ord b) => (Partial a b) -> Maybe Jectivity 
 getJectivityM f
  = case isBijectiveM f of       -- TODO pick the right Monoid, whose append picks the first non-nothing 
     Just{}  -> Just Bijective
@@ -253,7 +253,7 @@ refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> Maybe a)@.
 unlike 'isBijectiveM', doesn't need an @(Enumerable b)@ constraint. this helps when you want to ensure a function into an infinite type (e.g. 'show') is injective. and still reasonably efficient, given the @(Ord b)@ constraint. 
 
 -}
-isInjectiveM :: (Enumerable a, Ord a, Ord b) => (forall m. MonadThrow m => a -> m b) -> Maybe (b -> Maybe a)
+isInjectiveM :: (Enumerable a, Ord a, Ord b) => (Partial a b) -> Maybe (b -> Maybe a)
 isInjectiveM f = do             -- TODO make it "correct by construction", rather than explicit validation 
  _bs <- isUnique (imageM f)   -- Map.fromListWith (<>) [(b, a:|[]) | (a, b) <- Map.toList m]
  return g 
@@ -277,7 +277,7 @@ refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> NonEmpty a)@.
 can short-circuit. 
 
 -}
-isSurjectiveM :: (Enumerable a, Enumerable b, Ord a, Ord b) => (forall m. MonadThrow m => a -> m b) -> Maybe (b -> NonEmpty a)
+isSurjectiveM :: (Enumerable a, Enumerable b, Ord a, Ord b) => (Partial a b) -> Maybe (b -> NonEmpty a)
 isSurjectiveM f =  -- TODO make it "correct by construction", rather than explicit validation 
  if (Set.fromList (codomainM f)) `Set.isSubsetOf` (Set.fromList (imageM f))  -- the reverse always holds, no need to check  
  then Just g
@@ -292,7 +292,7 @@ refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> a)@.
 can short-circuit. 
 
 -}
-isBijectiveM :: (Enumerable a, Enumerable b, Ord a, Ord b) => (forall m. MonadThrow m => a -> m b) -> Maybe (b -> a)
+isBijectiveM :: (Enumerable a, Enumerable b, Ord a, Ord b) => (Partial a b) -> Maybe (b -> a)
 isBijectiveM f = do 
  fIn    <- isInjectiveM f
  _fSur  <- isSurjectiveM f --   TODO avoid re-computing invertM. isInjectiveWithM isSurjectiveWithM

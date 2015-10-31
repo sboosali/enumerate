@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables, DefaultSignatures, TypeOperators, FlexibleInstances, FlexibleContexts, LambdaCase #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables, DefaultSignatures, TypeOperators, FlexibleInstances, FlexibleContexts, LambdaCase #-}
 {- | see the 'Enumerable' class for documentation.  
 
 see "Data.Enumerate.Example" for examples. 
@@ -38,6 +38,7 @@ module Data.Enumerate.Types where
 import Data.Enumerate.Extra 
 
 import Data.Modular
+import Control.Monad.Catch (MonadThrow(..))
 
 import           GHC.Generics
 import           Data.Proxy
@@ -52,8 +53,6 @@ import System.Timeout
 import Control.DeepSeq (NFData,force)
 import GHC.TypeLits
 import Numeric.Natural
-import qualified Data.List as List 
-import qualified Data.Ord as Ord
 import Data.Ix
 
 
@@ -109,6 +108,15 @@ class Enumerable a where
  -- cardinality _ = gcardinality (Proxy :: Proxy (Rep a))
  -- TODO merge both methods into one that returns their pair
 
+{-| a (safely-)partial function. i.e. a function that:
+
+* fails only via the 'throwM' method of 'MonadThrow' 
+* succeeds only via the 'return' method of 'Monad' 
+
+
+-}
+type Partial a b = (forall m. MonadThrow m => a -> m b)
+
 -- | "Generic Enumerable", lifted to unary type constructors.
 class GEnumerable f where
  genumerated :: [f x]
@@ -126,8 +134,10 @@ instance GEnumerable (U1) where
  gcardinality _ = 1
  {-# INLINE gcardinality #-}
 
--- | call 'enumerated'
-instance (Enumerable a) => GEnumerable (K1 i a) where
+{-| call 'enumerated' 
+
+-}
+instance (Enumerable a) => GEnumerable (K1 R a) where
  genumerated    = K1 <$> enumerated
  gcardinality _ = cardinality (Proxy :: Proxy a)
  {-# INLINE gcardinality #-}
@@ -144,13 +154,25 @@ instance (GEnumerable (f), GEnumerable (g)) => GEnumerable (f :+: g) where
  gcardinality _ = gcardinality (Proxy :: Proxy (f)) + gcardinality (Proxy :: Proxy (g))
  {-# INLINE gcardinality #-}
 
--- | ignore metadata
-instance (GEnumerable (f)) => GEnumerable (M1 i t f) where
+-- | ignore selector metadata
+instance (GEnumerable (f)) => GEnumerable (M1 S t f) where
  genumerated    = M1 <$> genumerated
  gcardinality _ = gcardinality (Proxy :: Proxy (f))
  {-# INLINE gcardinality #-}
 
-{-| see "Data.Enumerate.Reify.getJectivity" 
+-- | ignore constructor metadata
+instance (GEnumerable (f)) => GEnumerable (M1 C t f) where
+ genumerated    = M1 <$> genumerated
+ gcardinality _ = gcardinality (Proxy :: Proxy (f))
+ {-# INLINE gcardinality #-}
+
+-- | ignore datatype metadata
+instance (GEnumerable (f)) => GEnumerable (M1 D t f) where
+ genumerated    = M1 <$> genumerated
+ gcardinality _ = gcardinality (Proxy :: Proxy (f))
+ {-# INLINE gcardinality #-}
+
+{-| see "Data.Enumerate.Reify.getJectivityM"
 
 -}
 data Jectivity = Injective | Surjective | Bijective deriving (Show,Read,Eq,Ord,Enum,Bounded)
@@ -307,31 +329,6 @@ indexedEnumerated = range (minBound,maxBound)
 indexedCardinality :: forall proxy a. (Bounded a, Ix a) => proxy a -> Natural 
 indexedCardinality _ = int2natural (rangeSize (minBound,maxBound::a))
 
-{-| the power set of a set of values. 
-
->>> (powerset2matrix . powerSet . Set.fromList) [1..3]
-[[],[1],[2],[3],[1,2],[1,3],[2,3],[1,2,3]]
-
--}
-powerSet :: (Ord a) => Set a -> Set (Set a) 
-powerSet values = Set.singleton values `Set.union` _Set_bind powerSet (dropEach values) 
- where 
- _Set_bind :: (Ord a, Ord b) => (a -> Set b) -> Set a -> Set b 
- _Set_bind f = _Set_join . Set.map f 
- _Set_join :: (Ord a) => Set (Set a) -> Set a
- _Set_join = Set.unions . Set.toList 
-
--- TODO do notation? powerList :: [a] -> [[a]] 
-
-{-| >>> (powerset2matrix . dropEach . Set.fromList) [1..3]
-[[1,2],[1,3],[2,3]]
-
--}
-dropEach :: (Ord a) => Set a -> Set (Set a) 
-dropEach values = Set.map dropOne values 
- where
- dropOne value = Set.delete value values 
-
 {-| enumerate only when the cardinality is small enough. 
 returns the cardinality when too large. 
 
@@ -360,12 +357,4 @@ Just [False,True]
 -}
 enumerateTimeout :: (Enumerable a, NFData a) => Int -> IO (Maybe [a])
 enumerateTimeout maxDuration = timeout maxDuration (return$ force enumerated)
-
-{-| convert a power set to an isomorphic matrix, sorting the entries. 
-
-(for doctest) 
-
--}
-powerset2matrix :: Set (Set a) -> [[a]] 
-powerset2matrix = (List.sortBy (Ord.comparing length) . fmap Set.toList . Set.toList)
 

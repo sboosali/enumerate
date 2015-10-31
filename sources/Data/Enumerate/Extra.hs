@@ -1,4 +1,7 @@
 {-# LANGUAGE RankNTypes, LambdaCase, ScopedTypeVariables #-}
+{-| 
+
+-}
 module Data.Enumerate.Extra where
 
 import Control.Monad.Catch (MonadThrow(..), SomeException(..))
@@ -10,6 +13,10 @@ import System.IO.Unsafe (unsafePerformIO)
 import Control.Exception (catches, throwIO, Handler(..), AsyncException, ArithException, ArrayException, ErrorCall, PatternMatchFail)
 import Data.Foldable  (traverse_)
 import Numeric.Natural 
+import qualified Data.Set as Set
+import Data.Set (Set) 
+import qualified Data.List as List 
+import qualified Data.Ord as Ord
 
 
 {-| @failed = 'throwM' . 'userError'@
@@ -91,4 +98,35 @@ showsPrecWith stringFrom functionInto p x = showParen (p > 10) $
 
 int2natural :: Int -> Natural 
 int2natural = fromInteger . toInteger
+
+{-| the power set of a set of values. 
+
+>>> (powerset2matrix . powerSet . Set.fromList) [1..3]
+[[],[1],[2],[3],[1,2],[1,3],[2,3],[1,2,3]]
+
+-}
+powerSet :: (Ord a) => Set a -> Set (Set a) 
+powerSet values = Set.singleton values `Set.union` _Set_bind powerSet (dropEach values) 
+ where 
+ _Set_bind :: (Ord a, Ord b) => (a -> Set b) -> Set a -> Set b 
+ _Set_bind f = _Set_join . Set.map f 
+ _Set_join :: (Ord a) => Set (Set a) -> Set a
+ _Set_join = Set.unions . Set.toList 
+
+{-| >>> (powerset2matrix . dropEach . Set.fromList) [1..3]
+[[1,2],[1,3],[2,3]]
+
+-}
+dropEach :: (Ord a) => Set a -> Set (Set a) 
+dropEach values = Set.map dropOne values 
+ where
+ dropOne value = Set.delete value values 
+
+{-| convert a power set to an isomorphic matrix, sorting the entries. 
+
+(for doctest) 
+
+-}
+powerset2matrix :: Set (Set a) -> [[a]] 
+powerset2matrix = (List.sortBy (Ord.comparing length) . fmap Set.toList . Set.toList)
 

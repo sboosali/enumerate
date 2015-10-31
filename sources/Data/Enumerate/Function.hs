@@ -1,4 +1,5 @@
 {-# LANGUAGE TupleSections, ScopedTypeVariables #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-| orphan instances, of 'Enumerate'/'Eq'/'Show', for functions. 
 
 (that are included for completeness, but not exported by default (i.e. by "Data.Enumerate"). 
@@ -188,7 +189,7 @@ is equivalent to the function:
 
 
 -}
-mappingEnumeratedAt :: [a] -> [b] -> [[(a,b)]] 
+mappingEnumeratedAt :: [a] -> [b] -> [[(a,b)]]           -- TODO diagonalize? performance? 
 mappingEnumeratedAt as bs = go (crossProduct as bs)
  where
  go [] = [] 
