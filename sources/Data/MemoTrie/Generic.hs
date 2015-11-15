@@ -42,6 +42,12 @@ instance (HasTrie (f x), HasTrie (g x)) => HasTrie ((f :+: g) x) where
   as `weave` [] = as
   (a:as) `weave` bs = a : (bs `weave` as)
 
+instance (HasTrie (f x), HasTrie (g x)) => HasTrie ((f :*: g) x) where
+ newtype ((f :*: g) x :->: b) = PairTrie1 ((f x, g x) :->: b)
+ trie f = PairTrie1 (trie (f . liftProduct))
+ untrie (PairTrie1 t) = (untrie t) . dropProduct 
+ enumerate (PairTrie1 t) = _enumerateWith liftProduct t
+
 instance (HasTrie a) => HasTrie (K1 i a x) where
  data (K1 i a x :->: b) = K1Trie (a :->: b) 
  trie f = K1Trie (trie (f . K1)) 
@@ -80,6 +86,20 @@ enumerateGeneric theDestructor t = _enumerateWith to (theDestructor t)
 
 _enumerateWith :: (HasTrie a) => (a -> a') -> (a :->: b) -> [(a', b)]
 _enumerateWith f = (fmap.first) f . enumerate
+
+dropProduct :: (f :*: g) a -> (f a, g a) 
+dropProduct (a :*: b) = (a, b)
+
+liftProduct :: (f a, g a) -> (f :*: g) a 
+liftProduct (a, b) = (a :*: b)
+
+dropSum :: (f :+: g) a -> Either (f a) (g a) 
+dropSum = \case
+ L1 x -> Left x 
+ R1 x -> Right x 
+
+liftSum :: Either (f a) (g a) -> (f :+: g) a 
+liftSum = either L1 R1
 
 
 data MyContext
