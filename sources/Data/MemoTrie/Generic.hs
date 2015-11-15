@@ -28,19 +28,10 @@ instance HasTrie (U1 x) where
  enumerate (U1Trie b) = [(U1, b)] 
 
 instance (HasTrie (f x), HasTrie (g x)) => HasTrie ((f :+: g) x) where
- data ((f :+: g) x :->: b) = SumTrie (f x :->: b) (g x :->: b)
- trie f = SumTrie (trie (f . L1)) (trie (f . R1))
- untrie (SumTrie tl tr) = \case
-  L1 a -> (untrie tl) a 
-  R1 a -> (untrie tr) a 
-
- enumerate (SumTrie tl tr) = _enumerateWith L1 tl `weave` _enumerateWith R1 tr
-  where 
-
-  weave :: [a] -> [a] -> [a]
-  [] `weave` as = as
-  as `weave` [] = as
-  (a:as) `weave` bs = a : (bs `weave` as)
+ newtype ((f :+: g) x :->: b) = EitherTrie1 (Either (f x) (g x) :->: b)
+ trie f = EitherTrie1 (trie (f . liftSum))
+ untrie (EitherTrie1 t) = (untrie t) . dropSum
+ enumerate (EitherTrie1 t) = _enumerateWith liftSum t
 
 instance (HasTrie (f x), HasTrie (g x)) => HasTrie ((f :*: g) x) where
  newtype ((f :*: g) x :->: b) = PairTrie1 ((f x, g x) :->: b)
@@ -51,15 +42,13 @@ instance (HasTrie (f x), HasTrie (g x)) => HasTrie ((f :*: g) x) where
 instance (HasTrie a) => HasTrie (K1 i a x) where
  data (K1 i a x :->: b) = K1Trie (a :->: b) 
  trie f = K1Trie (trie (f . K1)) 
- untrie (K1Trie t) = \case
-  K1 a -> (untrie t) a 
+ untrie (K1Trie t) = \(K1 a) -> (untrie t) a 
  enumerate (K1Trie t) = _enumerateWith K1 t 
 
 instance (HasTrie (f x)) => HasTrie (M1 i t f x) where
  data (M1 i t f x :->: b) = M1Trie (f x :->: b) 
  trie f = M1Trie (trie (f . M1)) 
- untrie (M1Trie t) = \case
-  M1 a -> (untrie t) a  
+ untrie (M1Trie t) = \(M1 a) -> (untrie t) a  
  enumerate (M1Trie t) = _enumerateWith M1 t 
 
 
