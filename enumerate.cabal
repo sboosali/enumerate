@@ -30,6 +30,8 @@ library
   Data.Enumerate.Function
   -- Data.CoRec
   -- Data.CoRec.MemoTrie
+  Data.TEnumerate
+  Data.MemoTrie.Generic 
 
  build-depends:    
      base >=4.8 && <4.9
