@@ -1,6 +1,6 @@
 {-# LANGUAGE TupleSections #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-| orphan instances, of 'Enumerate', for large types (i.e. @Word32@ / @Word64@ / @Int32@ / @Int64@).
+{-| orphan instances, of 'Enumerate', for large types (i.e. 'Word32' \/ 'Word64' \/ 'Int32' \/ 'Int64').
 
 (that are included for completeness, but not exported by default (i.e. by "Data.Enumerate"). 
 you probably want build-time instance-resolution errors rather than probable runtime non-termination). 

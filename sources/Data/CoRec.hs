@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE BangPatterns,
              ConstraintKinds,
              DataKinds,
@@ -12,6 +13,10 @@
              UndecidableInstances #-}
 {-| 
 
+@-- doctest header@
+
+>>> :set -XFlexibleContexts
+
 -}
 module Data.CoRec where 
 
@@ -23,6 +28,7 @@ import Data.Vinyl.Lens (rget)
 import Data.Maybe(fromJust)
 import Data.Proxy
 -- import GHC.Prim (Constraint)
+import Data.Void 
 
 
 -- | Generalize algebraic sum types.
@@ -171,4 +177,51 @@ truthyFull' = match truthyMatchers (column "full")
 truthyTrue' = match truthyMatchers (column True)
 
 -} 
+
+{-| 
+
+-}
+oneOfNone :: OneOf '[] -> Void 
+oneOfNone = match RNil
+
+{-| 
+
+>>> oneOfOne (column "a") :: String 
+"a" 
+
+@
+-- >>> oneOfOne (column "a") 
+-- ambiguity error
+
+-- >>> oneOfOne (column 0) :: Integer 
+-- ambiguity error 
+@
+
+-}
+oneOfOne :: OneOf '[a] -> a 
+oneOfOne = match 
+ (  (O id) 
+ :& RNil) 
+
+{-| 
+
+>>> oneOfTwo (column "a") :: Either String Integer 
+Left "a" 
+
+>>> oneOfTwo (column (2::Integer)) :: Either String Integer 
+Right 2 
+
+>>> [oneOfTwo (column "a"), oneOfTwo (column True)] :: [Either String Bool] 
+[Left "a",Right True]
+
+>>> [oneOfTwo (column "a"), oneOfTwo (column "b" )] :: [Either String String] 
+[Left "a",Left "b"]
+-- picks the first (leftmost) String in the type list 
+
+-}
+oneOfTwo :: OneOf '[a, b] -> Either a b 
+oneOfTwo = match 
+ (  (O Left) 
+ :& (O Right) 
+ :& RNil) 
 

@@ -1,6 +1,6 @@
 {-# LANGUAGE TupleSections, ScopedTypeVariables #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-| orphan instances, of 'Enumerate'/'Eq'/'Show', for functions. 
+{-| orphan instances, of 'Enumerate'\/'Eq'\/'Show', for functions. 
 
 (that are included for completeness, but not exported by default (i.e. by "Data.Enumerate"). 
 you probably want build-time instance-resolution errors rather than possible runtime non-termination). 
@@ -35,7 +35,10 @@ the 'cardinality' call is efficient (depending on the efficiency of the base typ
 you should be able to safely (WRT performance) call 'enumerateBelow', 
 unless the arithmetic itself becomes too expensive. 
 
-@enumerated = 'functionEnumerated'@ 
+@
+instance ('Enumerable' a, Enumerable b, 'Ord' a, Ord b) => Enumerable (a -> b) where 
+ enumerated = 'functionEnumerated'
+@ 
 
 -}
 instance (Enumerable a, Enumerable b, Ord a, Ord b) => Enumerable (a -> b) where 
@@ -93,6 +96,7 @@ unsafeFromList :: (Ord a) => [(a,b)] -> (a -> b)
 unsafeFromList l = unsafeToFunction (Map.fromList l) 
 {-# INLINABLE unsafeFromList #-}
 
+{-| see 'mappingEnumeratedAt' -}
 functionEnumerated :: (Enumerable a, Enumerable b, Ord a, Ord b) => [a -> b]
 functionEnumerated = functions 
  where
@@ -138,6 +142,7 @@ functionEnumerated = functions
 (LT,True)
 (EQ,True)
 (GT,True)
+<BLANKLINE>
 (LT,False)
 (EQ,False)
 (GT,False)

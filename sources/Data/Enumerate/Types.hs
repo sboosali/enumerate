@@ -1,9 +1,9 @@
-{-# LANGUAGE RankNTypes, ScopedTypeVariables, DefaultSignatures, TypeOperators, FlexibleInstances, FlexibleContexts, LambdaCase #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables, DefaultSignatures, TypeOperators, FlexibleInstances, FlexibleContexts, LambdaCase, DataKinds  #-}
 {- | see the 'Enumerable' class for documentation.  
 
 see "Data.Enumerate.Example" for examples. 
 
-can also help automatically derive <https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html @QuickCheck@> instances: 
+can also help automatically derive @<https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html QuickCheck>@ instances: 
 
 @
 newtype SmallNatural = ...   
@@ -18,6 +18,15 @@ instance Arbitrary T where arbitrary = elements 'enumerated'
 background on @Generics@: 
 
 * <https://hackage.haskell.org/package/base-4.8.1.0/docs/GHC-Generics.html GHC.Generics>
+
+
+also provides instances for:
+
+* sets 
+
+* modular integers 
+
+* vinyl records 
 
 
 related packages:
@@ -38,6 +47,7 @@ module Data.Enumerate.Types where
 import Data.Enumerate.Extra 
 
 import Data.Modular
+import Data.Vinyl (Rec(..))
 import Control.Monad.Catch (MonadThrow(..))
 
 import           GHC.Generics
@@ -250,6 +260,16 @@ instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d) => Enumerable 
 instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e) => Enumerable (a, b, c, d, e)
 instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f) => Enumerable (a, b, c, d, e, f)
 instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g) => Enumerable (a, b, c, d, e, f, g)
+
+{-| the cardinality is product of cardinalities. -} 
+instance (Enumerable (f a), Enumerable (Rec f as)) => Enumerable (Rec f (a ': as)) where
+ enumerated =  (:&) <$> enumerated <*> enumerated
+ cardinality _ = cardinality (Proxy :: Proxy (f a)) * cardinality (Proxy :: Proxy (Rec f as))
+
+{-| the cardinality is 1. -} 
+instance Enumerable (Rec f '[]) where
+ enumerated =  [RNil]
+ cardinality _ = 1
 
 {-| 
 

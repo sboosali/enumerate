@@ -44,6 +44,18 @@ either2throw f = f >>> \case
  Left  e -> throwM e
  Right x -> return x 
 
+{-| specialization -}
+throw2maybe :: (forall m. MonadThrow m => a -> m b) -> (a -> Maybe b)
+throw2maybe = id 
+
+{-| specialization -}
+throw2either :: (forall m. MonadThrow m => a -> m b) -> (a -> Either SomeException b)
+throw2either = id 
+
+{-| specialization -}
+throw2list :: (forall m. MonadThrow m => a -> m b) -> (a -> [b])
+throw2list = id 
+
 {-| makes an *unsafely*-partial function (i.e. a function that throws exceptions or that has inexhaustive pattern matching) into a *safely*-partial function (i.e. that explicitly returns in a monad that supports failure).
 
 

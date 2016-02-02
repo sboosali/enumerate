@@ -246,6 +246,9 @@ getJectivityM f
                             Nothing -> Nothing 
 
 
+isInjective :: (Enumerable a, Ord a, Ord b) => (a -> b) -> Maybe (b -> Maybe a)
+isInjective f = isInjectiveM (return.f)
+
 {-| returns the inverse of the injection, if injective.
 
 refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> Maybe a)@. 
@@ -269,6 +272,9 @@ isUnique l = if length l == length s then Nothing else Just s -- TODO make effic
  where
  s = Set.fromList l
 
+isSurjective :: (Enumerable a, Enumerable b, Ord a, Ord b) => (a -> b) -> Maybe (b -> NonEmpty a)
+isSurjective f = isSurjectiveM (return.f)
+
 {-| returns the inverse of the surjection, if surjective. 
 i.e. when a function's 'codomainM' equals its 'imageM'. 
 
@@ -284,6 +290,10 @@ isSurjectiveM f =  -- TODO make it "correct by construction", rather than explic
  else Nothing
  where
  g = NonEmpty.fromList . invertM f  -- safe, by validation 
+
+
+isBijective :: (Enumerable a, Enumerable b, Ord a, Ord b) => (a -> b) -> Maybe (b -> a)
+isBijective f = isBijectiveM (return.f) 
 
 {-| returns the inverse of the bijection, if bijective.
 
