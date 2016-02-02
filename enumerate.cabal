@@ -31,14 +31,13 @@ library
   -- Data.CoRec
   -- Data.CoRec.MemoTrie
   Data.TEnumerate
-  Data.MemoTrie.Generic 
 
  build-depends:    
-     base >=4.8 && <4.9
+     base ==4.8.* 
    , containers ==0.5.* 
    , ghc-prim==0.4.*
 
-   , semigroups ==0.16.*
+   , semigroups ==0.18.*
    , exceptions ==0.8.*
    , MemoTrie ==0.6.*
 --   , spoon ==0.3.*
