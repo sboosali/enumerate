@@ -20,6 +20,7 @@ cabal-dev
 cabal.sandbox.config
 cabal.config
 report.html
+.stack-work/
 
 # Emacs
 \#*
@@ -31,4 +32,3 @@ TAGS
 
 # OS X
 .DS_Store
-

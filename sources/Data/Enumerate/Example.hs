@@ -1,37 +1,37 @@
 {-# LANGUAGE LambdaCase, DeriveGeneric, DeriveAnyClass #-}
-module Data.Enumerate.Example where 
-import Data.Enumerate 
+module Data.Enumerate.Example where
+import Data.Enumerate
 
 import           System.Environment             (getArgs)
 import           Data.Void (Void)
-import           GHC.Generics (Generic) 
+import           GHC.Generics (Generic)
 
 
 main = mainWith =<< getArgs
 
 mainWith = \case
- _ -> return() 
+ _ -> traverse print demoEnumerated
 
 
-{- | (for documentation) 
+{- | (for documentation)
 
 demonstrates: empty type, unit type, product type, sum type, type variable.
 
-with @\{\-\# LANGUAGE DeriveGeneric, DeriveAnyClass \#\-\}@, the derivation is a one-liner: 
+with @\{\-\# LANGUAGE DeriveGeneric, DeriveAnyClass \#\-\}@, the derivation is a one-liner:
 
 @
-data DemoEnumerable a = ... deriving (Show,Generic,Enumerable) 
+data DemoEnumerable a = ... deriving (Show,Generic,Enumerable)
 @
 
 -}
 data DemoEnumerable a
  = DemoEnumerable0 Void
  | DemoEnumerable1
- | DemoEnumerable2 Bool (Maybe Bool) 
+ | DemoEnumerable2 Bool (Maybe Bool)
  | DemoEnumerable3 a
- deriving (Show,Generic,Enumerable) 
+ deriving (Show,Generic,Enumerable)
 
-{- | (for documentation) 
+{- | (for documentation)
 
 @demoEnumerated = enumerated@
 
@@ -47,6 +47,5 @@ DemoEnumerable3 False
 DemoEnumerable3 True
 
 -}
-demoEnumerated :: [DemoEnumerable Bool] 
+demoEnumerated :: [DemoEnumerable Bool]
 demoEnumerated = enumerated
-
