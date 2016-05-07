@@ -1,5 +1,8 @@
 {-# LANGUAGE LambdaCase, DeriveGeneric, DeriveAnyClass #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-
+
+-}
 module Data.Enumerate.Example where
 import Data.Enumerate
 import Data.Enumerate.Extra

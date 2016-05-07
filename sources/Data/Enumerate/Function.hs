@@ -54,7 +54,8 @@ True
 >>> (\case LT -> False; EQ -> False; GT -> False) == const True
 False
 
-because functions are curried, the instance is recursive, and it works on functions of any arity:
+because functions are curried, the instance is recursive,
+and it works on functions of any arity:
 
 > -- De Morgan's laws
 >>> (\x y -> not (x && y)) == (\x y -> not x || not y)
@@ -73,7 +74,8 @@ instance (Enumerable a, Eq b) => Eq (a -> b) where
 -- >>> not
 -- unsafeFromList [(False,True),(True,False)]
 
-because functions are curried, the instance is recursive, and it works on functions of any arity:
+because functions are curried, the instance is recursive,
+and it works on functions of any arity:
 
 -- >>> (&&)
 -- unsafeFromList [(False,unsafeFromList [(False,False),(True,False)]),(True,unsafeFromList [(False,False),(True,True)])]
@@ -159,7 +161,6 @@ is equivalent to the function:
  GT -> True
 @
 
-
 -}
 mappingEnumeratedAt :: [a] -> [b] -> [[(a,b)]]           -- TODO diagonalize? performance?
 mappingEnumeratedAt as bs = go (crossProduct as bs)
@@ -187,7 +188,7 @@ mappingEnumeratedAt as bs = go (crossProduct as bs)
 (GT,False)
 (GT,True)
 
-the length of the outer list is the size of the first set and
+the length of the outer list is the size of the first set, and
 the length of the inner list is the size of the second set.
 
 >>> print $ length crossOrderingBoolean

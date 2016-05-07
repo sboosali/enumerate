@@ -65,7 +65,7 @@ fromFunctionM f = Map.fromList (reifyFunctionM f)
 
 {- | convert a map to a function, if the map is total.
 
->>> let Just not_ = toFunction (Map.fromList [(False,True),(True,False)])
+>>> let (Just not_) = toFunction (Map.fromList [(False,True),(True,False)])
 >>> not_ False
 True
 
@@ -125,7 +125,7 @@ let myNotM :: Monad m => Bool -> m Bool
     myNotM False = return True
     myNotM True  = return False
 :}
->>> let Just myNot = isTotalM myNotM
+>>> let (Just myNot) = isTotalM myNotM
 >>> myNot False
 True
 
