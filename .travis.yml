@@ -1,0 +1,5 @@
+# https://docs.travis-ci.com/user/languages/haskell
+
+ghc:
+  - 7.10
+  - 7.8

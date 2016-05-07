@@ -1,2 +1,4 @@
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
-import Data.Enumerate.Example
+import qualified Data.Enumerate.Example
+
+main = Data.Enumerate.Example.main

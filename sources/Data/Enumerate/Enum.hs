@@ -48,7 +48,7 @@ module Data.Enumerate.Enum
 import Data.Enumerate.Types
 
 import Numeric.Natural
-import qualified Data.Array as Array
+import qualified Data.Array as Array --IntMap
 import Data.Array (Array, (!))
 import qualified Data.Map as Map
 import Data.Map (Map)

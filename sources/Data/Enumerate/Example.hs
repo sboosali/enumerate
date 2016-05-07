@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Data.Enumerate.Example where
 import Data.Enumerate
+import Data.Enumerate.Extra
 
 import Data.Array (Array)
 import Data.Map (Map)
@@ -49,7 +50,7 @@ data Demo a
 
 @demoEnumerated = enumerated@
 
->>> traverse print demoEnumerated
+>>> traverse_ print demoEnumerated
 Demo1
 Demo2 False Nothing
 Demo2 False (Just False)

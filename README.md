@@ -9,7 +9,7 @@ provides (1) a typeclass for enumerating all values in a finite type,
 
 ```haskell
     {-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
-    import Data.Enumerable (Enumerable(..))
+    import Data.Enumerate (Enumerable(..))
     import Data.Generics (Generics)
 
     data CrudOp = Add | Edit | Delete | View

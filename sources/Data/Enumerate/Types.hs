@@ -206,15 +206,16 @@ instance Enumerable Ordering
 
 {- |
 
->>> (maxBound::Int8) - (minBound::Int8)
-256
+@-- 'toInteger' prevents overflow@
+>>> toInteger (maxBound::Int8) - toInteger (minBound::Int8)
+255
 
 -}
 instance Enumerable Int8  where enumerated = boundedEnumerated; cardinality = boundedCardinality
 instance Enumerable Word8 where enumerated = boundedEnumerated; cardinality = boundedCardinality
 {- |
 
->>> (maxBound::Int16) - (minBound::Int16)
+>>> toInteger (maxBound::Int16) - toInteger (minBound::Int16)
 65535
 
 -}
@@ -222,13 +223,15 @@ instance Enumerable Int16  where enumerated = boundedEnumerated; cardinality = b
 instance Enumerable Word16 where enumerated = boundedEnumerated; cardinality = boundedCardinality
 {- | there are only a million (1,114,112) characters.
 
+>>> import Data.Char (ord,chr)  -- 'ord', 'chr'
+
 >>> ord minBound
 0
 
 >>> ord maxBound
 1114111
 
->>> length [chr 0..]
+>>> length [chr 0 ..]
 1114112
 
 -}
@@ -311,7 +314,9 @@ behavior may be undefined when the cardinality of @a@ is larger than the cardina
 >>> boundedCardinality (const(undefined::Int))   -- platform specific
 18446744073709551616
 
-@-- i.e. 1 + 9223372036854775807 - -9223372036854775808@
+@
+-- i.e. 1 + 9223372036854775807 - (-9223372036854775808)
+@
 
 works with non-zero-based Enum instances, like @Int64@ or a custom @toEnum/fromEnum@.
 assumes the enumeration's numbering is contiguous, e.g. if @fromEnum 0@ and @fromEnum 2@

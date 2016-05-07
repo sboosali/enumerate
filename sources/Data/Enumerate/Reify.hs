@@ -1,5 +1,5 @@
 {-# LANGUAGE RankNTypes, LambdaCase #-}
-{-| see 'reifyFunctionAtM'.  
+{-| see 'reifyFunctionAtM'.
 
 @-- doctest@
 
@@ -7,28 +7,30 @@
 
 -}
 module Data.Enumerate.Reify where
-import Data.Enumerate.Types 
-import Data.Enumerate.Extra 
+import Data.Enumerate.Types
+import Data.Enumerate.Extra
 
-import Control.Monad.Catch (MonadThrow(..), SomeException(..)) 
-import Control.DeepSeq (NFData) 
+import Control.Monad.Catch (MonadThrow(..), SomeException(..))
+import Control.DeepSeq (NFData)
 
 import Control.Arrow ((&&&))
 
 
-{- | reify a total function. 
+{- | reify a total function.
 
 @
->>> reifyFunction 'not'
+
+>>> reifyFunction not  -- Prelude 'not'
 [(False,True),(True,False)]
+
 @
 
--} 
+-}
 reifyFunction :: (Enumerable a) => (a -> b) -> [(a,b)]
 reifyFunction f = reifyFunctionM (return . f)
 {-# INLINABLE reifyFunction #-}
 
--- | reify a total function at any subset of the domain. 
+-- | reify a total function at any subset of the domain.
 reifyFunctionAt :: [a] -> (a -> b) -> [(a,b)]
 reifyFunctionAt domain f = reifyFunctionAtM domain (return . f)
 {-# INLINABLE reifyFunctionAt #-}
@@ -38,31 +40,31 @@ reifyFunctionM :: (Enumerable a) => (forall m. MonadThrow m => a -> m b) -> [(a,
 reifyFunctionM = reifyFunctionAtM enumerated
 {-# INLINABLE reifyFunctionM #-}
 
-{- | reify a (safely-)partial function at any domain. 
+{- | reify a (safely-)partial function at any domain.
 
-use the functions suffixed with @M@ when your function is explicitly partial, 
-i.e. of type @(forall m. MonadThrow m => a -> m b)@. 
-when inside a function arrow, like:  
+use the functions suffixed with @M@ when your function is explicitly partial,
+i.e. of type @(forall m. MonadThrow m => a -> m b)@.
+when inside a function arrow, like:
 
 @
 reifyFunctionAtM :: [a] -> (forall m. MonadThrow m => a -> m b) -> [(a,b)]
-reifyFunctionAtM domain f = ... 
+reifyFunctionAtM domain f = ...
 @
 
-the @Rank2@ type (and non-concrete types) means that @f@ can only use 
-parametric polymorphic functions, or the methods of the @MonadThrow@ class 
-(namely 'throwM'), or methods of @MonadThrow@ superclasses (namely 'return', et cetera). 
+the @Rank2@ type (and non-concrete types) means that @f@ can only use
+parametric polymorphic functions, or the methods of the @MonadThrow@ class
+(namely 'throwM'), or methods of @MonadThrow@ superclasses (namely 'return', et cetera).
 
-'MonadThrow' is a class from the @exceptions@ package that generalizes failibility. 
-it has instances for @Maybe@, @Either@, @[]@, @IO@, and more.     
+'MonadThrow' is a class from the @exceptions@ package that generalizes failibility.
+it has instances for @Maybe@, @Either@, @[]@, @IO@, and more.
 
-use the functions suffixed with @At@ when your domain isn't 'Enumerable', 
+use the functions suffixed with @At@ when your domain isn't 'Enumerable',
 or when you want to restrict the domain.
- 
+
 the most general function in this module.
 
 >>> :{
-let uppercasePartial :: (MonadThrow m) => Char -> m Char 
+let uppercasePartial :: (MonadThrow m) => Char -> m Char
     uppercasePartial c = case c of
      'a' -> return 'A'
      'b' -> return 'B'
@@ -71,11 +73,13 @@ let uppercasePartial :: (MonadThrow m) => Char -> m Char
 :}
 
 @
+
 >>> reifyFunctionAtM ['a'..'c'] uppercasePartial
-[('a','A'),('b','B')] 
+[('a','A'),('b','B')]
+
 @
 
-if your function doesn't fail under 'MonadThrow', see: 
+if your function doesn't fail under 'MonadThrow', see:
 
 * 'reifyFunctionAtMaybe'
 * 'reifyFunctionAtList'
@@ -84,7 +88,7 @@ if your function doesn't fail under 'MonadThrow', see:
 -}
 reifyFunctionAtM :: [a] -> (Partial a b) -> [(a,b)]
 -- reifyFunctionAtM :: (MonadThrow m) => [a] -> (a -> m b) -> m (Map a b)
-reifyFunctionAtM domain f 
+reifyFunctionAtM domain f
  = concatMap (bitraverse pure id)
  . fmap (id &&& f)
  $ domain
@@ -98,21 +102,21 @@ reifyPredicateAt = flip filter
 --  where
 --  f x = if p x then return x else throwM (ErrorCall "False")
 
--- MonadThrow Maybe	 
+-- MonadThrow Maybe
 -- (e ~ SomeException) => MonadThrow (Either e)
--- MonadThrow []	 
+-- MonadThrow []
 
--- | reify a (safely-)partial function that fails specifically under @Maybe@. 
+-- | reify a (safely-)partial function that fails specifically under @Maybe@.
 reifyFunctionMaybeAt :: [a] -> (a -> Maybe b) -> [(a, b)]
 reifyFunctionMaybeAt domain f = reifyFunctionAtM domain (maybe2throw f)
 {-# INLINABLE reifyFunctionMaybeAt #-}
 
--- | reify a (safely-)partial function that fails specifically under @[]@. 
+-- | reify a (safely-)partial function that fails specifically under @[]@.
 reifyFunctionListAt :: [a] -> (a -> [b]) -> [(a, b)]
 reifyFunctionListAt domain f = reifyFunctionAtM domain (list2throw f)
 {-# INLINABLE reifyFunctionListAt #-}
 
--- | reify a (safely-)partial function that fails specifically under @Either SomeException@. 
+-- | reify a (safely-)partial function that fails specifically under @Either SomeException@.
 reifyFunctionEitherAt :: [a] -> (a -> Either SomeException b) -> [(a, b)]
 reifyFunctionEitherAt domain f = reifyFunctionAtM domain (either2throw f)
 {-# INLINABLE reifyFunctionEitherAt #-}
@@ -121,14 +125,14 @@ reifyFunctionEitherAt domain f = reifyFunctionAtM domain (either2throw f)
 
 forces the function to be strict.
 
-@
->>> import Data.Ratio (Ratio) 
+>>> import Data.Ratio (Ratio)
+
 >>> fmap (1/) [0..3 :: Ratio Integer]
 [*** Exception: Ratio has zero denominator
->>> let (1/) = reciprocal 
->>> reifyFunctionSpoonAt [0..3 :: Ratio Integer] reciprocal 
+
+>>> let (1/) = reciprocal
+>>> reifyFunctionSpoonAt [0..3 :: Ratio Integer] reciprocal
 [(1 % 1,1 % 1),(2 % 1,1 % 2),(3 % 1,1 % 3)]
-@
 
 normal caveats from violating purity (via @unsafePerformIO@) and from catchalls (via @(e :: SomeExceptions -> _)@) apply.
 
@@ -151,7 +155,6 @@ reifyFunction2M :: (Enumerable a, Enumerable b) => (forall m. MonadThrow m => a 
 reifyFunction2M f = reifyFunction2AtM enumerated enumerated f
 {-# INLINABLE reifyFunction2M #-}
 
--- | reify a binary (safely-)partial function at some domain 
+-- | reify a binary (safely-)partial function at some domain
 reifyFunction2AtM :: [a] -> [b] -> (forall m. MonadThrow m => a -> b -> m c) -> [(a,[(b,c)])]
 reifyFunction2AtM as bs f = reifyFunctionAt as (\a -> reifyFunctionAtM bs (f a))
-
