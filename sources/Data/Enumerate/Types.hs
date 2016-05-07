@@ -123,7 +123,6 @@ class Enumerable a where
 * fails only via the 'throwM' method of 'MonadThrow'
 * succeeds only via the 'return' method of 'Monad'
 
-
 -}
 type Partial a b = (forall m. MonadThrow m => a -> m b)
 
@@ -241,6 +240,9 @@ instance Enumerable Char where enumerated = boundedEnumerated; cardinality = bou
 
 the 'cardinality' is the sum of the cardinalities of @a@ and @b@.
 
+>>> cardinality ([] :: [Either Bool Ordering])
+5
+
 -}
 instance (Enumerable a, Enumerable b) => Enumerable (Either a b) where
  enumerated    = (Left <$> enumerated) ++ (Right <$> enumerated)
@@ -252,6 +254,9 @@ instance (Enumerable a) => Enumerable (Maybe a) where
 {-| the product type.
 
 the 'cardinality' is the product of the cardinalities of @a@ and @b@.
+
+>>> cardinality ([] :: [(Bool,Ordering)])
+6
 
 -}
 instance (Enumerable a, Enumerable b) => Enumerable (a, b) where
@@ -282,6 +287,8 @@ warning: it grows quickly. don't try to take the power set of 'Char'! or even 'W
 the 'cardinality' call is efficient (depending on the efficiency of the base type's call).
 you should be able to safely call 'enumerateBelow', unless the arithmetic itself becomes too large.
 
+>>> enumerated :: [Set Bool]
+[fromList [],fromList [False],fromList [False,True],fromList [True]]
 
 -}
 instance (Enumerable a, Ord a) => Enumerable (Set a) where

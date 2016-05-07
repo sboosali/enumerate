@@ -1,4 +1,8 @@
 # enumerate
+
+[![Hackage](https://img.shields.io/hackage/v/enumerate.svg)](https://hackage.haskell.org/package/enumerate)
+[![Build Status](https://secure.travis-ci.org/sboosali/enumerate.svg)](http://travis-ci.org/sboosali/enumerate)
+
 enumerate all the values in a finite type (automatically)
 
 provides (1) a typeclass for enumerating all values in a finite type,
