@@ -17,6 +17,11 @@ data T = C0 | C1 () Bool SmallNatural SmallString | C2 ...
 instance Arbitrary T where arbitrary = elements 'enumerated'
 @
 
+(whenever possible) provides instances for all base types:
+
+* under @Data.@ / @Control.@ / @System.@ / @Text.@
+* even non-'Enum's
+* except when too large (like 'Int') (see "Data.Enumerate.Large")
 
 background on @Generics@:
 
@@ -55,12 +60,8 @@ import Control.Monad.Catch (MonadThrow(..))
 
 import           GHC.Generics
 import Data.Data (Data)
-import           Data.Proxy (Proxy(..))
 import           Control.Arrow ((&&&))
 import           Data.List (genericLength)
-import           Data.Void (Void)
-import           Data.Word (Word8, Word16)
-import           Data.Int (Int8, Int16)
 import qualified Data.Set as Set
 import Data.Set (Set)
 import System.Timeout (timeout)
@@ -68,6 +69,37 @@ import Control.DeepSeq (NFData,force)
 -- import GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^))
 import Numeric.Natural (Natural)
 import Data.Ix (Ix(..))
+
+import           Data.Void (Void)
+import           Data.Word (Word8, Word16)
+import           Data.Int (Int8, Int16)
+import           Data.Proxy (Proxy(..))
+
+-- for instances...
+import Data.Typeable ((:~:)(..))
+import Control.Applicative (Const(..))
+import Data.Functor.Identity (Identity(..))
+import Data.Type.Coercion (Coercion(..))
+import Data.Coerce (Coercible)
+import Data.Char (GeneralCategory)
+import Data.Ratio (Ratio,(%))
+import Data.Complex (Complex(..))
+--
+import Control.Exception (ArithException(..),AsyncException(..),NonTermination(..),NestedAtomically(..),BlockedIndefinitelyOnMVar(..),BlockedIndefinitelyOnSTM(..),AllocationLimitExceeded(..),Deadlock(..))
+import Data.Monoid (Any,All,Dual,First,Last,Sum,Product,Alt,Endo)
+import System.IO (IOMode,SeekMode,Newline(..),NewlineMode(NewlineMode))
+import Text.Printf (FormatAdjustment(..),FormatSign(..))
+import Foreign.C (CChar,CWchar,CSChar,CUChar,CShort,CUShort)
+import System.Posix.Types (CIno,CMode)
+import GHC.Exts(Down(..),SpecConstrAnnotation(..))
+--
+-- TODO CCc
+import GHC.Conc.Windows (ConsoleEvent)
+import GHC.IO.Buffer (BufferState(..))
+import GHC.IO.Device (IODeviceType(..))
+import GHC.IO.Encoding.Failure (CodingFailureMode(..))
+import GHC.IO.Encoding.Types (CodingProgress(..))
+import GHC.RTS.Flags (DoTrace,DoHeapProfile,DoCostCentres,GiveGCStats)
 
 
 {- | enumerate the set of all values in a (finitely enumerable) type.
@@ -89,7 +121,7 @@ laws:
 
 * consistent:
 
-    * @'cardinality' = 'length' 'enumerated'@
+    * @'cardinality' _ = 'length' 'enumerated'@
 
     so you can index the 'enumerated' with a nonnegative index below the 'cardinality'.
 
@@ -149,17 +181,32 @@ class Enumerable a where
  -- cardinality _ = gcardinality (Proxy :: Proxy (Rep a))
  -- TODO merge both methods into one that returns their pair
 
-{-| wrap any @(Bounded a, Enum a)@ to be a @Enumerable@ via 'boundedEnumerated'.
+{-
+instance Enumerable where
+ enumerated = boundedEnumerated
+ cardinality = boundedCardinality
 
-(avoids @OverlappingInstances@).
+instance Enumerable where
+ enumerated = []
+
+instance (Enumerable a) => Enumerable (X a) where
+   enumerated = X <$> enumerated
 
 -}
-newtype WrappedBoundedEnum a = WrappedBoundedEnum { unwrapBoundedEnum :: a }
 
-instance (Bounded a, Enum a) => Enumerable (WrappedBoundedEnum a) where
- -- type Cardinality (WrappedBoundedEnum a) = Cardinality a
- enumerated    = WrappedBoundedEnum <$> boundedEnumerated
- cardinality _ = boundedCardinality (Proxy :: Proxy a)
+ --------------------------------------------------------------------------------
+ -- main base types
+
+{- NOTE: to declare instances:
+
+* use default, when Generic (easiest)
+* use boundedEnumerated/boundedCardinality, when only Bounded (faster and safer than enumEnumerated)
+* use enumEnumerated, when only Enum (doesn't import constructors, only type)
+* use constructors, when no relevant instances
+
+-}
+
+--NOTE this file takes ~1s to build
 
 -- base types. TODO any more?
 instance Enumerable Void
@@ -167,7 +214,23 @@ instance Enumerable ()
 instance Enumerable Bool
 instance Enumerable Ordering
 
+-- | (phantom in @a@)
 instance Enumerable (Proxy a)
+
+instance (Enumerable a) => Enumerable (Identity a) where
+  enumerated = Identity <$> enumerated
+
+instance (Enumerable a) => Enumerable (Const a b) where
+  enumerated = Const <$> enumerated
+
+instance (a ~ b) => Enumerable (a :~: b) where
+  enumerated = [Refl]
+
+instance (Coercible a b) => Enumerable (Coercion a b) where
+  enumerated = [Coercion]
+
+-- Enumerable TypeRep -- we can't list all known types, statically (because separate compilation).
+-- but dynamically, maybe? and probably constant throughout the running program i.e. still pure.
 
 {- |
 
@@ -269,18 +332,6 @@ Could not deduce (Generic (a, b, c, d, e, f, g, h))
      arising from a use of `Data.Enumerate.Types.$gdmenumerated'
 -}
 
-{-| the cardinality is a product of cardinalities. -}
-instance (Enumerable (f a), Enumerable (Rec f as)) => Enumerable (Rec f (a ': as)) where
- -- type Cardinality (Rec f (a ': as)) = (Cardinality (f a)) * (Cardinality (Rec f as))
- enumerated =  (:&) <$> enumerated <*> enumerated
- cardinality _ = cardinality (Proxy :: Proxy (f a)) * cardinality (Proxy :: Proxy (Rec f as))
-
-{-|  -}
-instance Enumerable (Rec f '[]) where
- -- type Cardinality (Rec f '[]) = 1
- enumerated = [RNil]
- cardinality _ = 1
-
 {-|
 
 the 'cardinality' is the cardinality of the 'powerSet' of @a@, i.e. @2^|a|@.
@@ -297,6 +348,214 @@ instance (Enumerable a, Ord a) => Enumerable (Set a) where
  -- type Cardinality (Set a) = 2 ^ (Cardinality a)
  enumerated    = (Set.toList . powerSet . Set.fromList) enumerated
  cardinality _ = 2 ^ cardinality (Proxy :: Proxy a)
+
+--------------------------------------------------------------------------------
+-- more base types
+
+instance Enumerable GeneralCategory where
+  enumerated = boundedEnumerated
+  cardinality = boundedCardinality
+
+instance Enumerable IOMode where
+  enumerated = enumEnumerated
+  -- enumerated = [ReadMode,WriteMode,AppendMode,ReadWriteMode]
+ -- enumerated = boundedEnumerated
+ -- cardinality = boundedCardinality
+
+instance Enumerable SeekMode where
+  enumerated = enumEnumerated
+  -- enumerated = [AbsoluteSeek,RelativeSeek,SeekFromEnd]
+ -- enumerated = boundedEnumerated
+ -- cardinality = boundedCardinality
+
+instance Enumerable ArithException where
+  enumerated =
+   [ Overflow
+   , Underflow
+   , LossOfPrecision
+   , DivideByZero
+   , Denormal
+   , RatioZeroDenominator
+   ]
+
+instance Enumerable AsyncException where
+ enumerated = [StackOverflow, HeapOverflow, ThreadKilled, UserInterrupt]
+
+instance Enumerable NonTermination where
+ enumerated = [NonTermination]
+
+instance Enumerable NestedAtomically where
+ enumerated = [NestedAtomically]
+
+instance Enumerable BlockedIndefinitelyOnMVar where
+ enumerated = [BlockedIndefinitelyOnMVar]
+
+instance Enumerable BlockedIndefinitelyOnSTM where
+ enumerated = [BlockedIndefinitelyOnSTM]
+
+instance Enumerable AllocationLimitExceeded where
+ enumerated = [AllocationLimitExceeded]
+
+instance Enumerable Deadlock where
+ enumerated = [Deadlock]
+
+instance Enumerable Newline where
+ enumerated = [LF,CRLF]
+
+instance Enumerable NewlineMode where
+ enumerated = NewlineMode <$> enumerated <*> enumerated
+
+instance Enumerable FormatAdjustment where
+ enumerated = [LeftAdjust,ZeroPad]
+
+instance Enumerable FormatSign where
+ enumerated = [SignPlus,SignSpace]
+
+-- instance Enumerable CCc where
+--   enumerated = boundedEnumerated
+--   cardinality = boundedCardinality
+
+instance Enumerable All
+instance Enumerable Any
+instance (Enumerable a) => Enumerable (Dual a)
+instance (Enumerable a) => Enumerable (First a)
+instance (Enumerable a) => Enumerable (Last a)
+instance (Enumerable a) => Enumerable (Sum a)
+instance (Enumerable a) => Enumerable (Product a)
+instance (Enumerable (a -> a)) => Enumerable (Endo a)
+instance (Enumerable (f a)) => Enumerable (Alt f a)
+
+instance (Enumerable a) => Enumerable (Complex a) where
+  enumerated = (:+) <$> enumerated <*> enumerated
+
+{-| (@a@ can be any @Enumerable@,
+unlike the @Enum@ instance where @a@ is an @Integral@).
+-}
+-- instance (Enumerable a) => Enumerable (Ratio a) where
+--   enumerated = (%) <$> enumerated <*> enumerated
+
+--------------------------------------------------------------------------------
+-- ghc-only
+
+instance (Enumerable a) => Enumerable (Down a) where
+   enumerated = Down <$> enumerated
+
+instance Enumerable CIno where
+ enumerated = boundedEnumerated
+ cardinality = boundedCardinality
+instance Enumerable CMode where
+ enumerated = boundedEnumerated
+ cardinality = boundedCardinality
+instance Enumerable CChar where
+ enumerated = boundedEnumerated
+ cardinality = boundedCardinality
+instance Enumerable CWchar where
+ enumerated = boundedEnumerated
+ cardinality = boundedCardinality
+instance Enumerable CSChar where
+ enumerated = boundedEnumerated
+ cardinality = boundedCardinality
+instance Enumerable CUChar where
+ enumerated = boundedEnumerated
+ cardinality = boundedCardinality
+instance Enumerable CShort where
+ enumerated = boundedEnumerated
+ cardinality = boundedCardinality
+instance Enumerable CUShort where
+  enumerated = boundedEnumerated
+  cardinality = boundedCardinality
+
+instance Enumerable Associativity
+  -- LeftAssociative,RightAssociative,NotAssociative
+
+instance Enumerable SpecConstrAnnotation where
+ enumerated = [NoSpecConstr,ForceSpecConstr]
+
+instance Enumerable ConsoleEvent where
+ enumerated = enumEnumerated
+
+instance Enumerable BufferState where
+ enumerated = [ReadBuffer,WriteBuffer]
+
+instance Enumerable IODeviceType where
+  enumerated = [Directory,Stream,RegularFile,RawDevice]
+
+instance Enumerable CodingFailureMode where
+ enumerated = [ErrorOnCodingFailure,IgnoreCodingFailure,TransliterateCodingFailure,RoundtripFailure]
+
+instance Enumerable CodingProgress where
+  enumerated = [InputUnderflow,OutputUnderflow,InvalidSequence]
+
+instance Enumerable DoTrace where
+  enumerated = enumEnumerated
+instance Enumerable DoHeapProfile where
+  enumerated = enumEnumerated
+instance Enumerable DoCostCentres where
+  enumerated = enumEnumerated
+instance Enumerable GiveGCStats where
+  enumerated = enumEnumerated
+
+{- TODO why not generic/enum/bounded? ghc build time? to avoid recursive imports?
+
+nothing:
+ArithException
+AsyncException
+NonTermination
+NestedAtomically
+BlockedIndefinitelyOnMVar
+BlockedIndefinitelyOnSTM
+AllocationLimitExceeded
+Deadlock
+Fixity
+FormatAdjustment
+FormatSign
+Newline
+CCc
+CChar
+CWChar
+CSChar
+CUChar
+CShort
+CUShort
+
+no generic:
+NewlineMode
+Ratio
+
+no bounded:
+IOMode
+SeekMode
+ConsoleEvent
+DoTrace
+DoHeapProfile
+DoCostCentres
+GiveGCStats
+
+-}
+
+--------------------------------------------------------------------------------
+-- package types
+instance Enumerable Jectivity
+
+instance (Bounded a, Enum a) => Enumerable (WrappedBoundedEnum a) where
+ -- type Cardinality (WrappedBoundedEnum a) = Cardinality a
+ enumerated    = WrappedBoundedEnum <$> boundedEnumerated
+ cardinality _ = boundedCardinality (Proxy :: Proxy a)
+
+--------------------------------------------------------------------------------
+-- dependency types
+
+{-| the cardinality is a product of cardinalities. -}
+instance (Enumerable (f a), Enumerable (Rec f as)) => Enumerable (Rec f (a ': as)) where
+ -- type Cardinality (Rec f (a ': as)) = (Cardinality (f a)) * (Cardinality (Rec f as))
+ enumerated =  (:&) <$> enumerated <*> enumerated
+ cardinality _ = cardinality (Proxy :: Proxy (f a)) * cardinality (Proxy :: Proxy (Rec f as))
+
+{-|  -}
+instance Enumerable (Rec f '[]) where
+ -- type Cardinality (Rec f '[]) = 1
+ enumerated = [RNil]
+ cardinality _ = 1
 
 {-
 -- | (from the @modular-arithmetic@ package)
@@ -380,7 +639,13 @@ instance (GEnumerable (f)) => GEnumerable (M1 D t f) where
 -}
 data Jectivity = Injective | Surjective | Bijective
  deriving (Show,Read,Eq,Ord,Enum,Bounded,Ix,Generic,Data)
--- instance Enumerable Jectivity
+
+{-| wrap any @(Bounded a, Enum a)@ to be a @Enumerable@ via 'boundedEnumerated'.
+
+(avoids @OverlappingInstances@).
+
+-}
+newtype WrappedBoundedEnum a = WrappedBoundedEnum { unwrapBoundedEnum :: a }
 
 {-| a (safely-)partial function. i.e. a function that:
 
@@ -406,7 +671,13 @@ boundedEnumerated = enumFromTo minBound maxBound
 
 {-| for non-'Generic' Bounded Enums.
 
-behavior may be undefined when the cardinality of @a@ is larger than the cardinality of @Int@. this should be okay, as @Int@ is at least as big as @Int64@, which is at least as big as all the monomorphic types in @base@ that instantiate @Bounded@. you can double-check with:
+Assuming 'Bounded' is correct, safely stop the enumeration
+(and know where to start).
+
+behavior may be undefined when the cardinality of @a@ is larger than
+the cardinality of @Int@. this should be okay, as @Int@ is at least as big as
+@Int64@, which is at least as big as all the monomorphic types in @base@ that
+instantiate @Bounded@. you can double-check with:
 
 >>> boundedCardinality (const(undefined::Int))   -- platform specific
 18446744073709556464
@@ -415,8 +686,9 @@ behavior may be undefined when the cardinality of @a@ is larger than the cardina
 -- i.e. 1 + 9223372036854775807 - (-9223372036854775808)
 @
 
-works with non-zero-based Enum instances, like @Int64@ or a custom @toEnum/fromEnum@.
-assumes the enumeration's numbering is contiguous, e.g. if @fromEnum 0@ and @fromEnum 2@
+works with non-zero-based Enum instances, like @Int64@ or a custom
+@toEnum/fromEnum@. assumes the enumeration's numbering is
+contiguous, e.g. if @fromEnum 0@ and @fromEnum 2@
 both exist, then @fromEnum 1@ should exist too.
 
 -}
