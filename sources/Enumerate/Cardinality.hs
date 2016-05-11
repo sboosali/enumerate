@@ -2,7 +2,7 @@
 {-# LANGUAGE DataKinds, UndecidableInstances, ConstraintKinds, KindSignatures #-}
 {-# LANGUAGE ScopedTypeVariables, FlexibleContexts #-}
 
-{-|
+{-| the cardinality of a finite type, at the type-level.
 
 -}
 module Enumerate.Cardinality where
@@ -39,6 +39,8 @@ laws:
  * consistent with "Enumerate.Enumerable":
 
      * @'cardinality' = 'reifyCardinality'@
+
+     i.e. the value-level (a 'Natural') matches the type-level (a 'Nat')
 
 e.g.
 

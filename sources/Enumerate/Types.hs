@@ -4,22 +4,32 @@
 
 {-# LANGUAGE DeriveGeneric, DeriveDataTypeable #-}
 
-{- | see the 'Enumerable' class for documentation.
+{- | enumerate all values in a finite type.
+
+see the 'Enumerable' class for documentation.
 
 see "Enumerate.Example" for examples.
 
 can also help automatically derive @<https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html QuickCheck>@ instances:
 
 @
-newtype SmallNatural = ...
-instance Enumerable SmallNatural where ...
-newtype SmallString = ...
-instance Enumerable SmallString where  ...
-data T = C0 | C1 () Bool SmallNatural SmallString | C2 ...
-instance Arbitrary T where arbitrary = elements 'enumerated'
+newtype ValidString = ValidString String
+ deriving (Show)
+validStrings :: [String]
+makeValidString :: String -> Maybe ValidString
+makeValidString s = if s `member` validStrings then Just (ValidString s) else Nothing
+instance 'Enumerable' ValidString where enumerated = ValidString <$> validStrings ... -- manually (since normal String's are infinite)
+instance <https://hackage.haskell.org/package/quickcheck/docs/QuickCheck-#tArbitrary.html Arbitrary> ValidString where arbitrary = elements 'enumerated'
+TODO url
+
+data ValidName = ValidName ValidString ValidString | CoolValidName [ValidString]
+ deriving (Show,Generic)
+instance 'Enumerable' ValidName -- automatically
+
+instance Arbitrary ValidName where arbitrary = elements 'enumerated'
 @
 
-(whenever possible) provides instances for all base types:
+Provides instances for all base types (whenever possible):
 
 * under @Data.@ \/ @Control.@ \/ @System.@ \/ @Text.@, and even @GHC.@
 * even non-'Enum's
@@ -29,21 +39,19 @@ background on @Generics@:
 
 * <https://hackage.haskell.org/package/base-4.8.1.0/docs/GHC-Generics.html GHC.Generics>
 
-
 also provides instances for:
 
 * sets
 
 * vinyl records
 
-
 related packages:
-
-* <http://hackage.haskell.org/package/emgm-0.4/docs/Generics-EMGM-Functions-Enum.html emgm>.
-  allows infinite lists (by convention). too heavyweight.
 
 * <http://hackage.haskell.org/package/enumerable enumerable>.
 no @Generic@ instance.
+
+* <http://hackage.haskell.org/package/emgm-0.4/docs/Generics-EMGM-Functions-Enum.html emgm>.
+  allows infinite lists (by convention). too heavyweight.
 
 * <https://hackage.haskell.org/package/testing-feat-0.4.0.2/docs/Test-Feat-Class.html#t:Enumerable testing-feat>.
 too heavyweight (testing framework).
