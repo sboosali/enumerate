@@ -26,6 +26,7 @@ library
  exposed-modules:
   Data.Enumerate
   Data.Enumerate.Types
+  Data.Enumerate.Main
   Data.Enumerate.Reify
   -- Data.Enumerate.Domain
   Data.Enumerate.Example

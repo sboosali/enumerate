@@ -28,13 +28,19 @@ main = do
   , "sources/Data/Enumerate/Extra.hs"
   ]
 
- -- split up because some modules only succeed when they have the interpreter to themselves.
- -- seems like there's incompatibility between the Data.Enumerate.Types a module is *built* with,
- -- and they types that are present when it is *interpreted*.
  doctest
   [ "sources/Data/Enumerate/Function.hs"
   , "sources/Data/Enumerate/Example.hs"
   ]
+
+ doctest
+   [ "sources/Data/Cardinality.hs"
+   ]
+
+   -- split up because some modules only succeed when they have the interpreter to themselves.
+   -- seems like there's incompatibility between the Data.Enumerate.Types a module is *built* with,
+   -- and they types that are present when it is *interpreted*.
+
  --
  -- doctest
  --  [ "sources/Data/Enumerate/Reify.hs" -- freezes
