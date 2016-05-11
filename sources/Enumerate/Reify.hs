@@ -6,9 +6,9 @@
 >>> :set +m
 
 -}
-module Data.Enumerate.Reify where
-import Data.Enumerate.Types
-import Data.Enumerate.Extra
+module Enumerate.Reify where
+import Enumerate.Types
+import Enumerate.Extra
 
 import Control.Monad.Catch (MonadThrow(..), SomeException(..))
 import Control.DeepSeq (NFData)

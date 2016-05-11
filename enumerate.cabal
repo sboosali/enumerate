@@ -24,21 +24,21 @@ source-repository head
 
 library
  exposed-modules:
-  Data.Enumerate
-  Data.Enumerate.Types
-  Data.Enumerate.Main
-  Data.Enumerate.Reify
-  -- Data.Enumerate.Domain
-  Data.Enumerate.Example
-  Data.Enumerate.Map
-  Data.Enumerate.Extra
-  Data.Enumerate.Large
-  Data.Enumerate.Function
-  Data.Enumerate.Enum
+  Enumerate
+  Enumerate.Types
+  Enumerate.Main
+  Enumerate.Reify
+  -- Enumerate.Domain
+  Enumerate.Example
+  Enumerate.Map
+  Enumerate.Extra
+  Enumerate.Large
+  Enumerate.Function
+  Enumerate.Enum
   -- Data.CoRec
   -- Data.CoRec.MemoTrie
   -- Data.TEnumerate
-  Data.Cardinality
+  Enumerate.Cardinality
 
  build-depends:
      base >= 4.7 && < 5

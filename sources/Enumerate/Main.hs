@@ -1,5 +1,5 @@
-module Data.Enumerate.Main where
-import Data.Enumerate
+module Enumerate.Main where
+import Enumerate
 
 main = do
   putStrLn "\nreifyCardinality @Bool..."

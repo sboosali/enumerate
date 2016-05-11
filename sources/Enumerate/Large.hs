@@ -5,13 +5,13 @@
 (i.e. 'Word32' \/ 'Word64' \/ 'Int32' \/ 'Int64').
 
 (that are included for completeness, but not exported by default
-(i.e. by "Data.Enumerate").
+(i.e. by "Enumerate").
 you probably want build-time instance-resolution errors instead of
 probable runtime non-termination).
 
 -}
-module Data.Enumerate.Large where
-import Data.Enumerate.Types
+module Enumerate.Large where
+import Enumerate.Types
 
 import           Data.Word (Word32, Word64)
 import           Data.Int (Int32, Int64)

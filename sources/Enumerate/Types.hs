@@ -6,7 +6,7 @@
 
 {- | see the 'Enumerable' class for documentation.
 
-see "Data.Enumerate.Example" for examples.
+see "Enumerate.Example" for examples.
 
 can also help automatically derive @<https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck-Arbitrary.html QuickCheck>@ instances:
 
@@ -23,7 +23,7 @@ instance Arbitrary T where arbitrary = elements 'enumerated'
 
 * under @Data.@ \/ @Control.@ \/ @System.@ \/ @Text.@, and even @GHC.@
 * even non-'Enum's
-* except when too large (like 'Int') (see "Data.Enumerate.Large")
+* except when too large (like 'Int') (see "Enumerate.Large")
 
 background on @Generics@:
 
@@ -56,8 +56,8 @@ too heavyweight (testing framework, randomness unnecessary).
 
 -}
 
-module Data.Enumerate.Types where
-import Data.Enumerate.Extra
+module Enumerate.Types where
+import Enumerate.Extra
 
 import Data.Vinyl (Rec(..))
 import Control.Monad.Catch (MonadThrow(..))
@@ -336,7 +336,7 @@ instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, 
 -- instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g, Enumerable h) => Enumerable (a, b, c, d, e, f, g, h)
 {-
 Could not deduce (Generic (a, b, c, d, e, f, g, h))
-     arising from a use of `Data.Enumerate.Types.$gdmenumerated'
+     arising from a use of `Enumerate.Types.$gdmenumerated'
 -}
 
 {-|
@@ -641,7 +641,7 @@ instance (GEnumerable (f)) => GEnumerable (M1 D t f) where
 
 --------------------------------------------------------------------------------
 
-{-| see "Data.Enumerate.Reify.getJectivityM"
+{-| see "Enumerate.Reify.getJectivityM"
 
 -}
 data Jectivity = Injective | Surjective | Bijective

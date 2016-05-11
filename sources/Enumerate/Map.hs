@@ -24,10 +24,10 @@ a (safely-)partial function is isomorphic with a @Map@:
 modulo the error thrown.
 
 -}
-module Data.Enumerate.Map where
-import Data.Enumerate.Extra
-import Data.Enumerate.Types
-import Data.Enumerate.Reify
+module Enumerate.Map where
+import Enumerate.Extra
+import Enumerate.Types
+import Enumerate.Reify
 
 import Control.Monad.Catch (MonadThrow(..))
 import           Data.List.NonEmpty (NonEmpty(..))

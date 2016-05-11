@@ -23,18 +23,18 @@ main = do
  -- doctestLibraryModules
 
  doctest
-  [ "sources/Data/Enumerate.hs"
-  , "sources/Data/Enumerate/Types.hs"
-  , "sources/Data/Enumerate/Extra.hs"
+  [ "sources/Enumerate.hs"
+  , "sources/Enumerate/Types.hs"
+  , "sources/Enumerate/Extra.hs"
   ]
 
  doctest
-  [ "sources/Data/Enumerate/Function.hs"
-  , "sources/Data/Enumerate/Example.hs"
+  [ "sources/Enumerate/Function.hs"
+  , "sources/Enumerate/Example.hs"
   ]
 
  doctest
-   [ "sources/Data/Cardinality.hs"
+   [ "sources/Enumerate/Cardinality.hs"
    ]
 
    -- split up because some modules only succeed when they have the interpreter to themselves.
@@ -43,9 +43,9 @@ main = do
 
  --
  -- doctest
- --  [ "sources/Data/Enumerate/Reify.hs" -- freezes
+ --  [ "sources/Enumerate/Reify.hs" -- freezes
  --  ]
  --
  --  doctest
- --   [ "sources/Data/Enumerate/Map.hs" -- freezes
+ --   [ "sources/Enumerate/Map.hs" -- freezes
  --   ]

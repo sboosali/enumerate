@@ -1,10 +1,10 @@
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
-import qualified Data.Enumerate.Example
-import qualified Data.Enumerate.Main
+import qualified Enumerate.Example
+import qualified Enumerate.Main
 
 main = do
-  putStrLn "\nData.Enumerate.Example..."
-  Data.Enumerate.Example.main
+  putStrLn "\nEnumerate.Example..."
+  Enumerate.Example.main
 
-  putStrLn "\nData.Enumerate.Main..."
-  Data.Enumerate.Main.main
+  putStrLn "\nEnumerate.Main..."
+  Enumerate.Main.main

@@ -5,7 +5,7 @@
 {-|
 
 -}
-module Data.Cardinality where
+module Enumerate.Cardinality where
 
 import           GHC.Generics
 import Data.Vinyl (Rec)

@@ -31,10 +31,10 @@ table_A = 'table_enumerable'
 
 --TODO template-haskell
 
-(also see the source of "Data.Enumerate.Example")
+(also see the source of "Enumerate.Example")
 
 -}
-module Data.Enumerate.Enum
+module Enumerate.Enum
  ( minBound_enumerable
  , maxBound_enumerable
 
@@ -45,7 +45,7 @@ module Data.Enumerate.Enum
  , table_enumerable
  ) where
 
-import Data.Enumerate.Types
+import Enumerate.Types
 
 import Numeric.Natural
 import qualified Data.Array as Array --IntMap

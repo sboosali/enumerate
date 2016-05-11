@@ -3,9 +3,9 @@
 {-
 
 -}
-module Data.Enumerate.Example where
-import Data.Enumerate
-import Data.Enumerate.Extra
+module Enumerate.Example where
+import Enumerate
+import Enumerate.Extra
 
 import Data.Array (Array)
 import Data.Map (Map)

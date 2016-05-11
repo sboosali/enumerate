@@ -3,8 +3,10 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-| orphan instances, of 'Enumerate'\/'Eq'\/'Show', for functions.
 
-(that are included for completeness, but not exported by default (i.e. by "Data.Enumerate").
-you probably want build-time instance-resolution errors rather than possible runtime non-termination).
+(that are included for completeness, but not exported by default
+(i.e. by "Enumerate").
+you probably want build-time instance-resolution errors,
+rather than possible runtime non-termination).
 
 
 @-- doctest@
@@ -12,11 +14,11 @@ you probably want build-time instance-resolution errors rather than possible run
 >>> :set -XLambdaCase
 
 -}
-module Data.Enumerate.Function where
-import Data.Enumerate.Types
-import Data.Enumerate.Reify
-import Data.Enumerate.Map
-import Data.Enumerate.Extra
+module Enumerate.Function where
+import Enumerate.Types
+import Enumerate.Reify
+import Enumerate.Map
+import Enumerate.Extra
 
 import           Data.Proxy
 import qualified Data.Map as Map

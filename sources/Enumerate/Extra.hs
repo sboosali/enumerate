@@ -2,8 +2,8 @@
 {-|
 
 -}
-module Data.Enumerate.Extra
- ( module Data.Enumerate.Extra
+module Enumerate.Extra
+ ( module Enumerate.Extra
  , (>>>), traverse_
  ) where
 
