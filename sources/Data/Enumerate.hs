@@ -15,13 +15,17 @@ See the source of "Data.Enumerate.Example" for an example.
 -}
 module Data.Enumerate --TODO rename to Enumerable
  ( module Data.Enumerate.Types
+ , module Data.Cardinality
  , module Data.Enumerate.Reify
- -- , module Data.Enumerate.Domain
  , module Data.Enumerate.Map
  , module Data.Enumerate.Enum
+
+ -- , module Data.Enumerate.Domain
  ) where
 import Data.Enumerate.Types
+import Data.Cardinality
 import Data.Enumerate.Reify
--- import Data.Enumerate.Domain
 import Data.Enumerate.Map
 import Data.Enumerate.Enum
+
+-- import Data.Enumerate.Domain

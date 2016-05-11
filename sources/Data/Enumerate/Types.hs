@@ -149,96 +149,25 @@ class Enumerable a where
  -- cardinality _ = gcardinality (Proxy :: Proxy (Rep a))
  -- TODO merge both methods into one that returns their pair
 
-{-| a (safely-)partial function. i.e. a function that:
+{-| wrap any @(Bounded a, Enum a)@ to be a @Enumerable@ via 'boundedEnumerated'.
 
-* fails only via the 'throwM' method of 'MonadThrow'
-* succeeds only via the 'return' method of 'Monad'
-
--}
-type Partial a b = (forall m. MonadThrow m => a -> m b)
-
--- | "Generic Enumerable", lifted to unary type constructors.
-class GEnumerable f where
--- class (KnownNat (GCardinality f)) => GEnumerable f where
- -- type GCardinality f :: Nat
- genumerated :: [f x]
- gcardinality :: proxy f -> Natural
-
--- | empty list
-instance GEnumerable (V1) where
- -- type GCardinality (V1) = 0
- genumerated    = []
- gcardinality _ = 0
- {-# INLINE gcardinality #-}
-
--- | singleton list
-instance GEnumerable (U1) where
- -- type GCardinality (U1) = 1
- genumerated    = [U1]
- gcardinality _ = 1
- {-# INLINE gcardinality #-}
-
-{-| call 'enumerated'
+(avoids @OverlappingInstances@).
 
 -}
-instance (Enumerable a) => GEnumerable (K1 R a) where
- -- type GCardinality (K1 R a) = Cardinality a
- genumerated    = K1 <$> enumerated
- gcardinality _ = cardinality (Proxy :: Proxy a)
- {-# INLINE gcardinality #-}
+newtype WrappedBoundedEnum a = WrappedBoundedEnum { unwrapBoundedEnum :: a }
 
--- | multiply lists with @concatMap@
-instance (GEnumerable (f), GEnumerable (g)) => GEnumerable (f :*: g) where
- -- type GCardinality (f :*: g) = (GCardinality f) * (GCardinality g)
- genumerated    = (:*:) <$> genumerated <*> genumerated
- gcardinality _ = gcardinality (Proxy :: Proxy (f)) * gcardinality (Proxy :: Proxy (g))
- {-# INLINE gcardinality #-}
-
--- | add lists with @(<>)@
-instance (GEnumerable (f), GEnumerable (g)) => GEnumerable (f :+: g) where
- -- type GCardinality (f :+: g) = (GCardinality f) + (GCardinality g)
- genumerated    = map L1 genumerated ++ map R1 genumerated
- gcardinality _ = gcardinality (Proxy :: Proxy (f)) + gcardinality (Proxy :: Proxy (g))
- {-# INLINE gcardinality #-}
-
--- | ignore selector metadata
-instance (GEnumerable (f)) => GEnumerable (M1 S t f) where
- -- type GCardinality (M1 S t f) = GCardinality f
- genumerated    = M1 <$> genumerated
- gcardinality _ = gcardinality (Proxy :: Proxy (f))
- {-# INLINE gcardinality #-}
-
--- | ignore constructor metadata
-instance (GEnumerable (f)) => GEnumerable (M1 C t f) where
- -- type GCardinality (M1 C t f) = GCardinality f
- genumerated    = M1 <$> genumerated
- gcardinality _ = gcardinality (Proxy :: Proxy (f))
- {-# INLINE gcardinality #-}
-
--- | ignore datatype metadata
-instance (GEnumerable (f)) => GEnumerable (M1 D t f) where
- -- type GCardinality (M1 D t f) = GCardinality f
- genumerated    = M1 <$> genumerated
- gcardinality _ = gcardinality (Proxy :: Proxy (f))
- {-# INLINE gcardinality #-}
-
--- {-| wrap any @(Bounded a, Enum a)@ to be a @Enumerable@ via 'boundedEnumerated'.
---
--- (avoids @OverlappingInstances@).
---
--- -}
--- newtype WrappedBoundedEnum a = WrappedBoundedEnum { unwrapBoundedEnum :: a }
---
--- instance (Bounded a, Enum a) => Enumerable (WrappedBoundedEnum a) where
---  -- -- type Cardinality () =
---  enumerated    = WrappedBoundedEnum <$> boundedEnumerated
---  cardinality _ = boundedCardinality (Proxy :: Proxy a)
+instance (Bounded a, Enum a) => Enumerable (WrappedBoundedEnum a) where
+ -- type Cardinality (WrappedBoundedEnum a) = Cardinality a
+ enumerated    = WrappedBoundedEnum <$> boundedEnumerated
+ cardinality _ = boundedCardinality (Proxy :: Proxy a)
 
 -- base types. TODO any more?
 instance Enumerable Void
 instance Enumerable ()
 instance Enumerable Bool
 instance Enumerable Ordering
+
+instance Enumerable (Proxy a)
 
 {- |
 
@@ -377,12 +306,91 @@ instance (Integral i, Num i, KnownNat n) => Enumerable (Mod i n) where
  cardinality _ = fromInteger (natVal (Proxy :: Proxy n))
 -}
 
+--------------------------------------------------------------------------------
+
+-- | "Generic Enumerable", lifted to unary type constructors.
+class GEnumerable f where
+-- class (KnownNat (GCardinality f)) => GEnumerable f where
+ -- type GCardinality f :: Nat
+ genumerated :: [f x]
+ gcardinality :: proxy f -> Natural
+
+-- | empty list
+instance GEnumerable (V1) where
+ -- type GCardinality (V1) = 0
+ genumerated    = []
+ gcardinality _ = 0
+ {-# INLINE gcardinality #-}
+
+-- | singleton list
+instance GEnumerable (U1) where
+ -- type GCardinality (U1) = 1
+ genumerated    = [U1]
+ gcardinality _ = 1
+ {-# INLINE gcardinality #-}
+
+{-| call 'enumerated'
+
+-}
+instance (Enumerable a) => GEnumerable (K1 R a) where
+ -- type GCardinality (K1 R a) = Cardinality a
+ genumerated    = K1 <$> enumerated
+ gcardinality _ = cardinality (Proxy :: Proxy a)
+ {-# INLINE gcardinality #-}
+
+-- | multiply lists with @concatMap@
+instance (GEnumerable (f), GEnumerable (g)) => GEnumerable (f :*: g) where
+ -- type GCardinality (f :*: g) = (GCardinality f) * (GCardinality g)
+ genumerated    = (:*:) <$> genumerated <*> genumerated
+ gcardinality _ = gcardinality (Proxy :: Proxy (f)) * gcardinality (Proxy :: Proxy (g))
+ {-# INLINE gcardinality #-}
+
+-- | add lists with @(<>)@
+instance (GEnumerable (f), GEnumerable (g)) => GEnumerable (f :+: g) where
+ -- type GCardinality (f :+: g) = (GCardinality f) + (GCardinality g)
+ genumerated    = map L1 genumerated ++ map R1 genumerated
+ gcardinality _ = gcardinality (Proxy :: Proxy (f)) + gcardinality (Proxy :: Proxy (g))
+ {-# INLINE gcardinality #-}
+
+-- | ignore selector metadata
+instance (GEnumerable (f)) => GEnumerable (M1 S t f) where
+ -- type GCardinality (M1 S t f) = GCardinality f
+ genumerated    = M1 <$> genumerated
+ gcardinality _ = gcardinality (Proxy :: Proxy (f))
+ {-# INLINE gcardinality #-}
+
+-- | ignore constructor metadata
+instance (GEnumerable (f)) => GEnumerable (M1 C t f) where
+ -- type GCardinality (M1 C t f) = GCardinality f
+ genumerated    = M1 <$> genumerated
+ gcardinality _ = gcardinality (Proxy :: Proxy (f))
+ {-# INLINE gcardinality #-}
+
+-- | ignore datatype metadata
+instance (GEnumerable (f)) => GEnumerable (M1 D t f) where
+ -- type GCardinality (M1 D t f) = GCardinality f
+ genumerated    = M1 <$> genumerated
+ gcardinality _ = gcardinality (Proxy :: Proxy (f))
+ {-# INLINE gcardinality #-}
+
+--------------------------------------------------------------------------------
+
 {-| see "Data.Enumerate.Reify.getJectivityM"
 
 -}
 data Jectivity = Injective | Surjective | Bijective
  deriving (Show,Read,Eq,Ord,Enum,Bounded,Ix,Generic,Data)
 -- instance Enumerable Jectivity
+
+{-| a (safely-)partial function. i.e. a function that:
+
+* fails only via the 'throwM' method of 'MonadThrow'
+* succeeds only via the 'return' method of 'Monad'
+
+-}
+type Partial a b = (forall m. MonadThrow m => a -> m b)
+
+--------------------------------------------------------------------------------
 
 {- | for non-'Generic' Bounded Enums:
 
