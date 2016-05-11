@@ -1,4 +1,7 @@
-{-# LANGUAGE RankNTypes, ScopedTypeVariables, DefaultSignatures, TypeOperators, FlexibleInstances, FlexibleContexts, LambdaCase, DataKinds  #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables, DefaultSignatures, TypeOperators #-}
+{-# LANGUAGE FlexibleInstances, FlexibleContexts, LambdaCase #-}
+{-# LANGUAGE TypeFamilies, ExplicitNamespaces, DataKinds, UndecidableInstances #-}
+
 {- | see the 'Enumerable' class for documentation.
 
 see "Data.Enumerate.Example" for examples.
@@ -51,7 +54,8 @@ import Data.Vinyl (Rec(..))
 import Control.Monad.Catch (MonadThrow(..))
 
 import           GHC.Generics
-import           Data.Proxy
+import Data.Data (Data)
+import           Data.Proxy (Proxy(..))
 import           Control.Arrow ((&&&))
 import           Data.List (genericLength)
 import           Data.Void (Void)
@@ -59,14 +63,15 @@ import           Data.Word (Word8, Word16)
 import           Data.Int (Int8, Int16)
 import qualified Data.Set as Set
 import Data.Set (Set)
-import System.Timeout
+import System.Timeout (timeout)
 import Control.DeepSeq (NFData,force)
-import GHC.TypeLits
-import Numeric.Natural
-import Data.Ix
+-- import GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^))
+import Numeric.Natural (Natural)
+import Data.Ix (Ix(..))
 
 
-{- | enumerate the set of all values in a (finitely enumerable) type. enumerates depth first.
+{- | enumerate the set of all values in a (finitely enumerable) type.
+enumerates depth first.
 
 generalizes 'Enum's to any finite/discrete type. an Enumerable is either:
 
@@ -77,6 +82,10 @@ generalizes 'Enum's to any finite/discrete type. an Enumerable is either:
 can be implemented automatically via its 'Generic' instance.
 
 laws:
+
+* finite:
+
+   * @cardinality@ is not @_|_@
 
 * consistent:
 
@@ -105,6 +114,28 @@ laws:
 -}
 class Enumerable a where
 
+-- * (by necessity) @'KnownNat' ('Cardinality' a)@
+--class (KnownNat (Cardinality a)) => Enumerable a where
+
+ -- type Cardinality a :: Nat -- TODO
+ {- too much boilerplate
+
+  e.g.
+
+ instance Enumerable Jectivity
+
+ errors with:
+
+ No instance for (KnownNat (Cardinality Jectivity))
+  arising from the superclasses of an instance declaration
+ In the instance declaration for `Enumerable Jectivity'
+
+ would need:
+
+ instance (KnownNat (Cardinality Jectivity)) => Enumerable Jectivity
+
+ -}
+
  enumerated :: [a]
 
  default enumerated :: (Generic a, GEnumerable (Rep a)) => [a]
@@ -128,17 +159,21 @@ type Partial a b = (forall m. MonadThrow m => a -> m b)
 
 -- | "Generic Enumerable", lifted to unary type constructors.
 class GEnumerable f where
+-- class (KnownNat (GCardinality f)) => GEnumerable f where
+ -- type GCardinality f :: Nat
  genumerated :: [f x]
  gcardinality :: proxy f -> Natural
 
 -- | empty list
 instance GEnumerable (V1) where
+ -- type GCardinality (V1) = 0
  genumerated    = []
  gcardinality _ = 0
  {-# INLINE gcardinality #-}
 
 -- | singleton list
 instance GEnumerable (U1) where
+ -- type GCardinality (U1) = 1
  genumerated    = [U1]
  gcardinality _ = 1
  {-# INLINE gcardinality #-}
@@ -147,57 +182,59 @@ instance GEnumerable (U1) where
 
 -}
 instance (Enumerable a) => GEnumerable (K1 R a) where
+ -- type GCardinality (K1 R a) = Cardinality a
  genumerated    = K1 <$> enumerated
  gcardinality _ = cardinality (Proxy :: Proxy a)
  {-# INLINE gcardinality #-}
 
 -- | multiply lists with @concatMap@
 instance (GEnumerable (f), GEnumerable (g)) => GEnumerable (f :*: g) where
+ -- type GCardinality (f :*: g) = (GCardinality f) * (GCardinality g)
  genumerated    = (:*:) <$> genumerated <*> genumerated
  gcardinality _ = gcardinality (Proxy :: Proxy (f)) * gcardinality (Proxy :: Proxy (g))
  {-# INLINE gcardinality #-}
 
 -- | add lists with @(<>)@
 instance (GEnumerable (f), GEnumerable (g)) => GEnumerable (f :+: g) where
+ -- type GCardinality (f :+: g) = (GCardinality f) + (GCardinality g)
  genumerated    = map L1 genumerated ++ map R1 genumerated
  gcardinality _ = gcardinality (Proxy :: Proxy (f)) + gcardinality (Proxy :: Proxy (g))
  {-# INLINE gcardinality #-}
 
 -- | ignore selector metadata
 instance (GEnumerable (f)) => GEnumerable (M1 S t f) where
+ -- type GCardinality (M1 S t f) = GCardinality f
  genumerated    = M1 <$> genumerated
  gcardinality _ = gcardinality (Proxy :: Proxy (f))
  {-# INLINE gcardinality #-}
 
 -- | ignore constructor metadata
 instance (GEnumerable (f)) => GEnumerable (M1 C t f) where
+ -- type GCardinality (M1 C t f) = GCardinality f
  genumerated    = M1 <$> genumerated
  gcardinality _ = gcardinality (Proxy :: Proxy (f))
  {-# INLINE gcardinality #-}
 
 -- | ignore datatype metadata
 instance (GEnumerable (f)) => GEnumerable (M1 D t f) where
+ -- type GCardinality (M1 D t f) = GCardinality f
  genumerated    = M1 <$> genumerated
  gcardinality _ = gcardinality (Proxy :: Proxy (f))
  {-# INLINE gcardinality #-}
 
-{-| see "Data.Enumerate.Reify.getJectivityM"
+-- {-| wrap any @(Bounded a, Enum a)@ to be a @Enumerable@ via 'boundedEnumerated'.
+--
+-- (avoids @OverlappingInstances@).
+--
+-- -}
+-- newtype WrappedBoundedEnum a = WrappedBoundedEnum { unwrapBoundedEnum :: a }
+--
+-- instance (Bounded a, Enum a) => Enumerable (WrappedBoundedEnum a) where
+--  -- -- type Cardinality () =
+--  enumerated    = WrappedBoundedEnum <$> boundedEnumerated
+--  cardinality _ = boundedCardinality (Proxy :: Proxy a)
 
--}
-data Jectivity = Injective | Surjective | Bijective deriving (Show,Read,Eq,Ord,Enum,Bounded)
-
-{-| wrap any @(Bounded a, Enum a)@ to be a @Enumerable@ via 'boundedEnumerated'.
-
-(avoids @OverlappingInstances@).
-
--}
-newtype WrappedBoundedEnum a = WrappedBoundedEnum { unwrapBoundedEnum :: a }
-
-instance (Bounded a, Enum a) => Enumerable (WrappedBoundedEnum a) where
- enumerated    = WrappedBoundedEnum <$> boundedEnumerated
- cardinality _ = boundedCardinality (Proxy :: Proxy a)
-
--- base types
+-- base types. TODO any more?
 instance Enumerable Void
 instance Enumerable ()
 instance Enumerable Bool
@@ -206,20 +243,36 @@ instance Enumerable Ordering
 {- |
 
 @-- 'toInteger' prevents overflow@
->>> toInteger (maxBound::Int8) - toInteger (minBound::Int8)
-255
+>>> 1 + toInteger (maxBound::Int8) - toInteger (minBound::Int8)
+256
 
 -}
-instance Enumerable Int8  where enumerated = boundedEnumerated; cardinality = boundedCardinality
-instance Enumerable Word8 where enumerated = boundedEnumerated; cardinality = boundedCardinality
+instance Enumerable Int8  where
+  -- type Cardinality Int8 = 256 -- 2^8
+  enumerated = boundedEnumerated
+  cardinality = boundedCardinality
+
+instance Enumerable Word8 where
+  -- type Cardinality Word8 = 256 -- 2^8
+  enumerated = boundedEnumerated
+  cardinality = boundedCardinality
+
 {- |
 
->>> toInteger (maxBound::Int16) - toInteger (minBound::Int16)
-65535
+>>> 1 + toInteger (maxBound::Int16) - toInteger (minBound::Int16)
+65536
 
 -}
-instance Enumerable Int16  where enumerated = boundedEnumerated; cardinality = boundedCardinality
-instance Enumerable Word16 where enumerated = boundedEnumerated; cardinality = boundedCardinality
+instance Enumerable Int16  where
+   -- type Cardinality Int16 = 65536 -- 2^16
+   enumerated = boundedEnumerated
+   cardinality = boundedCardinality
+
+instance Enumerable Word16 where
+  -- type Cardinality Word16 = 65536 -- 2^16
+  enumerated = boundedEnumerated
+  cardinality = boundedCardinality
+
 {- | there are only a million (1,114,112) characters.
 
 >>> import Data.Char (ord,chr)  -- 'ord', 'chr'
@@ -234,7 +287,10 @@ instance Enumerable Word16 where enumerated = boundedEnumerated; cardinality = b
 1114112
 
 -}
-instance Enumerable Char where enumerated = boundedEnumerated; cardinality = boundedCardinality
+instance Enumerable Char where
+  -- type Cardinality Char = 1114112
+  enumerated = boundedEnumerated
+  cardinality = boundedCardinality
 
 {-| the sum type.
 
@@ -245,9 +301,13 @@ the 'cardinality' is the sum of the cardinalities of @a@ and @b@.
 
 -}
 instance (Enumerable a, Enumerable b) => Enumerable (Either a b) where
+ -- type Cardinality (Either a b) = (Cardinality a) + (Cardinality b)
  enumerated    = (Left <$> enumerated) ++ (Right <$> enumerated)
  cardinality _ = cardinality (Proxy :: Proxy a) + cardinality (Proxy :: Proxy b)
+
+{-| -}
 instance (Enumerable a) => Enumerable (Maybe a) where
+ -- type Cardinality (Maybe a) = 1 + (Cardinality a)
  enumerated    = Nothing : (Just <$> enumerated)
  cardinality _ = 1 + cardinality (Proxy :: Proxy a)
 
@@ -259,24 +319,37 @@ the 'cardinality' is the product of the cardinalities of @a@ and @b@.
 6
 
 -}
-instance (Enumerable a, Enumerable b) => Enumerable (a, b) where
- enumerated    = (,) <$> enumerated <*> enumerated
- cardinality _ = cardinality (Proxy :: Proxy a) * cardinality (Proxy :: Proxy b)
+instance (Enumerable a, Enumerable b) => Enumerable (a, b) --where
+ -- enumerated    = (,) <$> enumerated <*> enumerated
+ -- cardinality _ = cardinality (Proxy :: Proxy a) * cardinality (Proxy :: Proxy b)
 
+-- | 3
 instance (Enumerable a, Enumerable b, Enumerable c) => Enumerable (a, b, c)
+-- | 4
 instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d) => Enumerable (a, b, c, d)
+-- | 5
 instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e) => Enumerable (a, b, c, d, e)
+-- | 6
 instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f) => Enumerable (a, b, c, d, e, f)
+-- | 7
 instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g) => Enumerable (a, b, c, d, e, f, g)
 
-{-| the cardinality is product of cardinalities. -}
+-- instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g, Enumerable h) => Enumerable (a, b, c, d, e, f, g, h)
+{-
+Could not deduce (Generic (a, b, c, d, e, f, g, h))
+     arising from a use of `Data.Enumerate.Types.$gdmenumerated'
+-}
+
+{-| the cardinality is a product of cardinalities. -}
 instance (Enumerable (f a), Enumerable (Rec f as)) => Enumerable (Rec f (a ': as)) where
+ -- type Cardinality (Rec f (a ': as)) = (Cardinality (f a)) * (Cardinality (Rec f as))
  enumerated =  (:&) <$> enumerated <*> enumerated
  cardinality _ = cardinality (Proxy :: Proxy (f a)) * cardinality (Proxy :: Proxy (Rec f as))
 
-{-| the cardinality is 1. -}
+{-|  -}
 instance Enumerable (Rec f '[]) where
- enumerated =  [RNil]
+ -- type Cardinality (Rec f '[]) = 1
+ enumerated = [RNil]
  cardinality _ = 1
 
 {-|
@@ -292,15 +365,24 @@ you should be able to safely call 'enumerateBelow', unless the arithmetic itself
 
 -}
 instance (Enumerable a, Ord a) => Enumerable (Set a) where
+ -- type Cardinality (Set a) = 2 ^ (Cardinality a)
  enumerated    = (Set.toList . powerSet . Set.fromList) enumerated
  cardinality _ = 2 ^ cardinality (Proxy :: Proxy a)
 
 {-
 -- | (from the @modular-arithmetic@ package)
 instance (Integral i, Num i, KnownNat n) => Enumerable (Mod i n) where
+ -- type Cardinality (Mod i n) = n
  enumerated    = toMod <$> [0 .. fromInteger (natVal (Proxy :: Proxy n) - 1)]
  cardinality _ = fromInteger (natVal (Proxy :: Proxy n))
 -}
+
+{-| see "Data.Enumerate.Reify.getJectivityM"
+
+-}
+data Jectivity = Injective | Surjective | Bijective
+ deriving (Show,Read,Eq,Ord,Enum,Bounded,Ix,Generic,Data)
+-- instance Enumerable Jectivity
 
 {- | for non-'Generic' Bounded Enums:
 
@@ -319,7 +401,7 @@ boundedEnumerated = enumFromTo minBound maxBound
 behavior may be undefined when the cardinality of @a@ is larger than the cardinality of @Int@. this should be okay, as @Int@ is at least as big as @Int64@, which is at least as big as all the monomorphic types in @base@ that instantiate @Bounded@. you can double-check with:
 
 >>> boundedCardinality (const(undefined::Int))   -- platform specific
-18446744073709551616
+18446744073709556464
 
 @
 -- i.e. 1 + 9223372036854775807 - (-9223372036854775808)
@@ -377,8 +459,10 @@ and consuming its values is reasonable for your application.
 e.g. after benchmarking, you think you can process a billion entries within a minute.
 
 -}
-enumerateBelow :: forall a. (Enumerable a) => Natural -> Either Natural [a]
-enumerateBelow maxSize = if theSize < maxSize then Right enumerated else Left theSize
+enumerateBelow :: forall a. (Enumerable a) => Natural -> Either Natural [a] --TODO move
+enumerateBelow maxSize = if theSize < maxSize
+  then Right enumerated
+  else Left theSize
  where
  theSize = cardinality (Proxy :: Proxy a)
 
@@ -389,5 +473,6 @@ enumerateBelow maxSize = if theSize < maxSize then Right enumerated else Left th
 Just [False,True]
 
 -}
-enumerateTimeout :: (Enumerable a, NFData a) => Int -> IO (Maybe [a])
-enumerateTimeout maxDuration = timeout maxDuration (return$ force enumerated)
+enumerateTimeout :: (Enumerable a, NFData a) => Int -> IO (Maybe [a]) --TODO move
+enumerateTimeout maxDuration
+ = timeout maxDuration (return$ force enumerated)

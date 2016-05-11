@@ -1,4 +1,5 @@
 {-# LANGUAGE TupleSections, ScopedTypeVariables #-}
+{-# LANGUAGE TypeFamilies, ExplicitNamespaces, DataKinds, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-| orphan instances, of 'Enumerate'\/'Eq'\/'Show', for functions.
 
@@ -19,6 +20,7 @@ import Data.Enumerate.Extra
 
 import           Data.Proxy
 import qualified Data.Map as Map
+-- import GHC.TypeLits (Nat, type (^))
 
 
 {-| the exponential type.
@@ -40,7 +42,8 @@ instance ('Enumerable' a, Enumerable b, 'Ord' a, Ord b) => Enumerable (a -> b) w
 @
 
 -}
-instance (Enumerable a, Enumerable b, Ord a, Ord b) => Enumerable (a -> b) where
+instance (Enumerable a, Enumerable b, Ord a, Ord b) => Enumerable (a -> b) where --TODO, no (oprhan) instance, just the standalone function/type-instance?
+ -- -- type Cardinality (a -> b) = (Cardinality b) ^ (Cardinality a)
  enumerated    = functionEnumerated
  cardinality _ = cardinality (Proxy :: Proxy b) ^ cardinality (Proxy :: Proxy a)
 
