@@ -59,8 +59,11 @@ throw2either = id
 throw2list :: (forall m. MonadThrow m => a -> m b) -> (a -> [b])
 throw2list = id
 
-{-| makes an *unsafely*-partial function (i.e. a function that throws exceptions or that has inexhaustive pattern matching) into a *safely*-partial function (i.e. that explicitly returns in a monad that supports failure).
-
+{-| makes an *unsafely*-partial function
+(i.e. a function that throws exceptions or
+that has inexhaustive pattern matching)
+into a *safely*-partial function
+(i.e. that explicitly returns in a monad that supports failure).
 
 -}
 totalizeFunction :: (NFData b, MonadThrow m) => (a -> b) -> (a -> m b)
@@ -82,13 +85,16 @@ defaultPartialityHandlers =
     , Handler $ \(e :: ArrayException)   -> return (throwM e)
     , Handler $ \(e :: ErrorCall)        -> return (throwM e)
     , Handler $ \(e :: PatternMatchFail) -> return (throwM e)
-    , Handler $ \(e :: SomeException)    -> return (throwM e) -- TODO is catchall okay?
+    , Handler $ \(e :: SomeException)    -> return (throwM e) -- TODO is catchall okay? why is this here?
     ]
 {-# INLINEABLE defaultPartialityHandlers #-}
 
-{-| Evaluate a value to normal form and 'throwM' any exceptions are thrown during evaluation. For any error-free value, @spoon = Just@.
+{-| Evaluate a value to normal form and 'throwM' any exceptions are thrown
+during evaluation. For any error-free value, @spoon = Just@.
 
-taken from the <https://hackage.haskell.org/package/spoon-0.3.1/docs/Control-Spoon.html spoon> package.
+(taken from the
+<https://hackage.haskell.org/package/spoon-0.3.1/docs/Control-Spoon.html spoon>
+package.)
 
 -}
 spoonWith :: (NFData a, MonadThrow m) => [Handler (m a)] -> a -> m a
@@ -98,11 +104,10 @@ spoonWith handlers a = unsafePerformIO $ do
 
 {- | the eliminator as a function and the introducer as a string
 
-helper for declaring Show instances of datatypes without visible constructors (like @Map@
-which is shown as an list).
+helper for declaring Show instances of datatypes without
+visible constructors (like @Map@ which is shown as a list).
 
 -}
-
 showsPrecWith :: (Show a, Show b) => String -> (a -> b) -> Int -> a -> ShowS
 showsPrecWith stringFrom functionInto p x = showParen (p > 10) $
   showString stringFrom . showString " " . shows (functionInto x)
@@ -120,8 +125,9 @@ int2natural = fromInteger . toInteger
 [[],[1],[2],[3],[1,2],[1,3],[2,3],[1,2,3]]
 
 -}
-powerSet :: (Ord a) => Set a -> Set (Set a)
-powerSet values = Set.singleton values `Set.union` _Set_bind powerSet (dropEach values)
+powerSet :: (Ord a) => Set a -> Set (Set a) --TODO use [[a]]
+powerSet values =
+   Set.singleton values `Set.union` _Set_bind powerSet (dropEach values)
  where
  _Set_bind :: (Ord a, Ord b) => (a -> Set b) -> Set a -> Set b
  _Set_bind f = _Set_join . Set.map f

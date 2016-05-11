@@ -2,6 +2,8 @@
 {-# LANGUAGE FlexibleInstances, FlexibleContexts, LambdaCase #-}
 {-# LANGUAGE TypeFamilies, ExplicitNamespaces, DataKinds, UndecidableInstances #-}
 
+{-# LANGUAGE DeriveGeneric, DeriveDataTypeable #-}
+
 {- | see the 'Enumerable' class for documentation.
 
 see "Data.Enumerate.Example" for examples.
@@ -19,7 +21,7 @@ instance Arbitrary T where arbitrary = elements 'enumerated'
 
 (whenever possible) provides instances for all base types:
 
-* under @Data.@ / @Control.@ / @System.@ / @Text.@
+* under @Data.@ \/ @Control.@ \/ @System.@ \/ @Text.@, and even @GHC.@
 * even non-'Enum's
 * except when too large (like 'Int') (see "Data.Enumerate.Large")
 
@@ -32,29 +34,31 @@ also provides instances for:
 
 * sets
 
-* modular integers
-
 * vinyl records
 
 
 related packages:
 
-* <http://hackage.haskell.org/package/emgm-0.4/docs/Generics-EMGM-Functions-Enum.html emgm>.  allows infinite lists (by convention). too heavyweight.
+* <http://hackage.haskell.org/package/emgm-0.4/docs/Generics-EMGM-Functions-Enum.html emgm>.
+  allows infinite lists (by convention). too heavyweight.
 
-* <http://hackage.haskell.org/package/enumerable enumerable>. no @Generic@ instance.
+* <http://hackage.haskell.org/package/enumerable enumerable>.
+no @Generic@ instance.
 
-* <https://hackage.haskell.org/package/testing-feat-0.4.0.2/docs/Test-Feat-Class.html#t:Enumerable testing-feat>. too heavyweight (testing framework).
+* <https://hackage.haskell.org/package/testing-feat-0.4.0.2/docs/Test-Feat-Class.html#t:Enumerable testing-feat>.
+too heavyweight (testing framework).
 
-* <https://hackage.haskell.org/package/smallcheck smallcheck> too heavyweight (testing framework). Series enumerates up to some depth and can enumerated infinitely-inhabited types.
+* <https://hackage.haskell.org/package/smallcheck smallcheck>
+too heavyweight (testing framework). Series enumerates up to some depth and can enumerated infinitely-inhabited types.
 
-* https://hackage.haskell.org/package/quickcheck quickcheck> too heavyweight (testing framework, randomness unnecessary).
+* <https://hackage.haskell.org/package/quickcheck quickcheck>
+too heavyweight (testing framework, randomness unnecessary).
 
 -}
 
 module Data.Enumerate.Types where
 import Data.Enumerate.Extra
 
---import Data.Modular
 import Data.Vinyl (Rec(..))
 import Control.Monad.Catch (MonadThrow(..))
 
@@ -101,6 +105,9 @@ import GHC.IO.Encoding.Failure (CodingFailureMode(..))
 import GHC.IO.Encoding.Types (CodingProgress(..))
 import GHC.RTS.Flags (DoTrace,DoHeapProfile,DoCostCentres,GiveGCStats)
 
+--import Data.Modular (not on stack)
+-- * modular integers
+
 
 {- | enumerate the set of all values in a (finitely enumerable) type.
 enumerates depth first.
@@ -117,7 +124,7 @@ laws:
 
 * finite:
 
-   * @cardinality@ is not @_|_@
+    * @'cardinality' /= _|_@
 
 * consistent:
 
@@ -146,28 +153,6 @@ laws:
 -}
 class Enumerable a where
 
--- * (by necessity) @'KnownNat' ('Cardinality' a)@
---class (KnownNat (Cardinality a)) => Enumerable a where
-
- -- type Cardinality a :: Nat -- TODO
- {- too much boilerplate
-
-  e.g.
-
- instance Enumerable Jectivity
-
- errors with:
-
- No instance for (KnownNat (Cardinality Jectivity))
-  arising from the superclasses of an instance declaration
- In the instance declaration for `Enumerable Jectivity'
-
- would need:
-
- instance (KnownNat (Cardinality Jectivity)) => Enumerable Jectivity
-
- -}
-
  enumerated :: [a]
 
  default enumerated :: (Generic a, GEnumerable (Rep a)) => [a]
@@ -180,6 +165,28 @@ class Enumerable a where
  -- default cardinality :: (Generic a, GEnumerable (Rep a)) => proxy a -> Natural
  -- cardinality _ = gcardinality (Proxy :: Proxy (Rep a))
  -- TODO merge both methods into one that returns their pair
+
+ -- * (by necessity) @'KnownNat' ('Cardinality' a)@
+ --class (KnownNat (Cardinality a)) => Enumerable a where
+
+  -- type Cardinality a :: Nat -- TODO
+  {- too much boilerplate
+
+   e.g.
+
+  instance Enumerable Jectivity
+
+  errors with:
+
+  No instance for (KnownNat (Cardinality Jectivity))
+   arising from the superclasses of an instance declaration
+  In the instance declaration for `Enumerable Jectivity'
+
+  would need:
+
+  instance (KnownNat (Cardinality Jectivity)) => Enumerable Jectivity
+
+  -}
 
 {-
 instance Enumerable where
@@ -206,9 +213,8 @@ instance (Enumerable a) => Enumerable (X a) where
 
 -}
 
---NOTE this file takes ~1s to build
+--NOTE this file takes ~1s to build. split into another with orphans?
 
--- base types. TODO any more?
 instance Enumerable Void
 instance Enumerable ()
 instance Enumerable Bool
@@ -234,7 +240,8 @@ instance (Coercible a b) => Enumerable (Coercion a b) where
 
 {- |
 
-@-- 'toInteger' prevents overflow@
+@-- ('toInteger' prevents overflow)@
+
 >>> 1 + toInteger (maxBound::Int8) - toInteger (minBound::Int8)
 256
 
@@ -680,7 +687,7 @@ the cardinality of @Int@. this should be okay, as @Int@ is at least as big as
 instantiate @Bounded@. you can double-check with:
 
 >>> boundedCardinality (const(undefined::Int))   -- platform specific
-18446744073709556464
+18446744073709551616
 
 @
 -- i.e. 1 + 9223372036854775807 - (-9223372036854775808)

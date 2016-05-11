@@ -51,32 +51,44 @@ class Finite a where
   type Cardinality a = GCardinality (Rep a)
 
 -- base types. TODO any more?
+
+-- | @0@
 instance Finite Void
+-- | @1@
 instance Finite ()
+-- | @2@
 instance Finite Bool
+-- | @3@
 instance Finite Ordering
 
 instance Finite (Proxy a) where
  type Cardinality (Proxy a) = 1
 
+-- | @2^8@
 instance Finite Int8 where
- type Cardinality Int8 = 256 -- ^ 2^8
+ type Cardinality Int8 = 256
 
+-- | @2^8@
 instance Finite Word8 where
- type Cardinality Word8 = 256 -- 2^8
+ type Cardinality Word8 = 256
 
+-- | @2^16@
 instance Finite Int16 where
-  type Cardinality Int16 = 65536 -- 2^16
+  type Cardinality Int16 = 65536
 
+-- | @2^16@
 instance Finite Word16 where
- type Cardinality Word16 = 65536 -- 2^16
+ type Cardinality Word16 = 65536
 
+-- | @1114112@
 instance Finite Char where
  type Cardinality Char = 1114112
 
+-- | @1 + a@
 instance (Finite a) => Finite (Maybe a) where
  type Cardinality (Maybe a) = 1 + (Cardinality a)
 
+-- | @a + b@
 instance (Finite a, Finite b) => Finite (Either a b) where
  type Cardinality (Either a b) = (Cardinality a) + (Cardinality b)
 
@@ -84,6 +96,7 @@ instance (Finite a, Finite b) => Finite (Either a b) where
 instance (Finite (f a), Finite (Rec f as)) => Finite (Rec f (a ': as)) where
  type Cardinality (Rec f (a ': as)) = (Cardinality (f a)) * (Cardinality (Rec f as))
 
+ -- | @1@
 instance Finite (Rec f '[]) where
  type Cardinality (Rec f '[]) = 1
 
@@ -92,24 +105,25 @@ class Finite (Mod i n) where
  type Cardinality (Mod i n) = n
 -}
 
+-- | @a*b@
 instance (Finite a, Finite b) => Finite (a, b)
 
--- | 3
+-- | @a*b*c@
 instance (Finite a, Finite b, Finite c) => Finite (a, b, c)
--- | 4
+-- | @a*b*c*d@
 instance (Finite a, Finite b, Finite c, Finite d) => Finite (a, b, c, d)
--- | 5
+-- | @a*b*c*d*e@
 instance (Finite a, Finite b, Finite c, Finite d, Finite e) => Finite (a, b, c, d, e)
--- | 6
+-- | @a*b*c*d*e*f@
 instance (Finite a, Finite b, Finite c, Finite d, Finite e, Finite f) => Finite (a, b, c, d, e, f)
--- | 7
+-- | @a*b*c*d*e*f*g@
 instance (Finite a, Finite b, Finite c, Finite d, Finite e, Finite f, Finite g) => Finite (a, b, c, d, e, f, g)
 
--- |
+-- | @2^a@
 instance (Finite a) => Finite (Set a) where
  type Cardinality (Set a) = 2 ^ (Cardinality a)
 
--- |
+-- | @b^a@
 instance (Finite a, Finite b) => Finite (a -> b) where
  type Cardinality (a -> b) = (Cardinality b) ^ (Cardinality a)
 
@@ -153,16 +167,29 @@ type CardinalityWithin n a = IsCardinalityWithin n a ~ True
 
 {-|
 
->>> type CardinalityWithinAMillion = CardinalityWithin 1000000
+a predicate, inclusive.
+
+@
+> type CardinalityWithinAMillion a = CardinalityWithin 1000000 a
+> :kind! CardinalityWithinAMillion Bool
+True
+> :kind! CardinalityWithinAMillion Char
+False
+@
+
+-}
+type IsCardinalityWithin n a = Cardinality a <=? n
+
+{-
+>>> :set -XDataKinds
+>>> :set -XConstraintKinds
+>>> :set -XTypeFamilies
+>>> type CardinalityWithinAMillion a = CardinalityWithin 1000000 a
 >>> :kind! CardinalityWithinAMillion Bool
 True
 >>> :kind! CardinalityWithinAMillion Char
 False
-
-a predicate, inclusive.
-
 -}
-type IsCardinalityWithin n a = Cardinality a <=? n
 
 -- {-| enumerate only when the cardinality is small enough.
 --
