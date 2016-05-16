@@ -151,7 +151,7 @@ extensionallyUnequal f g
  = any ((/=) <$> f <*> g) enumerated
 {-# INLINABLE extensionallyUnequal #-}
 
--- | show all inputs and their outputs.
+-- | show all inputs and their outputs, as @unsafeFromList [...]@.
 functionShowsPrec
  :: (Enumerable a, Show a, Show b)
  => Int
@@ -160,6 +160,24 @@ functionShowsPrec
 functionShowsPrec
  = showsPrecWith "unsafeFromList" reifyFunction
 {-# INLINABLE functionShowsPrec #-}
+
+-- | show all inputs and their outputs, as @\case ...@.
+displayFunction
+  :: (Enumerable a, Show a, Show b)
+  => (a -> b)
+  -> String
+displayFunction
+    = reifyFunction
+  >>> fmap showCase
+  >>>  ("\\case":)
+  >>> intercalate "\n"
+ where
+ showCase (x,y) = intercalate " " ["", show x, " -> ", show y]
+
+-- displayPartialFunction
+--  :: (Enumerable a, Show a, Show b)
+--  => (a -> Maybe b)
+--  -> String
 
 {-| @[(a,b)]@ is a mapping, @[[(a,b)]]@ is a list of mappings.
 

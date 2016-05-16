@@ -65,7 +65,8 @@ asSurjection (Bijection f g) = Surjection f ((:|[]) <$> g) -- pure
 
 -}
 type Partial a b = (forall m. MonadThrow m => a -> m b)
--- (:->?)
+
+type (a -?> b) = Partial a b
 
 --------------------------------------------------------------------------------
  -- (by necessity) @'KnownNat' ('Cardinality' a)@

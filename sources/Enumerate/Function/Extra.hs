@@ -10,6 +10,7 @@ module Enumerate.Function.Extra
  , module Control.Arrow
 
  , module Data.Function
+ , module Data.List
  ) where
 
 import Data.Semigroup (Semigroup)
@@ -23,6 +24,7 @@ import System.IO.Unsafe (unsafePerformIO)
 import Control.Exception (catches, throwIO, Handler(..), AsyncException, ArithException, ArrayException, ErrorCall, PatternMatchFail)
 
 import Data.Function ((&))
+import Data.List (intercalate)
 
 
 nothing :: (Monad m) => m ()
