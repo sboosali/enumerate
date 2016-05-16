@@ -29,23 +29,9 @@ main = do
   ]
 
  doctest
-  [ "sources/Enumerate/Orphans/Function.hs"
-  , "sources/Enumerate/Example.hs"
+  [ "sources/Enumerate/Example.hs"
   ]
 
  doctest
    [ "sources/Enumerate/Cardinality.hs"
    ]
-
-   -- split up because some modules only succeed when they have the interpreter to themselves.
-   -- seems like there's incompatibility between the Data.Enumerate.Types a module is *built* with,
-   -- and they types that are present when it is *interpreted*.
-
- --
- -- doctest
- --  [ "sources/Enumerate/Reify.hs" -- freezes
- --  ]
- --
- --  doctest
- --   [ "sources/Enumerate/Map.hs" -- freezes
- --   ]

@@ -67,19 +67,18 @@ module Enumerate.Types where
 import Enumerate.Extra
 
 import Data.Vinyl (Rec(..))
-import Control.Monad.Catch (MonadThrow(..))
+import Control.DeepSeq (NFData,force)
 
+import qualified Data.Set as Set
+import Data.Set (Set)
 import           GHC.Generics
 import Data.Data (Data)
 import           Control.Arrow ((&&&))
 import           Data.List (genericLength)
-import qualified Data.Set as Set
-import Data.Set (Set)
 import System.Timeout (timeout)
-import Control.DeepSeq (NFData,force)
--- import GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^))
 import Numeric.Natural (Natural)
 import Data.Ix (Ix(..))
+-- import GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^))
 
 import           Data.Void (Void)
 import           Data.Word (Word8, Word16)
@@ -173,28 +172,6 @@ class Enumerable a where
  -- cardinality _ = gcardinality (Proxy :: Proxy (Rep a))
  -- TODO merge both methods into one that returns their pair
 
- -- * (by necessity) @'KnownNat' ('Cardinality' a)@
- --class (KnownNat (Cardinality a)) => Enumerable a where
-
-  -- type Cardinality a :: Nat -- TODO
-  {- too much boilerplate
-
-   e.g.
-
-  instance Enumerable Jectivity
-
-  errors with:
-
-  No instance for (KnownNat (Cardinality Jectivity))
-   arising from the superclasses of an instance declaration
-  In the instance declaration for `Enumerable Jectivity'
-
-  would need:
-
-  instance (KnownNat (Cardinality Jectivity)) => Enumerable Jectivity
-
-  -}
-
 {-
 instance Enumerable where
  enumerated = boundedEnumerated
@@ -208,7 +185,14 @@ instance (Enumerable a) => Enumerable (X a) where
 
 -}
 
- --------------------------------------------------------------------------------
+{-| wrap any @(Bounded a, Enum a)@ to be a @Enumerable@ via 'boundedEnumerated'.
+
+(avoids @OverlappingInstances@).
+
+-}
+newtype WrappedBoundedEnum a = WrappedBoundedEnum { unwrapBoundedEnum :: a }
+
+--------------------------------------------------------------------------------
  -- main base types
 
 {- NOTE: to declare instances:
@@ -549,7 +533,6 @@ GiveGCStats
 
 --------------------------------------------------------------------------------
 -- package types
-instance Enumerable Jectivity
 
 instance (Bounded a, Enum a) => Enumerable (WrappedBoundedEnum a) where
  -- type Cardinality (WrappedBoundedEnum a) = Cardinality a
@@ -645,29 +628,6 @@ instance (GEnumerable (f)) => GEnumerable (M1 D t f) where
  genumerated    = M1 <$> genumerated
  gcardinality _ = gcardinality (Proxy :: Proxy (f))
  {-# INLINE gcardinality #-}
-
---------------------------------------------------------------------------------
-
-{-| see "Enumerate.Reify.getJectivityM"
-
--}
-data Jectivity = Injective | Surjective | Bijective
- deriving (Show,Read,Eq,Ord,Enum,Bounded,Ix,Generic,Data)
-
-{-| wrap any @(Bounded a, Enum a)@ to be a @Enumerable@ via 'boundedEnumerated'.
-
-(avoids @OverlappingInstances@).
-
--}
-newtype WrappedBoundedEnum a = WrappedBoundedEnum { unwrapBoundedEnum :: a }
-
-{-| a (safely-)partial function. i.e. a function that:
-
-* fails only via the 'throwM' method of 'MonadThrow'
-* succeeds only via the 'return' method of 'Monad'
-
--}
-type Partial a b = (forall m. MonadThrow m => a -> m b)
 
 --------------------------------------------------------------------------------
 

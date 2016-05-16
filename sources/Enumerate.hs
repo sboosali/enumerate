@@ -20,16 +20,12 @@ See the source of "Enumerate.Example" for an example.
 module Enumerate --TODO rename to Enumerable
  ( module Enumerate.Types
  , module Enumerate.Cardinality
- , module Enumerate.Reify
- , module Enumerate.Map
  , module Enumerate.Enum
 
  -- , module Enumerate.Domain
  ) where
 import Enumerate.Types
 import Enumerate.Cardinality
-import Enumerate.Reify
-import Enumerate.Map
 import Enumerate.Enum
 
 -- import Enumerate.Domain
