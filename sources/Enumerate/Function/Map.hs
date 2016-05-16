@@ -179,6 +179,19 @@ displayFunction
 --  => (a -> Maybe b)
 --  -> String
 
+displayInjective
+ :: (Enumerable a, Show a, Show b)
+ => (a -> b)
+ -> Maybe String
+displayInjective f
+    = reifyFunction
+  >>> fmap showCase
+  >>>  ("\\case":)
+  >>> intercalate "\n"
+  where
+  showCase (x,y) = intercalate " " ["", show x, " <- ", show y]
+  fImage = image f
+
 {-| @[(a,b)]@ is a mapping, @[[(a,b)]]@ is a list of mappings.
 
 >>> let orderingPredicates = mappingEnumeratedAt [LT,EQ,GT] [False,True]

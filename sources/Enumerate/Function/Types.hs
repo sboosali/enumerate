@@ -4,7 +4,7 @@ import Enumerate.Types
 import Enumerate.Function.Extra
 
 import Control.Monad.Catch (MonadThrow)
-import Control.DeepSeq (NFData)
+import Control.DeepSeq
 
 import Data.Ix (Ix)
 
