@@ -20,7 +20,7 @@ import Control.Monad.Catch (MonadThrow(..), SomeException(..))
 
 import GHC.Generics (Generic)
 import Data.Data (Data)
-import Control.Arrow ((>>>))
+import Control.Arrow ((>>>),(<<<))
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Exception (catches, throwIO, Handler(..), AsyncException, ArithException, ArrayException, ErrorCall, PatternMatchFail)
 

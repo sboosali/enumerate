@@ -31,6 +31,13 @@ main = do
       let anEdit = fromKeyBinding aKeyBinding
       putStrLn $ intercalate " " ["", show aKeyBinding, "<-", show anEdit]
 
+  -- no instance (Enumerable KeyBinding)
+  -- case isSurjective emacsEdit of
+  --   Nothing             -> do
+  --     print $ "`emacsEdit` is non-surjective (there are infinitely many strings)"
+  --   Just fromKeyBinding -> do
+  --     putStrLn $ "`emacsEdit` is surjective:\n"
+
 data Edit = Edit Action Slice Region
  deriving (Show,Read,Eq,Ord,Generic,Enumerable)
 
@@ -85,3 +92,9 @@ emacsEndRegion = \case
  Character -> ["<right>"]
  Token     -> ["M-f"]
  Line      -> ["C-e"]
+
+-- chromeEdit :: Partial Edit KeyBinding
+-- chromeEdit = maybe2throw <<< \case
+--  Edit Transpose _     region -> Nothing
+--  Edit Cut       slice region -> chromeSelect region slice ++ ["M-c"]
+--  Edit Delete    slice region -> chromeSelect region slice ++ ["<del>"]
