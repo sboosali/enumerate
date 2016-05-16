@@ -108,7 +108,7 @@ helper for declaring Show instances of datatypes without
 visible constructors (like @Map@ which is shown as a list).
 
 -}
-showsPrecWith :: (Show a, Show b) => String -> (a -> b) -> Int -> a -> ShowS
+showsPrecWith :: (Show b) => String -> (a -> b) -> Int -> a -> ShowS
 showsPrecWith stringFrom functionInto p x = showParen (p > 10) $
   showString stringFrom . showString " " . shows (functionInto x)
 

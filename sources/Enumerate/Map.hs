@@ -1,4 +1,5 @@
-{-# LANGUAGE RankNTypes, LambdaCase #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE RankNTypes, LambdaCase, TupleSections #-}
 {-| converting between partial functions and maps.
 
 @(for doctest)@
@@ -40,6 +41,10 @@ import qualified Data.Set as Set
 import           Data.Set (Set)
 import           Data.Maybe (fromJust, mapMaybe, listToMaybe)
 import           Control.Exception(PatternMatchFail(..))
+import           Data.Proxy
+-- import GHC.TypeLits (Nat, type (^))
+import           Numeric.Natural
+
 
 {- | convert a total function to a map.
 
@@ -307,3 +312,165 @@ isBijectiveM f = do
  let fBi = (fromJust . fIn)  -- safe, because the intersection of "zero or one" with "one or more" is "one"
  return fBi
 -- let fOp = invertMap (fromFunctionM f) -- share the map
+
+--------------------------------------------------------------------------------
+{-| wraps 'Map.lookup'
+
+>>> (unsafeFromList [(False,True),(True,False)]) False
+True
+>>> (unsafeFromList [(False,True),(True,False)]) True
+False
+
+-}
+unsafeFromList
+ :: (Ord a)
+ => [(a,b)]
+ -> (a -> b)
+unsafeFromList
+ = unsafeToFunction . Map.fromList
+{-# INLINABLE unsafeFromList #-}
+
+{-| see 'mappingEnumeratedAt' -}
+functionEnumerated
+ :: (Enumerable a, Enumerable b, Ord a, Ord b)
+ => [a -> b]
+functionEnumerated = functions
+ where
+ functions = (unsafeToFunction . Map.fromList) <$> mappings
+ mappings = mappingEnumeratedAt enumerated enumerated
+
+-- | @|b| ^ |a|@
+functionCardinality
+ :: forall a b proxy. (Enumerable a, Enumerable b)
+ => proxy (a -> b)
+ -> Natural
+functionCardinality _
+ = cardinality (Proxy :: Proxy b) ^ cardinality (Proxy :: Proxy a)
+{-# INLINABLE functionCardinality #-}
+
+-- | (short-ciruits).
+extensionallyEqual
+ :: (Enumerable a, Eq b)
+ => (a -> b)
+ -> (a -> b)
+ -> Bool
+extensionallyEqual f g
+ = all ((==) <$> f <*> g) enumerated
+{-# INLINABLE extensionallyEqual #-}
+
+-- | (short-ciruits).
+extensionallyUnequal
+ :: (Enumerable a, Eq b)
+ => (a -> b)
+ -> (a -> b)
+ -> Bool
+extensionallyUnequal f g
+ = any ((/=) <$> f <*> g) enumerated
+{-# INLINABLE extensionallyUnequal #-}
+
+-- | show all inputs and their outputs.
+functionShowsPrec
+ :: (Enumerable a, Show a, Show b)
+ => Int
+ -> (a -> b)
+ -> ShowS
+functionShowsPrec
+ = showsPrecWith "unsafeFromList" reifyFunction
+{-# INLINABLE functionShowsPrec #-}
+
+{-| @[(a,b)]@ is a mapping, @[[(a,b)]]@ is a list of mappings.
+
+>>> let orderingPredicates = mappingEnumeratedAt [LT,EQ,GT] [False,True]
+>>> print $ length orderingPredicates
+8
+>>> printMappings $ orderingPredicates
+<BLANKLINE>
+(LT,False)
+(EQ,False)
+(GT,False)
+<BLANKLINE>
+(LT,False)
+(EQ,False)
+(GT,True)
+<BLANKLINE>
+(LT,False)
+(EQ,True)
+(GT,False)
+<BLANKLINE>
+(LT,False)
+(EQ,True)
+(GT,True)
+<BLANKLINE>
+(LT,True)
+(EQ,False)
+(GT,False)
+<BLANKLINE>
+(LT,True)
+(EQ,False)
+(GT,True)
+<BLANKLINE>
+(LT,True)
+(EQ,True)
+(GT,False)
+<BLANKLINE>
+(LT,True)
+(EQ,True)
+(GT,True)
+
+where the (total) mapping:
+
+@
+(LT,False)
+(EQ,False)
+(GT,True)
+@
+
+is equivalent to the function:
+
+@
+\\case
+ LT -> False
+ EQ -> False
+ GT -> True
+@
+
+-}
+mappingEnumeratedAt :: [a] -> [b] -> [[(a,b)]]           -- TODO diagonalize? performance?
+mappingEnumeratedAt as bs = go (crossProduct as bs)
+ where
+ go [] = []
+ go [somePairs] = do
+  pair <- somePairs
+  return$ [pair]
+ go (somePairs:theProduct) = do
+  pair <- somePairs
+  theExponent <- go theProduct
+  return$ pair : theExponent
+
+{-|
+
+>>> let crossOrderingBoolean = crossProduct [LT,EQ,GT] [False,True]
+>>> printMappings $ crossOrderingBoolean
+<BLANKLINE>
+(LT,False)
+(LT,True)
+<BLANKLINE>
+(EQ,False)
+(EQ,True)
+<BLANKLINE>
+(GT,False)
+(GT,True)
+
+the length of the outer list is the size of the first set, and
+the length of the inner list is the size of the second set.
+
+>>> print $ length crossOrderingBoolean
+3
+>>> print $ length (head crossOrderingBoolean)
+2
+
+-}
+crossProduct :: [a] -> [b] -> [[(a,b)]]
+crossProduct [] _ = []
+crossProduct (aValue:theDomain) theCodomain =
+ fmap (aValue,) theCodomain : crossProduct theDomain theCodomain
