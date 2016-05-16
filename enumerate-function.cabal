@@ -52,10 +52,10 @@ library
   Enumerate.Function.Invert
 
   Enumerate.Orphans.Function
-  Enumerate.Function.Main
 
- -- (for doctest) other-modules:
+ -- (for doctest / haddocks / exectuable) other-modules:
   Enumerate.Function.Extra
+  Enumerate.Function.Example
 
  build-depends:
     base >=4.7 && <5

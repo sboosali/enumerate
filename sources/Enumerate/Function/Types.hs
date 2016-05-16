@@ -13,8 +13,8 @@ import Data.Ix (Ix)
 
 -}
 data Jectivity = Injective | Surjective | Bijective
- deriving (Show,Read,Eq,Ord,Enum,Bounded,Ix,Generic,Data,NFData)
-instance Enumerable Jectivity
+ deriving (Show,Read,Eq,Ord,Enum,Bounded,Ix,Generic,Data
+          ,NFData,Enumerable)
 
 {- with proof:
 
@@ -44,7 +44,7 @@ type Partial a b = (forall m. MonadThrow m => a -> m b)
 -- (:->?)
 
 --------------------------------------------------------------------------------
- -- * (by necessity) @'KnownNat' ('Cardinality' a)@
+ -- (by necessity) @'KnownNat' ('Cardinality' a)@
  --class (KnownNat (Cardinality a)) => Enumerable a where
 
   -- type Cardinality a :: Nat -- TODO

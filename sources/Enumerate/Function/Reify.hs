@@ -94,7 +94,7 @@ reifyFunctionAtM domain f
  . fmap (id &&& f)
  $ domain
  where
- bitraverse f g (x,y) = (,) <$> f x <*> g y  -- avoid bifunctors dependency
+ bitraverse g h (x,y) = (,) <$> g x <*> h y  -- avoid bifunctors dependency
 
 -- | @reifyPredicateAt = 'flip' 'filter'@
 reifyPredicateAt :: [a] -> (a -> Bool) -> [a]
