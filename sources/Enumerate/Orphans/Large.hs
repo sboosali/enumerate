@@ -3,6 +3,10 @@
 {-| orphan instances, of 'Enumerable', for large types
 (i.e. 'Word32' \/ 'Word64' \/ 'Int32' \/ 'Int64').
 
+see:
+
+* 'boundedEnumerated', 'boundedCardinality'
+
 (that are included for completeness, but not exported by default
 (i.e. by "Enumerate").
 you probably want build-time instance-resolution errors instead of
