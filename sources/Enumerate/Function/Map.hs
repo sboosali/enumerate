@@ -169,7 +169,7 @@ displayFunction
 displayFunction
     = reifyFunction
   >>> fmap showCase
-  >>>  ("\\case":)
+  >>> ("\\case":)
   >>> intercalate "\n"
  where
  showCase (x,y) = intercalate " " ["", show x, " -> ", show y]
@@ -183,14 +183,27 @@ displayInjective
  :: (Enumerable a, Show a, Show b)
  => (a -> b)
  -> Maybe String
-displayInjective f
-    = reifyFunction
-  >>> fmap showCase
-  >>>  ("\\case":)
-  >>> intercalate "\n"
+displayInjective f = case isInjective f of
+  Nothing -> Nothing
+  Just{}  -> go f
   where
-  showCase (x,y) = intercalate " " ["", show x, " <- ", show y]
-  fImage = image f
+  go   = reifyFunction
+     >>> fmap showCase
+     >>> (["\\case"]++)
+     >>> (++[" _ <- Nothing"])
+     >>> intercalate "\n"
+  showCase (x,y) = intercalate " " ["", show y, " <- ", show (Just x)]
+
+  -- displayInjective f = go <$> isInjective f
+  --
+  --   where
+  --   go   = reifyFunction
+  --      >>> fmap showCase
+  --      >>> ("\\case":)
+  --      >>> intercalate "\n"
+  --   showCase = \case
+  --    (y, Nothing) ->
+  --    (y, Just x)  -> intercalate " " ["", show y, " <- ", show x]
 
 {-| @[(a,b)]@ is a mapping, @[[(a,b)]]@ is a list of mappings.
 
