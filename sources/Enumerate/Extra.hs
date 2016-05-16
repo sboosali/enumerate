@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, LambdaCase, ScopedTypeVariables #-}
+{-# LANGUAGE LambdaCase, ScopedTypeVariables #-}
 {-|
 
 -}
