@@ -11,6 +11,7 @@ module Enumerate.Function.Extra
 
  , module Data.Function
  , module Data.List
+ , module Data.Foldable
  ) where
 
 import Data.Semigroup (Semigroup)
@@ -25,6 +26,7 @@ import Control.Exception (catches, throwIO, Handler(..), AsyncException, ArithEx
 
 import Data.Function ((&))
 import Data.List (intercalate)
+import Data.Foldable (traverse_)
 
 
 nothing :: (Monad m) => m ()

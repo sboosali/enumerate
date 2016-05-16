@@ -168,40 +168,40 @@ displayFunction
   -> String
 displayFunction
     = reifyFunction
-  >>> fmap showCase
+  >>> fmap displayCase
   >>> ("\\case":)
   >>> intercalate "\n"
  where
- showCase (x,y) = intercalate " " ["", show x, " -> ", show y]
+ displayCase (x,y) = intercalate " " ["", show x, "->", show y]
 
 -- displayPartialFunction
 --  :: (Enumerable a, Show a, Show b)
---  => (a -> Maybe b)
+--  => (Partial a b)
 --  -> String
 
 displayInjective
- :: (Enumerable a, Show a, Show b)
+ :: (Enumerable a, Ord a, Ord b, Show a, Show b)
  => (a -> b)
  -> Maybe String
 displayInjective f = case isInjective f of
   Nothing -> Nothing
-  Just{}  -> go f
+  Just{}  -> Just (go f)
   where
   go   = reifyFunction
-     >>> fmap showCase
+     >>> fmap displayCase
      >>> (["\\case"]++)
      >>> (++[" _ <- Nothing"])
      >>> intercalate "\n"
-  showCase (x,y) = intercalate " " ["", show y, " <- ", show (Just x)]
+  displayCase (x,y) = intercalate " " ["", show y, "<-", show (Just x)]
 
   -- displayInjective f = go <$> isInjective f
   --
   --   where
   --   go   = reifyFunction
-  --      >>> fmap showCase
+  --      >>> fmap displayCase
   --      >>> ("\\case":)
   --      >>> intercalate "\n"
-  --   showCase = \case
+  --   displayCase = \case
   --    (y, Nothing) ->
   --    (y, Just x)  -> intercalate " " ["", show y, " <- ", show x]
 

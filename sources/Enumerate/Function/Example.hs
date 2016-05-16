@@ -13,13 +13,13 @@ stack build && stack exec -- enumerate-function-example
 main = do
 
   putStrLn "\nenumerating domain...\n"
-  _ <- traverse print (enumerated :: [Edit])
+  traverse_ print (enumerated :: [Edit])
 
   putStrLn "\nserializing function...\n"
   putStrLn $ displayFunction emacsEdit
 
   putStrLn "\nserializing inverse...\n"
-  putStrLn $ displayInjective emacsEdit
+  traverse_ putStrLn $ displayInjective emacsEdit
 
   putStrLn "\ndetecting jectivity...\n"
   case isInjective emacsEdit of
