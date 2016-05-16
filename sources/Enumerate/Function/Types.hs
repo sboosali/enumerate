@@ -32,6 +32,30 @@ jectivity :: () => (a -> b) -> Jectivity a b
 
 jectivity_ :: Jectivity -> Maybe Jectivity_
 
+OR
+
+newtype Injection  a b = Injection  (a -> b) (b -> Maybe a)
+newtype Surjection a b = Surjection (a -> b) (b -> NonEmpty a)
+newtype Bijection  a b = Bijection  (a -> b) (b -> a)
+
+-- | each input has zero-or-one output
+newtype a :?->: b = Injection  (a -> b) (b -> Maybe a)
+-- | each input has one-or-more output
+newtype a :+->: b = Surjection (a -> b) (b -> NonEmpty a)
+-- | each input has one output
+newtype a :<->: b = Bijection  (a -> b) (b -> a)
+
+toInjection  :: (a -> b) -> Maybe (Injection  a b)
+toSurjection :: (a -> b) -> Maybe (Surjection a b)
+toBijection  :: (a -> b) -> Maybe (Bijection  a b)
+
+asInjection :: (a :<->: b) -> (a :?->: b)
+asInjection (Bijection f g) = Injection f (Just <$> g) -- pure
+
+asSurjection :: (a :<->: b) -> (a :+->: b)
+asSurjection (Bijection f g) = Surjection f ((:|[]) <$> g) -- pure
+
+
 -}
 
 {-| a (safely-)partial function. i.e. a function that:
