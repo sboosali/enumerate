@@ -34,19 +34,21 @@ library
  exposed-modules:
   Enumerate
   Enumerate.Types
+  Enumerate.Enum
+  Enumerate.Cardinality
+  Enumerate.Orphans.Function
+  Enumerate.Orphans.Large
+
   Enumerate.Main
+  Enumerate.Example
+  Enumerate.Extra
+
+  Enumerate.Map
   Enumerate.Reify
   -- Enumerate.Domain
-  Enumerate.Example
-  Enumerate.Map
-  Enumerate.Extra
-  Enumerate.Large
-  Enumerate.Function
-  Enumerate.Enum
   -- Data.CoRec
   -- Data.CoRec.MemoTrie
   -- Data.TEnumerate
-  Enumerate.Cardinality
 
  build-depends:
      base >= 4.7 && < 5

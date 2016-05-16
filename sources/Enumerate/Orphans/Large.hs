@@ -10,7 +10,7 @@ you probably want build-time instance-resolution errors instead of
 probable runtime non-termination).
 
 -}
-module Enumerate.Large where
+module Enumerate.Orphans.Large where
 import Enumerate.Types
 
 import           Data.Word (Word32, Word64)

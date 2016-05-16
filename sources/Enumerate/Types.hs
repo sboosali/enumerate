@@ -19,8 +19,7 @@ validStrings :: [String]
 makeValidString :: String -> Maybe ValidString
 makeValidString s = if s `member` validStrings then Just (ValidString s) else Nothing
 instance 'Enumerable' ValidString where enumerated = ValidString <$> validStrings ... -- manually (since normal String's are infinite)
-instance <https://hackage.haskell.org/package/quickcheck/docs/QuickCheck-#tArbitrary.html Arbitrary> ValidString where arbitrary = elements 'enumerated'
-TODO url
+instance <https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck.html#t:Arbitrary Arbitrary> ValidString where arbitrary = elements 'enumerated'
 
 data ValidName = ValidName ValidString ValidString | CoolValidName [ValidString]
  deriving (Show,Generic)

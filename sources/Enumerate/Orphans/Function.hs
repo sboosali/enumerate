@@ -14,7 +14,7 @@ rather than possible runtime non-termination).
 >>> :set -XLambdaCase
 
 -}
-module Enumerate.Function where
+module Enumerate.Orphans.Function where
 import Enumerate.Types
 import Enumerate.Reify
 import Enumerate.Map

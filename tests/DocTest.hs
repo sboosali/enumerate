@@ -29,7 +29,7 @@ main = do
   ]
 
  doctest
-  [ "sources/Enumerate/Function.hs"
+  [ "sources/Enumerate/Orphans/Function.hs"
   , "sources/Enumerate/Example.hs"
   ]
 
