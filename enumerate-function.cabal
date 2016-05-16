@@ -47,9 +47,11 @@ library
  exposed-modules:
   Enumerate.Function
   Enumerate.Function.Types
-  Enumerate.Orphans.Function
   Enumerate.Function.Map
   Enumerate.Function.Reify
+  Enumerate.Function.Invert
+
+  Enumerate.Orphans.Function
   Enumerate.Function.Main
 
  -- (for doctest) other-modules:
