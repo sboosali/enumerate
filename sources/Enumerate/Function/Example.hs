@@ -21,7 +21,7 @@ main = do
   putStrLn "\nserializing inverse...\n"
   traverse_ putStrLn $ displayInjective emacsEdit
 
-  putStrLn "\ndetecting jectivity...\n"
+  putStrLn "\ndetecting jectivity..."
   case isInjective emacsEdit of
     Nothing             -> print $ "`emacsEdit` is non-injective"
     Just fromKeyBinding -> do
@@ -30,7 +30,6 @@ main = do
       let aKeyBinding = ["C-<spc>","M-b","C-w"]
       let anEdit = fromKeyBinding aKeyBinding
       putStrLn $ intercalate " " ["", show aKeyBinding, "<-", show anEdit]
-      putStrLn $ " ..."
 
 data Edit = Edit Action Slice Region
  deriving (Show,Read,Eq,Ord,Generic,Enumerable)
