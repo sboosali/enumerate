@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                enumerate
-version:             0.1.1
+version:             0.2.1
 synopsis:            enumerate all the values in a finite type (automatically)
 description:
   provides

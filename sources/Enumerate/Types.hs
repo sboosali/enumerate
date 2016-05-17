@@ -49,6 +49,12 @@ related packages:
 * <http://hackage.haskell.org/package/enumerable enumerable>.
 no @Generic@ instance.
 
+* <http://hackage.haskell.org/package/universe universe>
+no @Generic@ instance.
+
+* <http://hackage.haskell.org/package/prelude-safeenum-0.1.1.2/docs/Prelude-SafeEnum.html SafeEnum>
+only @Enum@s
+
 * <http://hackage.haskell.org/package/emgm-0.4/docs/Generics-EMGM-Functions-Enum.html emgm>.
   allows infinite lists (by convention). too heavyweight.
 
