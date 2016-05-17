@@ -9,6 +9,8 @@ import Enumerate.Extra
 
 import Data.Array (Array)
 import Data.Map (Map)
+import Data.Set (Set)
+import Data.Ord (Ordering)
 
 --import           System.Environment             (getArgs)
 import           Data.Void (Void)
@@ -21,15 +23,35 @@ import           GHC.Generics (Generic)
 --  _ -> do
 
 main = do
-    putStrLn ""
-    traverse print demoEnumerated
+    -- putStrLn ""
+    -- traverse print demoEnumerated
+    --
+    -- putStrLn ""
+    -- print $ (minBound :: Demo Bool)
+    -- print $ (maxBound :: Demo Bool)
+    --
+    -- putStrLn ""
+    -- print $ demoEnumerated == [minBound..maxBound]
 
-    putStrLn ""
-    print $ (minBound :: Demo Bool)
-    print $ (maxBound :: Demo Bool)
+    putStrLn "\n\nA Void\n"
+    putStrLn $ "|A Void| = " ++ show (cardinality ([]::[A Void]))
+    putStrLn "A Void = { ... }"
+    traverse print (enumerated :: [A Void])
 
-    putStrLn ""
-    print $ demoEnumerated == [minBound..maxBound]
+    putStrLn "\n\nA ()\n"
+    putStrLn $ "|A ()| = " ++ show (cardinality ([]::[A ()]))
+    putStrLn "A () = { ... }"
+    traverse print (enumerated :: [A ()])
+
+    putStrLn "\n\nA Bool\n"
+    putStrLn $ "|A Bool| = " ++ show (cardinality ([]::[A Bool]))
+    putStrLn "A Bool = { ... }"
+    traverse print (enumerated :: [A Bool])
+
+    putStrLn "\n\nA Ordering\n"
+    putStrLn $ "|A Ordering| = " ++ show (cardinality ([]::[A Ordering]))
+    putStrLn "A Ordering = { ... }"
+    traverse print (enumerated :: [A Ordering])
 
 {- | (for documentation)
 
@@ -48,6 +70,13 @@ data Demo a
  | Demo2 Bool (Maybe Bool)
  | Demo3 a
  deriving (Show,Eq,Ord,Generic,Enumerable)
+
+data A a
+   = A0 a
+   | A1 (Maybe a) (Either a a)
+   | A2 (a, a)
+   | A3 (Set a)
+  deriving (Show,Generic,Enumerable)
 
 {- | (for documentation)
 

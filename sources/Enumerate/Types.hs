@@ -6,6 +6,25 @@
 
 {- | enumerate all values in a finite type.
 
+e.g.
+
+@
+data A
+  = A0 Bool
+  | A1 (Either Bool) (Maybe Bool)
+  | A2 (Bool, Bool)
+  | A3 (Set Bool)
+  deriving (Show,Generic,Enumerable)
+
+> enumerate
+A0 False
+A0 True
+A1 ...
+
+> cardinality ([]::[A])
+
+@
+
 see the 'Enumerable' class for documentation.
 
 see "Enumerate.Example" for examples.

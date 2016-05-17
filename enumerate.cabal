@@ -64,6 +64,7 @@ library
                      DeriveGeneric DeriveFunctor DeriveFoldable DeriveTraversable
 
 
+-- $ stack build && stack exec enumerate-example
 executable enumerate-example
 
  main-is:             Main.hs
