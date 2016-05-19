@@ -47,6 +47,9 @@ library
   -- Data.CoRec.MemoTrie
   -- Data.TEnumerate
 
+ other-modules:
+  Spiros.Prelude
+
  build-depends:
      base >= 4.7 && < 5
    , ghc-prim >=0.3 && < 0.5
@@ -58,11 +61,11 @@ library
    , vinyl==0.5.*
    , deepseq >= 1.3
 
- hs-source-dirs:      sources
+ hs-source-dirs:      sources, compatibility
  default-language:    Haskell2010
  default-extensions: AutoDeriveTypeable DeriveDataTypeable
                      DeriveGeneric DeriveFunctor DeriveFoldable DeriveTraversable
-
+                     NoImplicitPrelude
 
 -- $ stack build && stack exec enumerate-example
 executable enumerate-example

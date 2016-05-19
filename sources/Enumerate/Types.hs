@@ -90,6 +90,7 @@ too heavyweight (testing framework, randomness unnecessary).
 
 module Enumerate.Types where
 import Enumerate.Extra
+import Spiros.Prelude
 
 import Data.Vinyl (Rec(..))
 import Control.DeepSeq (NFData,force)

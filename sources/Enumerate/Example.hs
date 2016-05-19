@@ -6,6 +6,7 @@
 module Enumerate.Example where
 import Enumerate
 import Enumerate.Extra
+import Spiros.Prelude
 
 import Data.Array (Array)
 import Data.Map (Map)
@@ -33,24 +34,28 @@ main = do
     -- putStrLn ""
     -- print $ demoEnumerated == [minBound..maxBound]
 
-    putStrLn "\n\nA Void\n"
-    putStrLn $ "|A Void| = " ++ show (cardinality ([]::[A Void]))
-    putStrLn "A Void = { ... }"
+    putStrLn "\n\n-- A Void"
+    putStrLn ">>> cardinality ([]::[A Void])"
+    print $ cardinality ([]::[A Void])
+    putStrLn ">>> enumerated :: [A Void]"
     traverse print (enumerated :: [A Void])
 
-    putStrLn "\n\nA ()\n"
-    putStrLn $ "|A ()| = " ++ show (cardinality ([]::[A ()]))
-    putStrLn "A () = { ... }"
+    putStrLn "\n\n-- A ()"
+    putStrLn ">>> cardinality ([]::[A ()])"
+    print $ cardinality ([]::[A ()])
+    putStrLn ">>> enumerated :: [A ()]"
     traverse print (enumerated :: [A ()])
 
-    putStrLn "\n\nA Bool\n"
-    putStrLn $ "|A Bool| = " ++ show (cardinality ([]::[A Bool]))
-    putStrLn "A Bool = { ... }"
+    putStrLn "\n\n-- A Bool"
+    putStrLn ">>> cardinality ([]::[A Bool])"
+    print $ cardinality ([]::[A Bool])
+    putStrLn ">>> enumerated :: [A Bool]"
     traverse print (enumerated :: [A Bool])
 
-    putStrLn "\n\nA Ordering\n"
-    putStrLn $ "|A Ordering| = " ++ show (cardinality ([]::[A Ordering]))
-    putStrLn "A Ordering = { ... }"
+    putStrLn "\n\n-- A Ordering"
+    putStrLn ">>> cardinality ([]::[A Ordering])"
+    print $ cardinality ([]::[A Ordering])
+    putStrLn ">>> enumerated :: [A Ordering]"
     traverse print (enumerated :: [A Ordering])
 
 {- | (for documentation)

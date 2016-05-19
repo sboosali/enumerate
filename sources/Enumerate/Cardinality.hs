@@ -17,6 +17,7 @@ import Data.Set (Set)
 import Numeric.Natural (Natural)
 import GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^), type (<=?))
 import           Data.Proxy (Proxy(..))
+import Spiros.Prelude
 
 -- alternatives:
 -- class Finite a where

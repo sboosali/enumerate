@@ -46,6 +46,7 @@ module Enumerate.Enum
  ) where
 
 import Enumerate.Types
+import Spiros.Prelude
 
 import Numeric.Natural
 import qualified Data.Array as Array --IntMap

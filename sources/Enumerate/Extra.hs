@@ -7,14 +7,15 @@ module Enumerate.Extra
  , (>>>), traverse_
  ) where
 
+
 -- import Language.Haskell.TH.Syntax (Name,nameBase)
 import Control.Arrow ((&&&), (>>>))
-import Data.Foldable  (traverse_)
 import Numeric.Natural
 import qualified Data.Set as Set
 import Data.Set (Set)
 import qualified Data.List as List
 import qualified Data.Ord as Ord
+import Spiros.Prelude
 
 
 int2natural :: Int -> Natural
