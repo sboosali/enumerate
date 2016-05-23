@@ -130,7 +130,7 @@ import System.Posix.Types (CIno,CMode)
 import GHC.Exts(Down(..),SpecConstrAnnotation(..))
 --
 -- TODO CCc
-import GHC.Conc.Windows (ConsoleEvent)
+-- import GHC.Conc.Windows (ConsoleEvent) -- platform-specific module
 import GHC.IO.Buffer (BufferState(..))
 import GHC.IO.Device (IODeviceType(..))
 import GHC.IO.Encoding.Failure (CodingFailureMode(..))
@@ -495,8 +495,8 @@ instance Enumerable Associativity
 instance Enumerable SpecConstrAnnotation where
  enumerated = [NoSpecConstr,ForceSpecConstr]
 
-instance Enumerable ConsoleEvent where
- enumerated = enumEnumerated
+-- instance Enumerable ConsoleEvent where
+--  enumerated = enumEnumerated
 
 instance Enumerable BufferState where
  enumerated = [ReadBuffer,WriteBuffer]
