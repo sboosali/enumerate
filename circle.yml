@@ -1,0 +1,20 @@
+# https://gist.github.com/dbp/bef96402ea07001dfed2
+
+dependencies:
+  cache_directories:
+    - "~/.stack"
+  pre:
+    - wget -q -O- https://s3.amazonaws.com/download.fpcomplete.com/ubuntu/fpco.key | sudo apt-key add -
+    - echo 'deb http://download.fpcomplete.com/ubuntu/precise stable main'|sudo tee /etc/apt/sources.list.d/fpco.list
+    - sudo apt-get update && sudo apt-get install stack -y
+  override:
+    - stack setup
+    - stack build
+    - stack build --test --only-dependencies
+
+test:
+  override:
+    - stack test
+
+# - stack setup +RTS -M1024m -K1024m
+# - stack build --only-dependencies -j1
