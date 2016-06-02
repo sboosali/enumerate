@@ -37,7 +37,7 @@ newtype ValidString = ValidString String
 validStrings :: [String]
 makeValidString :: String -> Maybe ValidString
 makeValidString s = if s `member` validStrings then Just (ValidString s) else Nothing
-instance 'Enumerable' ValidString where enumerated = ValidString <$> validStrings ... -- manually (since normal String's are infinite)
+instance 'Enumerable' ValidString where enumerated = ValidString \<$> validStrings ... -- manually (since normal String's are infinite)
 instance <https://hackage.haskell.org/package/QuickCheck/docs/Test-QuickCheck.html#t:Arbitrary Arbitrary> ValidString where arbitrary = elements 'enumerated'
 
 data ValidName = ValidName ValidString ValidString | CoolValidName [ValidString]
@@ -181,6 +181,8 @@ laws:
 (@Bounded@ constraint elided for convenience, but relevant.)
 
 ("inputs" a type, outputs a list of values).
+
+Every type in `base` (that can be an instance) is an instance.
 
 -}
 class Enumerable a where

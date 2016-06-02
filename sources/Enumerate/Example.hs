@@ -1,6 +1,139 @@
 {-# LANGUAGE LambdaCase, DeriveGeneric, DeriveAnyClass #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-
+{- |
+
+
+
+## Bounded Enum instance
+
+You can (semi-)automatically derive efficient 'Bounded'/'Enum' 
+instances:
+
+@
+instance Bounded (Demo Bool) where
+ minBound = 'minBound_enumerable' array_DemoBool
+ maxBound = 'maxBound_enumerable' array_DemoBool
+
+instance Enum (Demo Bool) where
+ toEnum   = 'toEnum_enumerable'   array_DemoBool
+ fromEnum = 'fromEnum_enumerable' table_DemoBool
+
+-- CAF
+array_DemoBool :: 'Array' Int (Demo Bool)
+array_DemoBool = 'array_enumerable'
+
+-- CAF
+table_DemoBool :: 'Map' (Demo Bool) Int
+table_DemoBool = 'table_enumerable'
+@
+
+## Run
+
+@
+stack build && stack exec -- enumerable-example
+@
+
+outputs:
+
+@
+-- A Void
+>>> cardinality ([]::[A Void])
+1
+>>> enumerated :: [A Void]
+A3 (fromList [])
+
+
+-- A ()
+>>> cardinality ([]::[A ()])
+8
+>>> enumerated :: [A ()]
+A0 ()
+A1 Nothing (Left ())
+A1 Nothing (Right ())
+A1 (Just ()) (Left ())
+A1 (Just ()) (Right ())
+A2 ((),())
+A3 (fromList [])
+A3 (fromList [()])
+
+
+-- A Bool
+>>> cardinality ([]::[A Bool])
+22
+>>> enumerated :: [A Bool]
+A0 False
+A0 True
+A1 Nothing (Left False)
+A1 Nothing (Left True)
+A1 Nothing (Right False)
+A1 Nothing (Right True)
+A1 (Just False) (Left False)
+A1 (Just False) (Left True)
+A1 (Just False) (Right False)
+A1 (Just False) (Right True)
+A1 (Just True) (Left False)
+A1 (Just True) (Left True)
+A1 (Just True) (Right False)
+A1 (Just True) (Right True)
+A2 (False,False)
+A2 (False,True)
+A2 (True,False)
+A2 (True,True)
+A3 (fromList [])
+A3 (fromList [False])
+A3 (fromList [False,True])
+A3 (fromList [True])
+
+
+-- A Ordering
+>>> cardinality ([]::[A Ordering])
+44
+>>> enumerated :: [A Ordering]
+A0 LT
+A0 EQ
+A0 GT
+A1 Nothing (Left LT)
+A1 Nothing (Left EQ)
+A1 Nothing (Left GT)
+A1 Nothing (Right LT)
+A1 Nothing (Right EQ)
+A1 Nothing (Right GT)
+A1 (Just LT) (Left LT)
+A1 (Just LT) (Left EQ)
+A1 (Just LT) (Left GT)
+A1 (Just LT) (Right LT)
+A1 (Just LT) (Right EQ)
+A1 (Just LT) (Right GT)
+A1 (Just EQ) (Left LT)
+A1 (Just EQ) (Left EQ)
+A1 (Just EQ) (Left GT)
+A1 (Just EQ) (Right LT)
+A1 (Just EQ) (Right EQ)
+A1 (Just EQ) (Right GT)
+A1 (Just GT) (Left LT)
+A1 (Just GT) (Left EQ)
+A1 (Just GT) (Left GT)
+A1 (Just GT) (Right LT)
+A1 (Just GT) (Right EQ)
+A1 (Just GT) (Right GT)
+A2 (LT,LT)
+A2 (LT,EQ)
+A2 (LT,GT)
+A2 (EQ,LT)
+A2 (EQ,EQ)
+A2 (EQ,GT)
+A2 (GT,LT)
+A2 (GT,EQ)
+A2 (GT,GT)
+A3 (fromList [])
+A3 (fromList [LT])
+A3 (fromList [LT,EQ])
+A3 (fromList [LT,EQ,GT])
+A3 (fromList [LT,GT])
+A3 (fromList [EQ])
+A3 (fromList [EQ,GT])
+A3 (fromList [GT])
+@
 
 -}
 module Enumerate.Example where

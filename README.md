@@ -3,11 +3,10 @@
 [![Hackage](https://img.shields.io/hackage/v/enumerate.svg)](https://hackage.haskell.org/package/enumerate)
 [![Build Status](https://secure.travis-ci.org/sboosali/enumerate.svg)](http://travis-ci.org/sboosali/enumerate)
 
-enumerate all the values in a finite type (automatically)
+Enumerate all the values in a finite type (automatically). Provides:
 
-provides (1) a typeclass for enumerating all values in a finite type,
-(2) a generic instance for automatic deriving, and
-(3) helpers that reify functions (partial or total, monadic or pure) into a Map.
+1. a typeclass for enumerating all values in a finite type,
+2. a generic instance for automatically deriving it, and
 
 # example
 
@@ -26,4 +25,11 @@ provides (1) a typeclass for enumerating all values in a finite type,
 ```
 
 # (extensive) documentation:
-https://hackage.haskell.org/package/enumerate
+https://hackage.haskell.org/package/enumerate/docs/Enumerate.html
+
+http://sboosali.github.io/documentation/enumerate/Enumerate.html (when hackage won't build the haddocks)
+
+# related:
+
+To reify functions, partial or total, into a Map,
+see [enumerate-function](https://github.com/sboosali/enumerate-function).
