@@ -46,13 +46,14 @@ module Enumerate.Enum
  ) where
 
 import Enumerate.Types
-import Spiros.Prelude
+import Enumerate.Extra
 
 import Numeric.Natural
 import qualified Data.Array as Array --IntMap
 import Data.Array (Array, (!))
 import qualified Data.Map as Map
 import Data.Map (Map)
+import Prelude (error)
 
 
 minBound_enumerable :: forall a. (Enumerable a) => Array Int a -> a

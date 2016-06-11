@@ -90,26 +90,20 @@ too heavyweight (testing framework, randomness unnecessary).
 
 module Enumerate.Types where
 import Enumerate.Extra
-import Spiros.Prelude
 
 import Data.Vinyl (Rec(..))
-import Control.DeepSeq (NFData,force)
+import Control.DeepSeq (force)
 
 import qualified Data.Set as Set
-import Data.Set (Set)
 import           GHC.Generics
-import Data.Data (Data)
-import           Control.Arrow ((&&&))
-import           Data.List (genericLength)
 import System.Timeout (timeout)
-import Numeric.Natural (Natural)
 import Data.Ix (Ix(..))
 -- import GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^))
 
 import           Data.Void (Void)
 import           Data.Word (Word8, Word16)
 import           Data.Int (Int8, Int16)
-import           Data.Proxy (Proxy(..))
+import Prelude (Enum(..))
 
 -- for instances...
 import Data.Typeable ((:~:)(..))
@@ -118,7 +112,7 @@ import Data.Functor.Identity (Identity(..))
 import Data.Type.Coercion (Coercion(..))
 import Data.Coerce (Coercible)
 import Data.Char (GeneralCategory)
-import Data.Ratio (Ratio,(%))
+-- import Data.Ratio (Ratio,(%)) -- from Prelude.Spiros
 import Data.Complex (Complex(..))
 --
 import Control.Exception (ArithException(..),AsyncException(..),NonTermination(..),NestedAtomically(..),BlockedIndefinitelyOnMVar(..),BlockedIndefinitelyOnSTM(..),AllocationLimitExceeded(..),Deadlock(..))
@@ -140,6 +134,12 @@ import GHC.RTS.Flags (DoTrace,DoHeapProfile,DoCostCentres,GiveGCStats)
 --import Data.Modular (not on stack)
 -- * modular integers
 
+
+{-$setup
+
+>>> import Prelude
+
+-}
 
 {- | enumerate the set of all values in a (finitely enumerable) type.
 enumerates depth first.
@@ -742,7 +742,7 @@ e.g. after benchmarking, you think you can process a billion entries within a mi
 
 -}
 enumerateBelow :: forall a. (Enumerable a) => Natural -> Either Natural [a] --TODO move
-enumerateBelow maxSize = if theSize < maxSize
+enumerateBelow maxSize = if theSize `lessThan` maxSize
   then Right enumerated
   else Left theSize
  where

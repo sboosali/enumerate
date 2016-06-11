@@ -4,18 +4,16 @@
 -}
 module Enumerate.Extra
  ( module Enumerate.Extra
- , (>>>), traverse_
+ , module Prelude.Spiros
  ) where
 
 
 -- import Language.Haskell.TH.Syntax (Name,nameBase)
-import Control.Arrow ((&&&), (>>>))
 import Numeric.Natural
 import qualified Data.Set as Set
-import Data.Set (Set)
 import qualified Data.List as List
 import qualified Data.Ord as Ord
-import Spiros.Prelude
+import Prelude.Spiros hiding ((:*:),C) -- shadows GHC.Generics
 
 
 int2natural :: Int -> Natural

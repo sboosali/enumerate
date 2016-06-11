@@ -39,14 +39,14 @@ outputs:
 -- A Void
 >>> cardinality ([]::[A Void])
 1
->>> enumerated :: [A Void]
+>>> _ <- traverse print (enumerated :: [A Void])
 A3 (fromList [])
 
 
 -- A ()
 >>> cardinality ([]::[A ()])
 8
->>> enumerated :: [A ()]
+>>> _ <- traverse print (enumerated :: [A ()])
 A0 ()
 A1 Nothing (Left ())
 A1 Nothing (Right ())
@@ -60,7 +60,7 @@ A3 (fromList [()])
 -- A Bool
 >>> cardinality ([]::[A Bool])
 22
->>> enumerated :: [A Bool]
+>>> _ <- traverse print (enumerated :: [A Bool])
 A0 False
 A0 True
 A1 Nothing (Left False)
@@ -88,7 +88,7 @@ A3 (fromList [True])
 -- A Ordering
 >>> cardinality ([]::[A Ordering])
 44
->>> enumerated :: [A Ordering]
+>>>_ <- traverse print (enumerated :: [A Ordering])
 A0 LT
 A0 EQ
 A0 GT
@@ -133,13 +133,13 @@ A3 (fromList [LT,GT])
 A3 (fromList [EQ])
 A3 (fromList [EQ,GT])
 A3 (fromList [GT])
+
 @
 
 -}
 module Enumerate.Example where
 import Enumerate
-import Enumerate.Extra
-import Spiros.Prelude
+import Prelude
 
 import Data.Array (Array)
 import Data.Map (Map)
@@ -166,6 +166,10 @@ main = do
     --
     -- putStrLn ""
     -- print $ demoEnumerated == [minBound..maxBound]
+
+    putStrLn "\nreifyCardinality @Bool..."
+    print $ reifyCardinality [False]
+    putStrLn "\n"
 
     putStrLn "\n\n-- A Void"
     putStrLn ">>> cardinality ([]::[A Void])"
@@ -220,7 +224,7 @@ data A a
 
 @demoEnumerated = enumerated@
 
->>> traverse_ print demoEnumerated
+>>> _ <- traverse print demoEnumerated
 Demo1
 Demo2 False Nothing
 Demo2 False (Just False)

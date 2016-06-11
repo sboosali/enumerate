@@ -31,6 +31,8 @@ source-repository head
 
 
 library
+ hs-source-dirs:      sources
+
  exposed-modules:
   Enumerate
   Enumerate.Types
@@ -38,7 +40,6 @@ library
   Enumerate.Cardinality
   Enumerate.Orphans.Large
 
-  Enumerate.Main
   Enumerate.Example
   Enumerate.Extra
 
@@ -47,28 +48,30 @@ library
   -- Data.CoRec.MemoTrie
   -- Data.TEnumerate
 
- other-modules:
-  Spiros.Prelude
-
  build-depends:
-     base >= 4.7 && < 5
-   , ghc-prim >=0.3 && < 0.5
-   , array ==0.5.*
-   , template-haskell  >=2.9
-   , containers ==0.5.*
+               base >= 4.7 && < 5
+             , spiros
+
+             , ghc-prim >=0.3 && < 0.5
+             , array ==0.5.*
+             , template-haskell  >=2.9
+             , containers ==0.5.*
 
    -- , modular-arithmetic==1.2.*
-   , vinyl==0.5.*
-   , deepseq >= 1.3
+             , vinyl==0.5.*
+             , deepseq >= 1.3
 
- hs-source-dirs:      sources, compatibility
  default-language:    Haskell2010
  default-extensions: AutoDeriveTypeable DeriveDataTypeable
                      DeriveGeneric DeriveFunctor DeriveFoldable DeriveTraversable
                      NoImplicitPrelude
+ ghc-options:
+             -Wall
+              -fno-warn-unticked-promoted-constructors
 
--- $ stack build && stack exec enumerate-example
-executable enumerate-example
+
+-- $ stack build && stack exec example-enumerate
+executable example-enumerate
 
  main-is:             Main.hs
  hs-source-dirs:      .

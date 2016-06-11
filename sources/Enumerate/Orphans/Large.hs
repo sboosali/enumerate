@@ -14,8 +14,8 @@ probable runtime non-termination).
 
 -}
 module Enumerate.Orphans.Large where
+import Enumerate.Extra
 import Enumerate.Types
-import Spiros.Prelude
 
 import           Data.Word (Word32, Word64)
 import           Data.Int (Int32, Int64)

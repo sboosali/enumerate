@@ -6,18 +6,19 @@
 
 -}
 module Enumerate.Cardinality where
+import Enumerate.Extra
+
+import Data.Vinyl (Rec)
 
 import           GHC.Generics
-import Data.Vinyl (Rec)
-import           Data.Proxy (Proxy)
+-- import           Data.Proxy (Proxy)
 import           Data.Void (Void)
 import           Data.Word (Word8, Word16)
 import           Data.Int (Int8, Int16)
-import Data.Set (Set)
-import Numeric.Natural (Natural)
+-- import Data.Set (Set)
+-- import Numeric.Natural (Natural)
 import GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^), type (<=?))
-import           Data.Proxy (Proxy(..))
-import Spiros.Prelude
+-- import           Data.Proxy 
 
 -- alternatives:
 -- class Finite a where

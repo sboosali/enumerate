@@ -1,6 +1,8 @@
-flags: {}
-extra-package-dbs: []
-packages:
-- '.'
-extra-deps: []
 resolver: lts-5.15
+
+packages:
+- .
+- ../spiros
+
+extra-deps:
+- spiros-0.0.0
