@@ -60,7 +60,7 @@ library
  build-depends:
     base >=4.7 && <5
 
-  , enumerate ==0.1.1
+  , enumerate >=0.2.1
 
   , containers ==0.5.*
 
