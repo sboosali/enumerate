@@ -43,6 +43,9 @@ module Enumerate.Enum
 
  , array_enumerable
  , table_enumerable
+
+ , toEnumDefault
+ , fromEnumDefault
  ) where
 
 import Enumerate.Types
@@ -84,6 +87,15 @@ table_enumerable :: forall a. (Enumerable a, Ord a) => Map a Int
 table_enumerable = Map.fromList (zip enumerated [0 .. n - 1])
  where n = nat2int $ cardinality ([] :: [a])
 
+toEnumDefault :: forall a. (Enumerable a) => Int -> a
+toEnumDefault = toEnum_enumerable array_enumerable
+-- use NOINLINE such that array_enumerable is reused
+{-# NOINLINE toEnumDefault #-}
+
+fromEnumDefault :: forall a. (Enumerable a, Ord a) => a -> Int
+fromEnumDefault = fromEnum_enumerable table_enumerable
+-- use NOINLINE such that table_enumerable is reused
+{-# NOINLINE fromEnumDefault #-}
 
 __fromJust__ :: String -> Maybe a -> a
 __fromJust__ name = maybe (__bug__ name) id
