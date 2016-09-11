@@ -52,7 +52,7 @@ library
                base >= 4.7 && < 5
              , spiros
 
-             , ghc-prim >=0.3 && < 0.5
+             , ghc-prim >=0.3 && < 0.6
              , array ==0.5.*
              , template-haskell  >=2.9
              , containers ==0.5.*
