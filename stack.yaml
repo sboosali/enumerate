@@ -1,4 +1,16 @@
-resolver: lts-5.15
+resolver: lts-7.14
+compiler: ghc-8.0
+
+nix:
+  enable: true
+  pure: true
+  packages: []
+  # shell-file: shell.nix
+
+nix:
+  enable: true
+  pure: true
+  packages: []
 
 packages:
 - .
