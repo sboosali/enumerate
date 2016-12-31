@@ -8,6 +8,8 @@ cbits/main
 sources/Data/Canonical.hs
 
 # Haskell
+cabal.project.local
+dist-newstyle/
 dist
 cabal-dev
 *.o

@@ -7,11 +7,6 @@ nix:
   packages: []
   # shell-file: shell.nix
 
-nix:
-  enable: true
-  pure: true
-  packages: []
-
 packages:
 - .
 - ../spiros
