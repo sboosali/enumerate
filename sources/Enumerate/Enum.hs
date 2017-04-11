@@ -1,5 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-
+{-# OPTIONS_GHC -fno-warn-redundant-constraints #-}
+ 
 {-|
 
 usage:
@@ -41,6 +42,12 @@ module Enumerate.Enum
  , toEnum_enumerable
  , fromEnum_enumerable
 
+ , minBound_enumerable'
+ , maxBound_enumerable'
+
+ , toEnum_enumerable'
+ , fromEnum_enumerable'
+
  , array_enumerable
  , table_enumerable
 
@@ -51,12 +58,30 @@ module Enumerate.Enum
 import Enumerate.Types
 import Enumerate.Extra
 
-import Numeric.Natural
 import qualified Data.Array as Array --IntMap
 import Data.Array (Array, (!))
 import qualified Data.Map as Map
 import Data.Map (Map)
 import Prelude (error)
+
+
+--TODO check core for sharing
+minBound_enumerable' :: forall a. (Enumerable a) => a 
+minBound_enumerable' = minBound_enumerable array_enumerable
+{-# INLINE minBound_enumerable' #-}
+
+maxBound_enumerable' :: forall a. (Enumerable a) => a
+maxBound_enumerable' = maxBound_enumerable array_enumerable
+{-# INLINE maxBound_enumerable' #-}
+
+
+toEnum_enumerable' :: forall a. (Enumerable a) => (Int -> a)
+toEnum_enumerable'   = toEnum_enumerable   array_enumerable
+{-# INLINE toEnum_enumerable' #-}
+
+fromEnum_enumerable' :: forall a. (Enumerable a, Ord a) => (a -> Int)
+fromEnum_enumerable' = fromEnum_enumerable table_enumerable
+{-# INLINE fromEnum_enumerable' #-}
 
 
 minBound_enumerable :: forall a. (Enumerable a) => Array Int a -> a

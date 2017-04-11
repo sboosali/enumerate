@@ -254,3 +254,5 @@ array_DemoBool = array_enumerable
 -- CAF
 table_DemoBool :: Map (Demo Bool) Int
 table_DemoBool = table_enumerable
+
+-------------------------------------------------------
