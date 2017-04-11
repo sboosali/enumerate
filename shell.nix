@@ -61,10 +61,10 @@ let
                        then pkgs.haskellPackages
                        else pkgs.haskell.packages.${compiler};
 
-  f = import ./.;
+  f = import ./package.nix;
 
   ps = {
-    spiros = ../spiros;
+   spiros = haskellPackages.callPackage ~/spiros {}; # absolute
   };
 
   d0 = haskellPackages.callPackage f ps;

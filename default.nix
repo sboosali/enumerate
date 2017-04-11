@@ -1,12 +1,10 @@
-{ nixpkgs ? import <nixpkgs> {}, compiler ? "ghc802" }:
+{ nixpkgs ? import <nixpkgs> {}, compiler ? "ghc802" }: # , localPackages ? {} }:
 let
 
 h = nixpkgs.pkgs.haskell.packages.${compiler};
 
-ps = {
- spiros = h.callPackage ~/spiros {}; # absolute
-};
-
 in
 
-h.callPackage ./package.nix ps
+h.callPackage ./package.nix {} # localPackages
+
+# nix-build --arg '{spiros = ??? ;}'
