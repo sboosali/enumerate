@@ -39,6 +39,7 @@ library
   Enumerate.Enum
   Enumerate.Cardinality
   Enumerate.Orphans.Large
+  Enumerate.Orphans.GHC
 
   Enumerate.Example
   Enumerate.Extra
