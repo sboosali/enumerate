@@ -1,9 +1,16 @@
 resolver: lts-8.11
 compiler: ghc-8.0.2
 
+nix:
+#  enable: true # TODO platform-specifics?
+  pure: true
+  packages: []
+  # shell-file: shell.nix
+
 packages:
 - .
 - ../spiros
 
 extra-deps:
 - spiros-0.0.0
+- dump-core-0.1.3  # hide behind flag?

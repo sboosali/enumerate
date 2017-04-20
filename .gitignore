@@ -6,8 +6,13 @@ TODO
 cbits/main
 .projectile
 sources/Data/Canonical.hs
+core/
+result/
+result
 
 # Haskell
+cabal.project.local
+dist-newstyle/
 dist
 cabal-dev
 *.o
