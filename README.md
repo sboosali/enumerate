@@ -3,4 +3,6 @@
 
 # enumerate-function
 
-TODO
+see the `Enumerate.Function` module for examples and documentation.
+
+(if hackage is broken, see the source: https://github.com/sboosali/enumerate-function/blob/master/sources/Enumerate/Function.hs ).

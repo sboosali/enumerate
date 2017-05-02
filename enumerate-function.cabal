@@ -1,7 +1,10 @@
 name:                enumerate-function
-version:             0.0.0
-synopsis:            TODO
-description:         TODO
+version:             0.0.1
+synopsis:            simple package for inverting functions and testing totality, via brute enumeration of the domain
+description:         
+ .
+ see the "Enumerate.Function" module for examples for documentation.
+ .
 homepage:            http://github.com/sboosali/enumerate-function#readme
 license:             BSD3
 license-file:        LICENSE
