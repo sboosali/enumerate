@@ -1,11 +1,5 @@
-resolver: lts-8.11
-compiler: ghc-8.0.2
-
-nix:
-#  enable: true # TODO platform-specifics?
-  pure: true
-  packages: []
-  # shell-file: shell.nix
+resolver: nightly-2017-12-05
+# compiler: ghc-8.0.2
 
 packages:
 - .

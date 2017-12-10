@@ -25,6 +25,10 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
+tested-with: GHC == 8.0.2, GHC == 8.2.2
+-- `multi-ghc-travis` uses `Tested-With`. 
+-- ..\multi-ghc-travis\make_travis_yml.hs enumerate.cabal > .travis.yml
+
 source-repository head
   type:     git
   location: https://github.com/sboosali/enumerate
@@ -93,39 +97,39 @@ executable example-enumerate
    , enumerate
 
 
--- -- $ stack test doctest
--- test-suite doctest
+-- $ stack test doctest
+test-suite doctest
+ hs-source-dirs:      tests
+ main-is:             DocTest.hs
+ type:                exitcode-stdio-1.0
+
+ default-language:    Haskell2010
+ ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+
+ build-depends:
+    base
+  , enumerate
+  , doctest
+  --, cabal-info
+
+-- -- $ stack test unittest
+-- test-suite unittest
 --  hs-source-dirs:      tests
---  main-is:             DocTest.hs
+--  main-is:             UnitTest.hs
 --  type:                exitcode-stdio-1.0
 
 --  default-language:    Haskell2010
 --  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
 
+--  other-modules:
+--   Enumerate.Test
+
 --  build-depends:
 --     base
 --   , enumerate
---   , doctest
---   --, cabal-info
-
--- -- -- $ stack test unittest
--- -- test-suite unittest
--- --  hs-source-dirs:      tests
--- --  main-is:             UnitTest.hs
--- --  type:                exitcode-stdio-1.0
--- --
--- --  default-language:    Haskell2010
--- --  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
--- --
--- --  other-modules:
--- --   Enumerate.Test
--- --
--- --  build-depends:
--- --     base
--- --   , enumerate
--- --   , hspec ==2.2.*
--- --   , QuickCheck ==2.8.*
--- --   , smallcheck ==1.1.*
--- --   -- , tasty
--- --   -- , tasty-quickcheck
--- --   -- , tasty-hunit
+--   , hspec ==2.2.*
+--   , QuickCheck ==2.8.*
+--   , smallcheck ==1.1.*
+--   -- , tasty
+--   -- , tasty-quickcheck
+--   -- , tasty-hunit
