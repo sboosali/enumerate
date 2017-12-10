@@ -1,0 +1,10 @@
+resolver: lts-8.11
+compiler: ghc-8.0.2
+
+packages:
+- .
+- ../enumerate
+
+extra-deps: 
+- spiros-0.0.0
+- enumerate-0.2.2
