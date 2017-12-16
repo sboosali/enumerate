@@ -1,12 +1,7 @@
 # my
 ignore/
-notes
-goals
-TODO
-cbits/main
 .projectile
-sources/Data/Canonical.hs
-core/
+enumerate/sources/Data/Canonical.hs
 result/
 result
 
