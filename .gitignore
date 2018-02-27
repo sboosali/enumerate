@@ -4,6 +4,7 @@ ignore/
 enumerate/sources/Data/Canonical.hs
 result/
 result
+ghcid.txt
 
 # Haskell
 cabal.project.local

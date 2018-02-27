@@ -64,7 +64,7 @@ let
   f = import ./package.nix;
 
   ps = {
-   spiros = haskellPackages.callPackage ~/spiros {}; # absolute
+   spiros = haskellPackages.callPackage ~/haskell/spiros {}; # absolute
   };
 
   d0 = haskellPackages.callPackage f ps;
