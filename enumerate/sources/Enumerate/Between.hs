@@ -142,7 +142,7 @@ newtype Between
  (sin :: Sign) (min :: Nat)
  (sax :: Sign) (max :: Nat)
  = UnsafeBetween Integer
- deriving (Show,Eq,Ord,Generic,NFData)
+ deriving (Show,Eq,Ord,Generic,NFData,Hashable)
 
 ----------------------------------------
 
@@ -183,26 +183,54 @@ instance
   ) => Num (Between sin min sax max)
   where
 
-  fromInteger = fromInteger >>> idInteger >>> clipBetween Nothing
+  fromInteger = fromInteger >>> idInteger >>> clipBetween'
     where
     idInteger :: Integer -> Integer
     idInteger = id
 
-  UnsafeBetween i₁ + UnsafeBetween i₂ = clipBetween Nothing $
+  UnsafeBetween i₁ + UnsafeBetween i₂ = clipBetween' $
     i₁ + i₂
     
-  UnsafeBetween i₁ * UnsafeBetween i₂ = clipBetween Nothing $
+  UnsafeBetween i₁ * UnsafeBetween i₂ = clipBetween' $
     i₁ * i₂
 
-  abs    (UnsafeBetween i) = clipBetween Nothing $
+  abs    (UnsafeBetween i) = clipBetween' $
     abs i
     
-  signum (UnsafeBetween i) = clipBetween Nothing $
+  signum (UnsafeBetween i) = clipBetween' $
     signum i
     
-  negate (UnsafeBetween i) = clipBetween Nothing $
+  negate (UnsafeBetween i) = clipBetween' $
     negate i
 
+-- | all operations that overflow/underflow are clipped (with 'clipBetween'). 
+instance
+  ( KnownInteger sin min
+  , KnownInteger sax max
+  ) => Real (Between sin min sax max)
+  where
+    
+  toRational (UnsafeBetween i) = toRational i
+
+-- | all operations that overflow/underflow are clipped (with 'clipBetween'). 
+instance
+  ( KnownInteger sin min
+  , KnownInteger sax max
+  ) => Integral (Between sin min sax max)
+  where
+    
+  toInteger (UnsafeBetween i) = i
+  
+  quotRem (UnsafeBetween i) (UnsafeBetween j) =
+    (clipBetween' *** clipBetween') (i `quotRem` j)
+  
+  {-
+   quot :: a -> a -> a 
+        integer division truncated toward zero
+   rem :: a -> a -> a 
+       integer remainder
+  -}
+  
 ----------------------------------------
 
 {-|
@@ -290,6 +318,16 @@ clipBetween proxy
   -- proxy = Proxy :: Proxy (Between sin min sax max)
 
 ----------------------------------------
+
+-- | is 'clipBetween' without a proxy (it leans on inference). 
+clipBetween'
+  :: forall a sin min sax max proxy.
+     ( Integral a -- Num a
+     , KnownBetween sin min sax max
+     )
+  => a
+  -> Between sin min sax max
+clipBetween' = clipBetween Nothing
 
 ---------------------------------------
 

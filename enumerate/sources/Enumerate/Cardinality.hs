@@ -54,6 +54,8 @@ class Finite a where
   type Cardinality a :: Nat
   type Cardinality a = GCardinality (Rep a)
 
+----------------------------------------
+
 -- base types. TODO any more?
 
 -- | @0@

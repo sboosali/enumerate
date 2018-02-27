@@ -190,6 +190,20 @@ class Enumerable a where
  -- cardinality _ = gcardinality (Proxy :: Proxy (Rep a))
  -- TODO merge both methods into one that returns their pair
 
+{-ERROR
+
+with -XGeneralizedNewtypeDeriving:
+
+    Couldn't match representation of type ‘proxy ...’ with that of ‘proxy ...’
+
+SOLUTION
+
+Thanks for the bug report. Note that this only happens when -fdefer-type-errors is on. This is a duplicate of #12104, which has been fixed in GHC 8.2.1.
+
+-}
+
+----------------------------------------
+
 {-
 instance Enumerable where
  enumerated = boundedEnumerated
