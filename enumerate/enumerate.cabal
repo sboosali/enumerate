@@ -46,6 +46,9 @@ library
   Enumerate.Types
   Enumerate.Enum
   Enumerate.Cardinality
+  Enumerate.Between
+  Enumerate.Modular
+  
   Enumerate.Orphans.Large
   Enumerate.Orphans.GHC
 
