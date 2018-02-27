@@ -4,7 +4,7 @@ import Enumerate.Types
 import Enumerate.Function.Extra
 
 import Control.Monad.Catch (MonadThrow)
-import Control.DeepSeq
+-- import Control.DeepSeq
 
 import Data.Ix (Ix)
 
@@ -68,7 +68,8 @@ type Partial a b = (forall m. MonadThrow m => a -> m b)
 
 type (a -?> b) = Partial a b
 
---------------------------------------------------------------------------------
+----------------------------------------
+
  -- (by necessity) @'KnownNat' ('Cardinality' a)@
  --class (KnownNat (Cardinality a)) => Enumerable a where
 

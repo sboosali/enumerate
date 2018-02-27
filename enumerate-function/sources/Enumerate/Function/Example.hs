@@ -1,4 +1,6 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, LambdaCase #-}
+
+
 {-|
 
 -}
@@ -10,6 +12,7 @@ import Enumerate.Function
 {-
 stack build && stack exec -- enumerate-function-example
 -}
+main :: IO ()
 main = do
 
   putStrLn "\nenumerating domain...\n"
