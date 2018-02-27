@@ -2,6 +2,16 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase, ScopedTypeVariables #-}
 
+
+{-|
+
+@
+-- for doctest:
+@
+>>> :set -XDataKinds
+>>> pBetweenNegativeThreeAndPositiveSeven = Proxy :: Proxy (Between Negative 3 Positive 7)
+
+-}
 module Enumerate.Between where
 
 import Enumerate.Types
@@ -45,9 +55,11 @@ data Sign
 class KnownSign (sign :: Sign) where
   signVal :: proxy sign -> Integer
 
+-- | @= +1@
 instance KnownSign 'Positive where
   signVal _ = 1
 
+-- | @= -1@
 instance KnownSign 'Negative where
   signVal _ = -1
 
@@ -65,18 +77,24 @@ sign2int = \case
 
 -}
 
+{-|
+
+>>> pNegative = Proxy :: Proxy 'Negative'
+>>> pThree    = Proxy :: Proxy 3
+>>> intVal pNegative pThree
+-3
+
+-}
 intVal
   :: forall (sign :: Sign) (nat :: Nat) proxy proxy'.
      ( KnownSign sign
      , KnownNat  nat
      )
-  => proxy sign
+  => proxy  sign
   -> proxy' nat
   -> Integer
-intVal sign nat = signVal sign * natVal nat
-
-
-
+intVal pSign pNat =
+  signVal pSign * natVal pNat
 
 
 -- reifyINTEGER
@@ -90,7 +108,7 @@ intVal sign nat = signVal sign * natVal nat
 
 ----------------------------------------
 
-{-| a integer in an inclusive interval. 
+{-| am integer within an inclusive interval. 
 
 
 @
@@ -128,6 +146,7 @@ newtype Between
 
 ----------------------------------------
 
+-- | an out-of-bounds 'toEnum' is clipped (with 'clipBetween'). 
 instance
   ( KnownBetween sin min sax max
   ) => Enum (Between sin min sax max) where
@@ -157,6 +176,7 @@ instance
 
 --instance (Integral i, KnownNat n) => Num (i `Mod` n) where
 
+-- | all operations that overflow/underflow are clipped (with 'clipBetween'). 
 instance
   ( KnownInteger sin min
   , KnownInteger sax max
@@ -168,15 +188,29 @@ instance
     idInteger :: Integer -> Integer
     idInteger = id
 
-  UnsafeBetween i₁ + UnsafeBetween i₂ = clipBetween Nothing $ i₁ + i₂
-  UnsafeBetween i₁ * UnsafeBetween i₂ = clipBetween Nothing $ i₁ * i₂
+  UnsafeBetween i₁ + UnsafeBetween i₂ = clipBetween Nothing $
+    i₁ + i₂
+    
+  UnsafeBetween i₁ * UnsafeBetween i₂ = clipBetween Nothing $
+    i₁ * i₂
 
-  abs    (UnsafeBetween i) = clipBetween Nothing $ abs i
-  signum (UnsafeBetween i) = clipBetween Nothing $ signum i
-  negate (UnsafeBetween i) = clipBetween Nothing $ negate i
+  abs    (UnsafeBetween i) = clipBetween Nothing $
+    abs i
+    
+  signum (UnsafeBetween i) = clipBetween Nothing $
+    signum i
+    
+  negate (UnsafeBetween i) = clipBetween Nothing $
+    negate i
 
 ----------------------------------------
 
+{-|
+
+>>> minBetween pBetweenNegativeThreeAndPositiveSeven
+-3
+
+-}
 minBetween
   :: forall sin min sax max proxy.
      ( KnownInteger sin min
@@ -188,6 +222,12 @@ minBetween _proxy = intVal pSin pMin
   pSin = Proxy :: Proxy sin
   pMin = Proxy :: Proxy min
 
+{-|
+
+>>> maxBetween pBetweenNegativeThreeAndPositiveSeven
+7
+
+-}
 maxBetween
   :: forall sin min sax max proxy.
     ( KnownInteger sax max
@@ -199,7 +239,40 @@ maxBetween _proxy = intVal pSax pMax
   pSax = Proxy :: Proxy sax
   pMax = Proxy :: Proxy max
 
--- | primary constructor. 
+{-|
+
+>>> rangeBetween pBetweenNegativeThreeAndPositiveSeven
+10
+
+-}
+rangeBetween
+  :: forall sin min sax max proxy.
+    ( KnownBetween sin min sax max
+    )
+  => proxy (Between sin min sax max)
+  -> Natural
+rangeBetween proxy
+    = maximum - minimum
+    & max 0
+    & fromInteger
+  where
+  maximum = maxBetween proxy
+  minimum = minBetween proxy
+
+{- | the primary constructor. total via clipping (rounds up underflow and rounds down overflow).
+
+i.e. 'id' on in-bounds inputs, and 'min' or 'max' for out-of-bounds inputs.
+
+>>> clipBetween pBetweenNegativeThreeAndPositiveSeven (-9 :: Integer)
+UnsafeBetween (-3)
+
+>>> clipBetween pBetweenNegativeThreeAndPositiveSeven (9 :: Integer)
+UnsafeBetween 7
+
+>>> clipBetween pBetweenNegativeThreeAndPositiveSeven (0 :: Integer)
+UnsafeBetween 0
+
+-}
 clipBetween
   :: forall a sin min sax max proxy.
      ( Integral a -- Num a
@@ -209,10 +282,10 @@ clipBetween
   -> a
   -> Between sin min sax max
 clipBetween proxy
-  = toInteger
-  > max (minBetween proxy)
-  > min (maxBetween proxy)
-  > UnsafeBetween
+    = toInteger
+  >>> max (minBetween proxy)
+  >>> min (maxBetween proxy)
+  >>> UnsafeBetween
   -- where
   -- proxy = Proxy :: Proxy (Between sin min sax max)
 
