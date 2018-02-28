@@ -1,5 +1,7 @@
 {-# LANGUAGE DeriveGeneric, DeriveDataTypeable #-}
 
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 {-|
 
 -}

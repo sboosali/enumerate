@@ -1,5 +1,7 @@
 {-# LANGUAGE TypeFamilies, ExplicitNamespaces, DataKinds, UndecidableInstances #-}
+
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+
 {-| orphan instances, of 'Enumerable', for large types
 (i.e. 'Word32' \/ 'Word64' \/ 'Int32' \/ 'Int64').
 

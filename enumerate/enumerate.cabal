@@ -25,9 +25,16 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
-tested-with: GHC == 8.0.2, GHC == 8.2.2
+tested-with: 
+ GHC == 8.0.2
+ GHC == 8.2.2
 -- `multi-ghc-travis` uses `Tested-With`. 
 -- ..\multi-ghc-travis\make_travis_yml.hs enumerate.cabal > .travis.yml
+
+flag orphans
+  default: True
+  description: Implement orphan instances for some types in `base`. Either way, they are not exported by default (by the root module).
+  manual: True
 
 source-repository head
   type:     git
@@ -41,6 +48,24 @@ flag dump-core
 library
  hs-source-dirs:      sources
 
+--TODO toggle orphans 
+
+ if flag(orphans) 
+    exposed-modules:
+       Enumerate.Orphans.Large
+
+ if flag(orphans) && impl(ghc >= 8.0) && impl(ghc <= 8.4)
+    exposed-modules:
+       Enumerate.Orphans.GHC
+       
+ -- if impl(ghc >= 8.0) && impl(ghc <= 8.4)
+ --    exposed-modules:
+ --       Enumerate.Orphans.GHC
+ --       Enumerate.Orphans.Large
+ -- else   
+ --    exposed-modules:
+ --       Enumerate.Orphans.Large
+
  exposed-modules:
   Enumerate
   Enumerate.Types
@@ -48,9 +73,6 @@ library
   Enumerate.Cardinality
   Enumerate.Between
   Enumerate.Modular
-  
-  Enumerate.Orphans.Large
-  Enumerate.Orphans.GHC
 
   Enumerate.Example
   Enumerate.Test

@@ -1,5 +1,8 @@
 {-# LANGUAGE LambdaCase, DeriveGeneric, DeriveAnyClass #-}
 {-# LANGUAGE FlexibleInstances #-}
+
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+
 {-| test that nullary method calls are shared. 
 
 TODO cross-module benchmark and core check.
