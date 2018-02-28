@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, KindSignatures, GADTs, ConstraintKinds #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase, ScopedTypeVariables #-}
+{-# LANGUAGE LambdaCase, ScopedTypeVariables, TypeOperators, TupleSections #-}
 
 
 {-|
@@ -8,7 +8,9 @@
 @
 -- for doctest:
 @
+
 >>> :set -XDataKinds
+>>> import Data.Proxy (Proxy(..))
 >>> pBetweenNegativeThreeAndPositiveSeven = Proxy :: Proxy (Between Negative 3 Positive 7)
 
 -}
@@ -18,8 +20,9 @@ import Enumerate.Types
 
 import GHC.TypeLits
 
+import Control.Exception
 import Prelude (Enum(..))
-import Prelude.Spiros
+import Prelude.Spiros hiding (either2maybe) 
 
 ----------------------------------------
 -- data Modular i = Modular
@@ -51,6 +54,9 @@ type KnownInteger (sign :: Sign) (nat :: Nat) =
 data Sign
  = Positive
  | Negative
+
+-- | a hack since we can't distinguish @(Positive,0)@ from @(Negative,0)@
+type Unsigned = Positive
 
 class KnownSign (sign :: Sign) where
   signVal :: proxy sign -> Integer
@@ -108,8 +114,7 @@ intVal pSign pNat =
 
 ----------------------------------------
 
-{-| am integer within an inclusive interval. 
-
+{-| An integer within an (inclusive) interval. 
 
 @
 Between sin min sax max
@@ -142,7 +147,42 @@ newtype Between
  (sin :: Sign) (min :: Nat)
  (sax :: Sign) (max :: Nat)
  = UnsafeBetween Integer
- deriving (Show,Eq,Ord,Generic,NFData,Hashable)
+ deriving (Show,Eq,Ord,Generic,Data,NFData,Hashable)
+
+----------------------------------------
+
+-- | @[0 .. 7]@
+type Octal = Base 8
+
+-- | @[0 .. 9]@
+type Decimal = Base 10  -- Between Unsigned 0 Positive 9
+
+-- | @[0 .. 15]@
+type Hexadecimal = Base 16
+
+----------------------------------------
+
+-- | @[0 .. 100]@
+type Percentage = PositiveBelow 100
+
+----------------------------------------
+
+-- | @[-1, 0, +1]@
+type PlusMinusOne = Absolute 1
+
+----------------------------------------
+
+-- | @[-n .. +n]@
+type Absolute (n :: Nat) = Between Negative n Positive n
+ 
+-- | @[0 .. (n-1)]@
+type Base (n :: Nat) = PositiveBelow (n-1)
+
+-- | @[-n .. 0]@
+type NegativeBelow (n :: Nat) = Between Negative n Unsigned 0
+
+-- | @[0 .. +n]@
+type PositiveBelow (n :: Nat) = Between Unsigned 0 Positive n
 
 ----------------------------------------
 
@@ -230,6 +270,42 @@ instance
    rem :: a -> a -> a 
        integer remainder
   -}
+
+-- | @read \@Integer@ and @'checkBetween'@
+instance
+  ( KnownBetween sin min sax max
+  ) =>
+  Read (Between sin min sax max) where
+  
+  readsPrec precedence string = results'
+  
+     where
+     results' :: [((Between sin min sax max), String)]
+     results' = results & fmap go & catMaybes
+       -- fwiw, we don't short-circuit, we just keep the parses whose integers are in-bounds, but they're probably equivalent 
+
+     go ::       (Integer,                 String)
+        -> Maybe (Between sin min sax max, String)
+     go (i,s) = (,s) <$> either2maybe (isBetween' i)
+     
+     results :: [(Integer, String)]
+     results = readsPrec precedence string
+
+     either2maybe :: Either e a -> Maybe a
+     either2maybe = either (const Nothing) Just
+
+  {-
+*Main> :i readsPrec
+class Read a where
+  readsPrec :: Int -> ReadS a
+  ...
+    -- Defined in GHC.Read
+*Main> :i ReadS
+type ReadS a = String -> [(a, String)]
+    -- Defined in Text.ParserCombinators.ReadP
+  -}
+
+  
   
 ----------------------------------------
 
@@ -280,12 +356,14 @@ rangeBetween
   => proxy (Between sin min sax max)
   -> Natural
 rangeBetween proxy
-    = maximum - minimum
+    = maximum' - minimum'
     & max 0
     & fromInteger
   where
-  maximum = maxBetween proxy
-  minimum = minBetween proxy
+  maximum' = maxBetween proxy
+  minimum' = minBetween proxy
+
+----------------------------------------
 
 {- | the primary constructor. total via clipping (rounds up underflow and rounds down overflow).
 
@@ -317,17 +395,161 @@ clipBetween proxy
   -- where
   -- proxy = Proxy :: Proxy (Between sin min sax max)
 
-----------------------------------------
-
 -- | is 'clipBetween' without a proxy (it leans on inference). 
 clipBetween'
-  :: forall a sin min sax max proxy.
+  :: forall a sin min sax max.
      ( Integral a -- Num a
      , KnownBetween sin min sax max
      )
   => a
   -> Between sin min sax max
 clipBetween' = clipBetween Nothing
+
+----------------------------------------
+--TODO specializations
+
+{-# SPECIALIZE clipBetween
+               :: Maybe (Between Unsigned 0 Positive 9)
+               -> Integer
+               -> (Between Unsigned 0 Positive 9)
+  #-}
+
+{-# SPECIALIZE clipBetween
+               :: Proxy (Between Unsigned 0 Positive 9)
+               -> Integer
+               -> (Between Unsigned 0 Positive 9)
+  #-}
+
+{-# SPECIALIZE clipBetween
+               :: Maybe (Between Unsigned 0 Positive 9)
+               -> Int
+               -> (Between Unsigned 0 Positive 9)
+  #-}
+
+{-# SPECIALIZE clipBetween
+               :: Proxy (Between Unsigned 0 Positive 9)
+               -> Int
+               -> (Between Unsigned 0 Positive 9)
+  #-}
+
+
+{-# SPECIALIZE clipBetween
+               :: Maybe (Between Unsigned 0 Positive 255)
+               -> Integer
+               -> (Between Unsigned 0 Positive 255)
+  #-}
+
+{-# SPECIALIZE clipBetween
+               :: Proxy (Between Unsigned 0 Positive 255)
+               -> Integer
+               -> (Between Unsigned 0 Positive 255)
+  #-}
+
+{-# SPECIALIZE clipBetween
+               :: Maybe (Between Unsigned 0 Positive 255)
+               -> Int
+               -> (Between Unsigned 0 Positive 255)
+  #-}
+
+{-# SPECIALIZE clipBetween
+               :: Proxy (Between Unsigned 0 Positive 255)
+               -> Int
+               -> (Between Unsigned 0 Positive 255)
+  #-}
+
+---------------------------------------
+  
+{- | a secondary constructor. partial (safely), via @Either 'NotBetween'@).
+
+outputs:
+
+* 'Right' on in-bounds inputs,
+* 'NumberIsTooLow' or 'NumberIsTooHigh' for out-of-bounds inputs,
+* 'IntervalIsEmpty' when the 'Between' itself is invalid. 
+
+>>> isBetween pBetweenNegativeThreeAndPositiveSeven (-9 :: Integer)
+Left NumberIsTooLow
+
+>>> isBetween pBetweenNegativeThreeAndPositiveSeven (9 :: Integer)
+Left NumberIsTooHigh
+
+>>> isBetween pBetweenNegativeThreeAndPositiveSeven (0 :: Integer)
+Right (UnsafeBetween 0)
+
+>>> import Prelude (undefined)
+>> pEmptyBetween = Proxy :: Proxy (Between Positive 1 Negative 1)
+>>> isBetween pEmptyBetween undefined
+Left IntervalIsEmpty
+
+-}
+isBetween
+  :: forall a sin min sax max proxy.
+     ( Integral a -- Num a
+     , KnownBetween sin min sax max
+     )
+  => proxy (Between sin min sax max)
+  -> a
+  -> Either NotBetween (Between sin min sax max)
+isBetween proxy x =
+  if   not (checkBetween proxy)
+  then Left IntervalIsEmpty
+  else if   not (i >= minimum')
+       then Left NumberIsTooLow
+       else if   not (i <= maximum')
+            then Left NumberIsTooHigh
+            else Right (UnsafeBetween i)
+  where
+  i        = toInteger x
+  maximum' = maxBetween proxy
+  minimum' = minBetween proxy
+
+-- | 'isBetween' with the type parameters being implicit (i.e. no @proxy@). 
+isBetween'
+  :: forall a sin min sax max.
+     ( Integral a -- Num a
+     , KnownBetween sin min sax max
+     )
+  => a
+  -> Either NotBetween (Between sin min sax max)
+isBetween' = isBetween Nothing
+
+----------------------------------------
+
+data NotBetween
+  = NumberIsTooLow
+  | NumberIsTooHigh
+  | IntervalIsEmpty
+  deriving (Show,Read,Eq,Ord,Enum,Bounded,Generic)
+
+instance Exception  NotBetween
+instance NFData     NotBetween
+instance Hashable   NotBetween
+instance Enumerable NotBetween
+
+-- | 'False' if the interval itself ('Between') is invalid:
+-- 'minBetween' must be less than or equal to 'maxBetween'
+--
+-- >>> pSingularBetween = Proxy :: Proxy (Between Positive 1 Positive 1)
+-- >>> checkBetween pSingularBetween
+-- True
+-- 
+-- >>> checkBetween (Proxy :: Proxy (Between Positive 1 Positive 2))
+-- True
+--
+-- >>> checkBetween (Proxy :: Proxy (Between Positive 1 Negative 1))
+-- False
+--
+-- Can be checked at the type-level too.
+checkBetween  
+  :: forall sin min sax max proxy.
+     ( KnownBetween sin min sax max
+     )
+  => proxy (Between sin min sax max)
+  -> Bool
+checkBetween proxy = minimum' <= maximum'
+  where
+  minimum' = minBetween proxy
+  maximum' = maxBetween proxy
 
 ---------------------------------------
 

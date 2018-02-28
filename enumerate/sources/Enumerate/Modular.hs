@@ -1,5 +1,5 @@
 module Enumerate.Modular where
 
-import Enumerate.Types
+--import Enumerate.Types
 
 ----------------------------------------

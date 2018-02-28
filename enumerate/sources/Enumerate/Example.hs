@@ -1,5 +1,8 @@
 {-# LANGUAGE LambdaCase, DeriveGeneric, DeriveAnyClass #-}
 {-# LANGUAGE FlexibleInstances #-}
+
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+
 {- |
 
 
@@ -175,19 +178,19 @@ main = do
     putStrLn ">>> cardinality ([]::[A Void])"
     print $ cardinality ([]::[A Void])
     putStrLn ">>> enumerated :: [A Void]"
-    traverse print (enumerated :: [A Void])
+    _ <- traverse print (enumerated :: [A Void])
 
     putStrLn "\n\n-- A ()"
     putStrLn ">>> cardinality ([]::[A ()])"
     print $ cardinality ([]::[A ()])
     putStrLn ">>> enumerated :: [A ()]"
-    traverse print (enumerated :: [A ()])
+    _ <- traverse print (enumerated :: [A ()])
 
     putStrLn "\n\n-- A Bool"
     putStrLn ">>> cardinality ([]::[A Bool])"
     print $ cardinality ([]::[A Bool])
     putStrLn ">>> enumerated :: [A Bool]"
-    traverse print (enumerated :: [A Bool])
+    _ <- traverse print (enumerated :: [A Bool])
 
     putStrLn "\n\n-- A Ordering"
     putStrLn ">>> cardinality ([]::[A Ordering])"
