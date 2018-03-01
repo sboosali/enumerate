@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+
 {-
 
 (the
@@ -9,29 +10,25 @@ are for debugging.)
 
 -}
 import Test.DocTest
--- import Data.Enumerate.Extra
 
--- import Cabal.Info (getLibraryModules)
---
--- doctestLibraryModules = do
---   ms <- getLibraryModules >>= either (show >>> error) return
---   traverse_ print ms
---   doctest ms
+{-
 
+$ grep -h -i LANGUAGE -r sources/ | sort | uniq | ...
 
-main = do
- -- doctestLibraryModules
+$ cat ... | sort | uniq | xargs | sed -e 's/ / /g'
 
- doctest
-  [ "sources/Enumerate.hs"
-  , "sources/Enumerate/Types.hs"
-  , "sources/Enumerate/Extra.hs"
-  ]
+-}
 
- doctest
-  [ "sources/Enumerate/Example.hs"
-  ]
+-- [1] every module in this directory (i.e. `hs-source-dirs`),
+-- [2] and all language extensions,
+-- whether enabled by default or otherwise used,
+-- (i.e. both `default-extensions` and `other-extensions`)
+-- EXCEPT those that conflict
+-- (e.g. DeriveAnyClass and GeneralizedNewtypeDeriving)
 
- doctest
-   [ "sources/Enumerate/Cardinality.hs"
-   ]
+extensions2flags :: String -> [String]
+extensions2flags = fmap ("-X"++) . words
+
+main = doctest $
+ [ "sources/" ] ++ extensions2flags "ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveGeneric ExplicitNamespaces FlexibleContexts FlexibleInstances GADTs KindSignatures LambdaCase RankNTypes ScopedTypeVariables TupleSections TypeFamilies TypeOperators UndecidableInstances"
+

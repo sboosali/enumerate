@@ -46,8 +46,9 @@ e.g. 'Enumerate.reifyFunction' (which takes time linear in the domain)
 on a function of type @(:: Int -> Bool)@,
 won't terminate anytime soon.
 
->>> 1 + toInteger (maxBound::Int64) - toInteger (minBound::Int64)
-18446744000000000000
+>>> let sizeInt64 = 1 + toInteger (maxBound::Int64) - toInteger (minBound::Int64)
+>>> sizeInt64
+18446744073709551616
 
 -}
 instance Enumerable Int64  where
@@ -84,3 +85,15 @@ instance Enumerable Word  where
 --
 -- -}
 -- type INT_SIZE = 18446744000000000000
+
+{-
+
+>>> let sizeInt64 = 1 + toInteger (maxBound::Int64) - toInteger (minBound::Int64)
+>>> sizeInt64 `elem` [18446744073709551616, 18446744000000000000]
+True
+
+### Failure in sources/Enumerate/Orphans/Large.hs:49: expression `1 + toInteger (maxBound::Int64) - toInteger (minBound::Int64)'
+expected: 18446744000000000000
+ but got: 18446744073709551616
+
+-}

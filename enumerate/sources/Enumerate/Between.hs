@@ -3,15 +3,7 @@
 {-# LANGUAGE LambdaCase, ScopedTypeVariables, TypeOperators, TupleSections #-}
 
 
-{-|
-
-@
--- for doctest:
-@
-
->>> :set -XDataKinds
->>> import Data.Proxy (Proxy(..))
->>> pBetweenNegativeThreeAndPositiveSeven = Proxy :: Proxy (Between Negative 3 Positive 7)
+{-| see 'Between', 'clipBetween', 'isBetween', 'readBetween'. 
 
 -}
 module Enumerate.Between where
@@ -22,7 +14,20 @@ import GHC.TypeLits
 
 import Control.Exception
 import Prelude (Enum(..))
-import Prelude.Spiros hiding (either2maybe) 
+import Prelude.Spiros
+
+
+{- $setup
+
+@
+for doctest:
+@
+
+>>> :set -XDataKinds
+>>> import Data.Proxy (Proxy(..))
+>>> pBetweenNegativeThreeAndPositiveSeven = Proxy :: Proxy (Between Negative 3 Positive 7)
+
+-}
 
 ----------------------------------------
 -- data Modular i = Modular
@@ -85,7 +90,7 @@ sign2int = \case
 
 {-|
 
->>> pNegative = Proxy :: Proxy 'Negative'
+>>> pNegative = Proxy :: Proxy Negative  -- 'Negative'
 >>> pThree    = Proxy :: Proxy 3
 >>> intVal pNegative pThree
 -3
@@ -291,9 +296,6 @@ instance
      results :: [(Integer, String)]
      results = readsPrec precedence string
 
-     either2maybe :: Either e a -> Maybe a
-     either2maybe = either (const Nothing) Just
-
   {-
 *Main> :i readsPrec
 class Read a where
@@ -304,8 +306,6 @@ class Read a where
 type ReadS a = String -> [(a, String)]
     -- Defined in Text.ParserCombinators.ReadP
   -}
-
-  
   
 ----------------------------------------
 
@@ -371,10 +371,8 @@ i.e. 'id' on in-bounds inputs, and 'min' or 'max' for out-of-bounds inputs.
 
 >>> clipBetween pBetweenNegativeThreeAndPositiveSeven (-9 :: Integer)
 UnsafeBetween (-3)
-
 >>> clipBetween pBetweenNegativeThreeAndPositiveSeven (9 :: Integer)
 UnsafeBetween 7
-
 >>> clipBetween pBetweenNegativeThreeAndPositiveSeven (0 :: Integer)
 UnsafeBetween 0
 
@@ -469,15 +467,13 @@ outputs:
 
 >>> isBetween pBetweenNegativeThreeAndPositiveSeven (-9 :: Integer)
 Left NumberIsTooLow
-
 >>> isBetween pBetweenNegativeThreeAndPositiveSeven (9 :: Integer)
 Left NumberIsTooHigh
-
 >>> isBetween pBetweenNegativeThreeAndPositiveSeven (0 :: Integer)
 Right (UnsafeBetween 0)
 
 >>> import Prelude (undefined)
->> pEmptyBetween = Proxy :: Proxy (Between Positive 1 Negative 1)
+>>> pEmptyBetween = Proxy :: Proxy (Between Positive 1 Negative 1)
 >>> isBetween pEmptyBetween undefined
 Left IntervalIsEmpty
 
@@ -526,20 +522,20 @@ instance NFData     NotBetween
 instance Hashable   NotBetween
 instance Enumerable NotBetween
 
--- | 'False' if the interval itself ('Between') is invalid:
--- 'minBetween' must be less than or equal to 'maxBetween'
---
--- >>> pSingularBetween = Proxy :: Proxy (Between Positive 1 Positive 1)
--- >>> checkBetween pSingularBetween
--- True
--- 
--- >>> checkBetween (Proxy :: Proxy (Between Positive 1 Positive 2))
--- True
---
--- >>> checkBetween (Proxy :: Proxy (Between Positive 1 Negative 1))
--- False
---
--- Can be checked at the type-level too.
+{- | 'False' if the interval itself ('Between') is invalid:
+'minBetween' must be less than or equal to 'maxBetween'
+
+>>> pSingularBetween = Proxy :: Proxy (Between Positive 1 Positive 1)
+>>> checkBetween pSingularBetween
+True
+>>> checkBetween (Proxy :: Proxy (Between Positive 1 Positive 2))
+True
+>>> checkBetween (Proxy :: Proxy (Between Positive 1 Negative 1))
+False
+
+Can be checked at the type-level too.
+
+-}
 checkBetween  
   :: forall sin min sax max proxy.
      ( KnownBetween sin min sax max
@@ -551,12 +547,75 @@ checkBetween proxy = minimum' <= maximum'
   minimum' = minBetween proxy
   maximum' = maxBetween proxy
 
+
+--NOTE uselessly uninferrable
+-- -- | 'checkBetween' with the type parameters being implicit (i.e. no @proxy@).
+-- checkBetween'  
+--   :: forall sin min sax max proxy.
+--      ( KnownBetween sin min sax max
+--      )
+--   => Bool
+-- checkBetween' = checkBetween Nothing
+
 ---------------------------------------
+
+{-|
+
+>>> readBetween pBetweenNegativeThreeAndPositiveSeven "11" 
+Left (BetweenValidationFailure NumberIsTooHigh)
+>>> readBetween pBetweenNegativeThreeAndPositiveSeven "three" 
+Left (BetweenParsingFailure "three")
+>>> readBetween pBetweenNegativeThreeAndPositiveSeven "-1"
+Right (UnsafeBetween (-1))
+
+-}
+readBetween
+  :: forall sin min sax max proxy.
+     ( KnownBetween sin min sax max
+     )
+  => proxy (Between sin min sax max)
+  -> String
+  -> Either BetweenError (Between sin min sax max)
+readBetween proxy s = do
+  i <- readInteger_BetweenError s
+  j <- isBetween_BetweenError i
+  return j
+
+  where
+  isBetween_BetweenError
+    = isBetween proxy
+    > first BetweenValidationFailure
+  
+  readInteger_BetweenError
+    = readInteger
+    > maybe2either (BetweenParsingFailure s)
+
+  readInteger :: String -> Maybe Integer
+  readInteger = readMay
+
+data BetweenError
+  = BetweenParsingFailure    String
+  | BetweenValidationFailure NotBetween
+  deriving (Show,Read,Eq,Ord,Generic)
+
+instance Exception  BetweenError
+instance NFData     BetweenError
+instance Hashable   BetweenError
+--instance Enumerable BetweenError
+
+-- | 'readBetween' with the type parameters being implicit (i.e. no @proxy@).
+readBetween'
+  :: forall sin min sax max.
+     ( KnownBetween sin min sax max
+     )
+  => String
+  -> Either BetweenError (Between sin min sax max)
+readBetween' = readBetween Nothing
+  
+----------------------------------------
 
 
 {-
-
-----------------------------------------
 
 data INTEGER
  = Negative Nat
@@ -615,6 +674,13 @@ instance Num Between where
 
 
 
+
+>>> readBetween' "11" :: Between Negative 10 Positive 10 
+Left (BetweenValidationFailure NumberIsTooHigh)
+>>> readBetween' "eleven" :: Between Negative 10 Positive 10
+Left (BetweenParsingFailure "eleven")
+>>> readBetween' "-5" :: Between Negative 10 Positive 10 
+Right (UnsafeBetween 5)
 
 
 
