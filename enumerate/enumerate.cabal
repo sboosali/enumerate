@@ -85,7 +85,7 @@ library
 
  build-depends:
                base >= 4.7 && < 5
-             , spiros
+             , spiros             >=0.2
 
              , ghc-prim >=0.3
              , array >=0.5
