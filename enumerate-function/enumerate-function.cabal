@@ -1,16 +1,22 @@
 name:                enumerate-function
-version:             0.0.1
-synopsis:            simple package for inverting functions and testing totality, via brute enumeration of the domain
-description:         
+version:             0.2.3
+
+synopsis:            Invert functions via enumeration
+description:
+ Invert functions by brute-force, enumerating their domain (the <https://hackage.haskell.org/package/enumerate @enumerate@> package provides a generalized @Enum@). Once a function is "reified" into its inputs\/outputs, we can check properties like:
  .
- see the "Enumerate.Function" module for examples for documentation.
+ * Totality 
+ * Injectivity
+ * Surjectivity
  .
-homepage:            http://github.com/sboosali/enumerate-function#readme
+ See the "Enumerate.Function" module for examples for documentation.
+
+homepage:            http://github.com/sboosali/enumerate#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Spiros Boosalis
 maintainer:          samboosalis@gmail.com
-copyright:           2016 Spiros Boosalis
+copyright:           2018 Spiros Boosalis
 category:            TODO
 build-type:          Simple
 cabal-version:       >=1.10
@@ -30,8 +36,10 @@ extra-source-files:
 
 source-repository head
   type:     git
-  location: https://github.com/sboosali/enumerate-function
+  location: https://github.com/sboosali/enumerate
+  subdir:   enumerate-function
 
+----------------------------------------
 
 library
  hs-source-dirs:      sources

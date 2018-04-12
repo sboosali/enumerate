@@ -1,10 +1,9 @@
 # my
 ignore/
-.projectile
-enumerate/sources/Data/Canonical.hs
-result/
+
+# Nix
 result
-ghcid.txt
+result-*
 
 # Haskell
 cabal.project.local
@@ -22,6 +21,8 @@ cabal.sandbox.config
 cabal.config
 report.html
 .stack-work/
+ghcid.txt
+.styx/
 
 # Emacs
 \#*
@@ -30,6 +31,7 @@ report.html
 \#*\#
 *.log
 TAGS
+.projectile
 
 # OS X
 .DS_Store
