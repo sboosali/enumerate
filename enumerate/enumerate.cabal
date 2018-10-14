@@ -126,20 +126,26 @@ library
   -- Data.TEnumerate
 
  build-depends:
-    base             >= 4.7 && < 5
-  , spiros           >=0.2
-  , ghc-prim         >=0.3
-  , array            >=0.5
-  , template-haskell >=2.9
-  , containers       >=0.5
-  , vinyl            >=0.5
-  , deepseq          >= 1.3
+
+               base >= 4.7 && < 5
+
+               ---base             >= 4.7 && < 5
+               ---base-noprelude   >= 4.7 && < 5
+
+             , spiros           >=0.2
+             , ghc-prim         >=0.3
+             , array            >=0.5
+             , template-haskell >=2.9
+             , containers       >=0.5
+             , vinyl            >=0.5
+             , deepseq          >= 1.3
 -- , modular-arithmetic==1.2.*
 
  default-language:   Haskell2010
  default-extensions:
-  NoImplicitPrelude
-  AutoDeriveTypeable DeriveDataTypeable DeriveGeneric DeriveFunctor DeriveFoldable DeriveTraversable 
+                    NoImplicitPrelude
+                    AutoDeriveTypeable DeriveDataTypeable DeriveGeneric DeriveFunctor DeriveFoldable DeriveTraversable
+                    PackageImports
 
  other-extensions: ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveDataTypeable DeriveGeneric ExplicitNamespaces FlexibleContexts FlexibleInstances GADTs GeneralizedNewtypeDeriving KindSignatures LambdaCase RankNTypes ScopedTypeVariables TupleSections TypeFamilies TypeOperators UndecidableInstances
 

@@ -103,7 +103,7 @@ import Data.Ix (Ix(..))
 import           Data.Void (Void)
 import           Data.Word (Word8, Word16)
 import           Data.Int (Int8, Int16)
-import Prelude (Enum(..))
+import           "base" Prelude (Enum(..))
 
 -- for instances...
 import Data.Typeable ((:~:)(..))

@@ -1,7 +1,10 @@
 packages:
-  enumerate/
-  enumerate-function/
-  
+  ./enumerate/
+  ./enumerate-function/
+
+optional-packages:
+  ../spiros/spiros/
+
 constraints:
   -- see https://github.com/haskell-infra/hackage-trustees/issues/119
   foundation >=0.0.14

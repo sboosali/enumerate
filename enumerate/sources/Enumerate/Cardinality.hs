@@ -1,6 +1,7 @@
-{-# LANGUAGE TypeFamilies, ExplicitNamespaces, TypeOperators, FlexibleInstances #-}
+{-# LANGUAGE TypeFamilies, ExplicitNamespaces, FlexibleInstances #-}
 {-# LANGUAGE DataKinds, UndecidableInstances, ConstraintKinds, KindSignatures #-}
 {-# LANGUAGE ScopedTypeVariables, FlexibleContexts #-}
+{-# LANGUAGE TypeOperators, NoStarIsType #-}
 
 {-| the cardinality of a finite type, at the type-level.
 
@@ -17,8 +18,12 @@ import           Data.Word (Word8, Word16)
 import           Data.Int (Int8, Int16)
 -- import Data.Set (Set)
 -- import Numeric.Natural (Natural)
-import GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^), type (<=?))
 -- import           Data.Proxy 
+
+--import Data.Kind (Type, Constraint)
+
+import Data.Kind (Type)
+import GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^), type (<=?))
 
 -- alternatives:
 -- class Finite a where
@@ -135,7 +140,7 @@ instance (Finite a, Finite b) => Finite (a -> b) where
 
 --------------------------------------------------------------------------------
 
-type family GCardinality (f :: * -> *) :: Nat
+type family GCardinality (f :: Type -> Type) :: Nat
 
 type instance GCardinality (V1) = 0
 
