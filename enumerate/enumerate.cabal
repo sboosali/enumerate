@@ -10,39 +10,46 @@ version:             0.2.3
 -- Information -----------------------------------
 --------------------------------------------------
 
-synopsis:            Enumerate all the values in a finite type (automatically)
-description:
-  @enumerate@ provides: 
-  .
-    * (1) a typeclass for enumerating all values in a finite type,
-    * (2) a generic instance for automatic deriving, and
-    * (3) helpers that reify functions (partial or total, monadic or pure)
-    into a Map.
-  .
-  see the "Enumerable" module for extensive documentation.
+synopsis:    Enumerate all the values in a finite type (automatically)
+
+description: Provides: 
+             .
+                 * (1) A typeclass for enumerating all values in a finite type,
+                 * (2) A generic instance for automatic deriving, and
+                 * (3) Helpers that reify functions (partial or total, monadic or pure)
+                       into a Map.
+             .
+             See the "Enumerable" module for extensive documentation.
+             .
+
+category:    Data
 
 --------------------------------------------------
 
-homepage:            https://github.com/sboosali/enumerate
-license:             BSD-4-Clause
-license-file:        LICENSE
-author:              Sam Boosalis
+author:              Spiros Boosalis
 maintainer:          samboosalis@gmail.com
--- copyright:
-category:            Data
-extra-source-files:  README.md
+homepage:            https://github.com/sboosali/enumerate
 
 --------------------------------------------------
 
-tested-with: GHC == 8.0.2
-             GHC == 8.2.2
+tested-with: GHC == 8.6.1
+           , GHC == 8.4.3
+           , GHC == 8.2.2
+           , GHC == 8.0.2
+--           , GHC == 7.10.3
 
 -- `multi-ghc-travis` uses `Tested-With`. 
 -- ..\multi-ghc-travis\make_travis_yml.hs enumerate.cabal > .travis.yml
 
 --------------------------------------------------
 
--- extra-source-files:
+license:             BSD-4-Clause
+copyright:           2018 Sam Boosalis
+license-file:        LICENSE
+
+--------------------------------------------------
+
+extra-source-files: README.md
 
 --data-files:
 --  data/
@@ -132,35 +139,35 @@ library
 
  if flag(orphans) 
     exposed-modules:
-       Enumerate.Orphans.Large
+                    Enumerate.Orphans.Large
 
 ------------------------------
 
  if flag(orphans) && impl(ghc >= 8.0) && impl(ghc <= 8.2)
     exposed-modules:
-       Enumerate.Orphans.GHC       
+                    Enumerate.Orphans.GHC       
 
 ------------------------------
 
  ghc-options:
-  -Wall
-  -Wcompat
+             -Wall
+             -Wcompat
 
   -- disable
-  -Wno-unticked-promoted-constructors
+             -Wno-unticked-promoted-constructors
 
   -- enable
-  -Wincomplete-uni-patterns
-  -Wincomplete-record-updates
-  -Widentities
-  -Wmissing-methods
+             -Wincomplete-uni-patterns
+             -Wincomplete-record-updates
+             -Widentities
+             -Wmissing-methods
 
   -- raise a warning into an error
   -- -Werror=missing-fields
 
   -- use `typed-holes`, not `undefined`, during development
-  -fdefer-typed-holes
-  -Wtyped-holes
+             -fdefer-typed-holes
+             -Wtyped-holes
 
  -- if impl(ghc >= 8.0) && impl(ghc <= 8.4)
  --    exposed-modules:
@@ -193,11 +200,35 @@ library
  default-language: Haskell2010
 
  default-extensions:
+                    AutoDeriveTypeable
+                    DeriveDataTypeable
+                    DeriveFoldable
+                    DeriveFunctor
+                    DeriveGeneric
+                    DeriveTraversable
                     NoImplicitPrelude
-                    AutoDeriveTypeable DeriveDataTypeable DeriveGeneric DeriveFunctor DeriveFoldable DeriveTraversable
                     PackageImports
 
- other-extensions: ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveDataTypeable DeriveGeneric ExplicitNamespaces FlexibleContexts FlexibleInstances GADTs GeneralizedNewtypeDeriving KindSignatures LambdaCase RankNTypes ScopedTypeVariables TupleSections TypeFamilies TypeOperators UndecidableInstances
+ other-extensions:
+                  ConstraintKinds
+                  DataKinds
+                  DefaultSignatures
+                  DeriveAnyClass
+                  DeriveDataTypeable
+                  DeriveGeneric
+                  ExplicitNamespaces
+                  FlexibleContexts
+                  FlexibleInstances
+                  GADTs
+                  GeneralizedNewtypeDeriving
+                  KindSignatures
+                  LambdaCase
+                  RankNTypes
+                  ScopedTypeVariables
+                  TupleSections
+                  TypeFamilies
+                  TypeOperators
+                  UndecidableInstances
 
 ------------------------------
 
@@ -208,7 +239,6 @@ library
   ghc-options: -fplugin=DumpCore -fplugin-opt DumpCore:core
 
 ------------------------------
-
 
 --------------------------------------------------
 -- Tests -----------------------------------------
@@ -227,9 +257,9 @@ test-suite doctest
  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
 
  build-depends:
-    base
-  , enumerate
-  , doctest
+               base
+             , enumerate
+             , doctest
   --, cabal-info
 
 --------------------------------------------------
@@ -246,14 +276,14 @@ test-suite unit
  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
 
  other-modules:
-  Enumerate.Test
+               Enumerate.Test
 
  build-depends:
-    base
-  , enumerate
-  , hspec      >=2.2
-  , QuickCheck >=2.8
-  , smallcheck >=1.1
+               base
+             , enumerate
+             , hspec      >=2.2
+             , QuickCheck >=2.8
+             , smallcheck >=1.1
   -- , tasty
   -- , tasty-quickcheck
   -- , tasty-hunit

@@ -1,84 +1,115 @@
+cabal-version:       2.4
+build-type:          Simple
+
+--------------------------------------------------
+
 name:                enumerate-function
 version:             0.2.3
 
-synopsis:            Invert functions via enumeration
-description:
- Invert functions by brute-force, enumerating their domain (the <https://hackage.haskell.org/package/enumerate @enumerate@> package provides a generalized @Enum@). Once a function is "reified" into its inputs\/outputs, we can check properties like:
- .
- * Totality 
- * Injectivity
- * Surjectivity
- .
- See the "Enumerate.Function" module for examples for documentation.
+--------------------------------------------------
+-- Information -----------------------------------
+--------------------------------------------------
 
-homepage:            http://github.com/sboosali/enumerate#readme
-license:             BSD-4-Clause
-license-file:        LICENSE
+synopsis:    Invert functions via enumeration
+
+description: Invert functions by brute-force, enumerating their domain.
+             .
+             Once a function is "reified" into its inputs\/outputs, we can check properties like:
+             .
+             * Totality
+             * Injectivity
+             * Surjectivity
+             .
+             See the "Enumerate.Function" module for examples for documentation.
+             .
+             (The <https://hackage.haskell.org/package/enumerate @enumerate@> package,
+             a (version-locked) dependency, provides a generalized @Enum@,
+             which is used to brute-force all inputs of a function)
+             .
+
+category:    Data
+
+--------------------------------------------------
+
 author:              Spiros Boosalis
 maintainer:          samboosalis@gmail.com
-copyright:           2018 Spiros Boosalis
-category:            TODO
-build-type:          Simple
-cabal-version:       >=1.10
+homepage:            https://github.com/sboosali/enumerate
 
--- $ stack new PACKAGE spirosboosalis.hsfiles -p "module:MODULE"
+--------------------------------------------------
 
-extra-source-files:
-  README.md
-  .travis.yml
-  HLint.hs
-  stack.yaml
+tested-with: GHC == 8.6.1
+           , GHC == 8.4.3
+           , GHC == 8.2.2
+           , GHC == 8.0.2
+--           , GHC == 7.10.3
+
+--------------------------------------------------
+
+license:             BSD-4-Clause
+copyright:           2018 Sam Boosalis
+license-file:        LICENSE
+
+--------------------------------------------------
+
+extra-source-files: README.md
+                    .travis.yml
+                    HLint.hs
+                    stack.yaml
 
 --data-files:
 --  data/
+
+--------------------------------------------------
 
 source-repository head
   type:     git
   location: https://github.com/sboosali/enumerate
   subdir:   enumerate-function
 
-----------------------------------------
+--------------------------------------------------
+-- Flags -----------------------------------------
+--------------------------------------------------
+
+--------------------------------------------------
+-- Library ---------------------------------------
+--------------------------------------------------
 
 library
- hs-source-dirs:      sources
- default-language:    Haskell2010
- ghc-options:         -Wall -fno-warn-unticked-promoted-constructors
- default-extensions: AutoDeriveTypeable DeriveDataTypeable DeriveGeneric
-                     DeriveFunctor DeriveFoldable DeriveTraversable
-                     LambdaCase EmptyCase TypeOperators PostfixOperators
-                     ViewPatterns BangPatterns KindSignatures
-                     NamedFieldPuns RecordWildCards TupleSections
-                     MultiWayIf DoAndIfThenElse EmptyDataDecls
-                     MultiParamTypeClasses FlexibleContexts FlexibleInstances
-                     TypeFamilies FunctionalDependencies
-                     ScopedTypeVariables StandaloneDeriving
+
+------------------------------
+
+ hs-source-dirs: sources
+ 
+------------------------------
 
  exposed-modules:
-  Enumerate.Function
-  Enumerate.Function.Types
-  Enumerate.Function.Map
-  Enumerate.Function.Reify
-  Enumerate.Function.Invert
+                 Enumerate.Function
+                 Enumerate.Function.Types
+                 Enumerate.Function.Map
+                 Enumerate.Function.Reify
+                 Enumerate.Function.Invert
 
-  Enumerate.Orphans.Function
+                 Enumerate.Orphans.Function
 
  -- (for doctest / haddocks / exectuable) other-modules:
-  Enumerate.Function.Extra
-  Enumerate.Function.Example
+                 Enumerate.Function.Extra
+                 Enumerate.Function.Example
+
+------------------------------
 
  build-depends:
-    base >=4.7 && <5
+               base >=4.7 && <5
 
-  , enumerate 
+             , enumerate 
    -- >=0.2.2
 
-  , containers >=0.5
+             , containers >=0.5
 
 
-  , semigroups >=0.18
-  , exceptions >=0.8
-  , MemoTrie >=0.6
-  , deepseq >= 1.3
+             , semigroups >=0.18
+             , exceptions >=0.8
+             , MemoTrie >=0.6
+             , deepseq >= 1.3
 
   -- ,
   -- , transformers
@@ -108,9 +139,49 @@ library
   -- , async
   -- , parallel
 
+------------------------------
 
--- $ stack build && stack exec -- example-enumerate-function
+ ghc-options:         -Wall -fno-warn-unticked-promoted-constructors
+
+------------------------------
+
+ default-language: Haskell2010
+
+ default-extensions: AutoDeriveTypeable
+                     BangPatterns
+                     DeriveDataTypeable
+                     DeriveFoldable
+                     DeriveFunctor
+                     DeriveGeneric
+                     DeriveTraversable
+                     DoAndIfThenElse
+                     EmptyCase
+                     EmptyDataDecls
+                     FlexibleContexts
+                     FlexibleInstances
+                     FunctionalDependencies
+                     KindSignatures
+                     LambdaCase
+                     MultiParamTypeClasses
+                     MultiWayIf
+                     NamedFieldPuns
+                     PostfixOperators
+                     RecordWildCards
+                     ScopedTypeVariables
+                     StandaloneDeriving
+                     TupleSections
+                     TypeFamilies
+                     TypeOperators
+                     ViewPatterns
+
+------------------------------
+
+--------------------------------------------------
+-- Programs --------------------------------------
+--------------------------------------------------
+
 executable example-enumerate-function
+
  hs-source-dirs:      executables
  main-is:             Main.hs
 
@@ -118,11 +189,15 @@ executable example-enumerate-function
  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
 
  build-depends:
-    base
-  , enumerate-function
+               base
+             , enumerate-function
 
+-- $ stack build && stack exec -- example-enumerate-function
 
--- $ stack test doctest
+--------------------------------------------------
+-- Tests -----------------------------------------
+--------------------------------------------------
+
 test-suite doctest
  hs-source-dirs:      tests
  main-is:             DocTest.hs
@@ -132,13 +207,16 @@ test-suite doctest
  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
 
  build-depends:
-    base
-  , enumerate-function
-  , doctest
+               base
+             , enumerate-function
+             , doctest
 
+-- $ stack test doctest
 
--- $ stack test unittest
+--------------------------------------------------
+
 test-suite unittest
+
  hs-source-dirs:      tests
  main-is:             UnitTest.hs
  type:                exitcode-stdio-1.0
@@ -147,18 +225,22 @@ test-suite unittest
  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
 
  other-modules:
-  Enumerate.Test
+               Enumerate.Test
 
  build-depends:
-    base
-  , enumerate-function
-  , hspec ==2.2.*
-  , QuickCheck ==2.8.*
+               base
+             , enumerate-function
+             , hspec ==2.2.*
+             , QuickCheck ==2.8.*
   -- , tasty
   -- , tasty-quickcheck
 
+-- $ stack test unittest
 
--- $ stack bench
+--------------------------------------------------
+-- Benchmarks ------------------------------------
+--------------------------------------------------
+
 benchmark command
  hs-source-dirs:      benchmarks
  main-is:             Bench.hs
@@ -168,7 +250,11 @@ benchmark command
  ghc-options:      -Wall -threaded -rtsopts -with-rtsopts=-N
 
  build-depends:
-    base
-  , enumerate-function
-  , criterion
-  , deepseq
+               base
+             , enumerate-function
+             , criterion
+             , deepseq
+
+-- $ stack bench
+
+--------------------------------------------------
