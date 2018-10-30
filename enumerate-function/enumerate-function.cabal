@@ -12,7 +12,7 @@ description:
  See the "Enumerate.Function" module for examples for documentation.
 
 homepage:            http://github.com/sboosali/enumerate#readme
-license:             BSD3
+license:             BSD-4-Clause
 license-file:        LICENSE
 author:              Spiros Boosalis
 maintainer:          samboosalis@gmail.com

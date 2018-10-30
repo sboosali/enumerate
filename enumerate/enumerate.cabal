@@ -1,4 +1,4 @@
-cabal-version:       >=1.10
+cabal-version:       2.4
 build-type:          Simple
 
 --------------------------------------------------
@@ -24,15 +24,13 @@ description:
 --------------------------------------------------
 
 homepage:            https://github.com/sboosali/enumerate
-license:             MIT
+license:             BSD-4-Clause
 license-file:        LICENSE
 author:              Sam Boosalis
 maintainer:          samboosalis@gmail.com
 -- copyright:
 category:            Data
-build-type:          Simple
 extra-source-files:  README.md
-cabal-version:       >=1.24
 
 --------------------------------------------------
 
