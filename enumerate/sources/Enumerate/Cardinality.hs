@@ -1,7 +1,7 @@
 {-# LANGUAGE TypeFamilies, ExplicitNamespaces, FlexibleInstances #-}
 {-# LANGUAGE DataKinds, UndecidableInstances, ConstraintKinds, KindSignatures #-}
 {-# LANGUAGE ScopedTypeVariables, FlexibleContexts #-}
-{-# LANGUAGE TypeOperators, NoStarIsType #-}
+{-# LANGUAGE TypeOperators #-}
 
 {-| the cardinality of a finite type, at the type-level.
 

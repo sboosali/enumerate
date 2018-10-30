@@ -1,4 +1,8 @@
 NoStarIsType
 
 
+-- * modular integers
+--import Data.Modular (not on stack)
+
+
 

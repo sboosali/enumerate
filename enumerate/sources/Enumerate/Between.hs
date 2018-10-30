@@ -1,14 +1,32 @@
+{-# LANGUAGE CPP #-}
+
+--------------------------------------------------
+
 {-# LANGUAGE DataKinds, KindSignatures, GADTs, ConstraintKinds #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase, ScopedTypeVariables, TypeOperators, TupleSections #-}
 
+--------------------------------------------------
+--------------------------------------------------
 
 {-| see 'Between', 'clipBetween', 'isBetween', 'readBetween'. 
 
 -}
+
 module Enumerate.Between where
 
+--------------------------------------------------
+
+#include <sboo-base-feature-macros.h>
+
+--------------------------------------------------
+--------------------------------------------------
+
 import Enumerate.Types
+
+--------------------------------------------------
+-- Imports ---------------------------------------
+--------------------------------------------------
 
 import GHC.TypeLits
 
@@ -16,6 +34,15 @@ import Control.Exception
 import Prelude (Enum(..))
 import Prelude.Spiros
 
+--------------------------------------------------
+-- Imports: CPP ----------------------------------
+--------------------------------------------------
+
+-- #if HAS_BASE_Semigroup
+-- import "base" Data.Semigroup (Semigroup(..))
+-- #endif
+
+--------------------------------------------------
 
 {- $setup
 
@@ -28,6 +55,10 @@ for doctest:
 >>> pBetweenNegativeThreeAndPositiveSeven = Proxy :: Proxy (Between Negative 3 Positive 7)
 
 -}
+
+--------------------------------------------------
+-- Types -----------------------------------------
+--------------------------------------------------
 
 ----------------------------------------
 -- data Modular i = Modular
@@ -148,11 +179,28 @@ Singleton (intVal (Proxy @s) (Proxy @n))
 
 
 -}
+
 newtype Between
+
  (sin :: Sign) (min :: Nat)
  (sax :: Sign) (max :: Nat)
+
  = UnsafeBetween Integer
- deriving (Show,Eq,Ord,Generic,Data,NFData,Hashable)
+
+----------------------------------------
+
+#if HAS_EXTENSION_DerivingStrategies
+
+ deriving stock   ( Show, Eq, Ord, Generic, Data )
+ deriving newtype ( NFData, Hashable )
+
+#else
+
+ deriving ( Show,Eq,Ord,Generic,Data
+          , NFData,Hashable
+          )
+
+#endif
 
 ----------------------------------------
 
@@ -307,7 +355,9 @@ type ReadS a = String -> [(a, String)]
     -- Defined in Text.ParserCombinators.ReadP
   -}
   
-----------------------------------------
+--------------------------------------------------
+-- Values ----------------------------------------
+--------------------------------------------------
 
 {-|
 

@@ -141,7 +141,8 @@ library
 
 ------------------------------
 
- ghc-options:         -Wall -fno-warn-unticked-promoted-constructors
+ ghc-options: -Wall
+              -fno-warn-unticked-promoted-constructors
 
 ------------------------------
 

@@ -232,11 +232,32 @@ library
 
 ------------------------------
 
+ if impl(ghc >= 8.0)
+    default-extensions: TemplateHaskellQuotes
+                        DuplicateRecordFields
+                        ApplicativeDo
+
+ if impl(ghc >= 8.2)
+    default-extensions: 
+
+ if impl(ghc >= 8.4)
+    default-extensions: DerivingStrategies
+
+ if impl(ghc >= 8.6)
+    default-extensions: NoStarIsType
+
+------------------------------
+
  -- cabal new-build -fdump-core 
  -- stack build --flag enumerate:dump-core 
  if flag(dump-core)
   build-depends: dump-core
   ghc-options: -fplugin=DumpCore -fplugin-opt DumpCore:core
+
+ ------------------------------
+
+ include-dirs:     include
+ install-includes: include/sboo-base-feature-macros.h
 
 ------------------------------
 
