@@ -5,21 +5,23 @@
 
 {-| See 'reifyFunctionAtM'.
 
-@-- doctest@
-
->>> :set +m
-
 -}
 
 module Enumerate.Function.Reify where
 
 --------------------------------------------------
+-- Imports: (Internal) Project Libraries ---------
+--------------------------------------------------
 
 import Enumerate.Types
+
+--------------------------------------------------
+
 import Enumerate.Function.Types
 import Enumerate.Function.Extra
 
 --------------------------------------------------
+-- Imports: (External) Dependency Libraries ------
 --------------------------------------------------
 
 import "exceptions" Control.Monad.Catch (MonadThrow(..), SomeException(..))
@@ -29,10 +31,36 @@ import "exceptions" Control.Monad.Catch (MonadThrow(..), SomeException(..))
 import "deepseq"    Control.DeepSeq (NFData)
 
 --------------------------------------------------
+-- Imports: Standard Library ---------------------
+--------------------------------------------------
 
 import Control.Arrow ((&&&))
 
 --------------------------------------------------
+
+-- import GHC.TypeLits (Nat, type (^))
+
+--------------------------------------------------
+-- DocTest ---------------------------------------
+--------------------------------------------------
+
+-- $setup
+-- 
+-- >>> :set +m
+-- >>> :set -XLambdaCase
+-- >>> :{
+-- let uppercasePartial :: (MonadThrow m) => Char -> m Char  -- :: Partial Char Char
+--     uppercasePartial = \case
+--      'a' -> return 'A'
+--      'b' -> return 'B'
+--      'z' -> return 'Z'
+--      _   -> failed "uppercasePartial"
+-- :}
+--
+-- 
+
+--------------------------------------------------
+-- Definitions -----------------------------------
 --------------------------------------------------
 
 {- | Reify a total function.
@@ -92,20 +120,9 @@ or when you want to restrict the domain.
 
 the most general function in this module.
 
->>> :{
-let uppercasePartial :: (MonadThrow m) => Char -> m Char
-    uppercasePartial c = case c of
-     'a' -> return 'A'
-     'b' -> return 'B'
-     'z' -> return 'Z'
-     _   -> failed "uppercasePartial"
-:}
-
 @
-
 >>> reifyFunctionAtM ['a'..'c'] uppercasePartial
 [('a','A'),('b','B')]
-
 @
 
 if your function doesn't fail under 'MonadThrow', see:
@@ -171,10 +188,8 @@ reifyFunctionEitherAt domain f = reifyFunctionAtM domain (either2throw f)
 forces the function to be strict.
 
 >>> import Data.Ratio (Ratio)
-
 >>> fmap (1/) [0..3 :: Ratio Integer]
 [*** Exception: Ratio has zero denominator
-
 >>> let (1/) = reciprocal
 >>> reifyFunctionSpoonAt [0..3 :: Ratio Integer] reciprocal
 [(1 % 1,1 % 1),(2 % 1,1 % 2),(3 % 1,1 % 3)]

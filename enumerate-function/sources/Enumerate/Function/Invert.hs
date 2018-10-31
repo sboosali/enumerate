@@ -43,15 +43,36 @@ import           Control.Arrow ((>>>))
 import           Data.Function ((&))
 
 --------------------------------------------------
+-- DocTest ---------------------------------------
 --------------------------------------------------
 
-{- | convert a total function to a map.
+-- $setup
+-- 
+-- >>> :set +m
+-- >>> :set -XLambdaCase
+-- >>> :{
+-- let uppercasePartial :: (MonadThrow m) => Char -> m Char  -- :: Partial Char Char
+--     uppercasePartial = \case
+--      'a' -> return 'A'
+--      'b' -> return 'B'
+--      'z' -> return 'Z'
+--      _   -> failed "uppercasePartial"
+-- :}
+--
+-- 
 
-@
->>> fromFunction not  -- Prelude 'not'
+--------------------------------------------------
+-- Definitions -----------------------------------
+--------------------------------------------------
+
+{- | Convert a total function to a map.
+
+>>> fromFunction not
 fromList [(False,True),(True,False)]
 
-@
+(with Prelude 'not').
+
+Morally, it's identity.
 
 -}
 
@@ -62,9 +83,11 @@ fromFunction f = fromFunctionM (return.f)
 
 --------------------------------------------------
 
-{- | convert a (safely-)partial function to a map.
+{- | Convert a (safely-)partial function to a map.
 
 wraps 'reifyFunctionM'.
+
+Morally, it's identity.
 
 -}
 
@@ -75,12 +98,12 @@ fromFunctionM f = Map.fromList (reifyFunctionM f)
 
 --------------------------------------------------
 
-{- | convert the inverse of a total function to a map.
+{- | Convert the inverse of a total function to a map.
 
-@
->>> fromInverse (==EQ)  -- Prelude 'EQ'
-fromList [(False,EQ:|[]),(True,LT:|[GT])]
-@
+>>> fromInverse (==EQ)
+fromList [(False,GT :| [LT]),(True,EQ :| [])]
+
+(with Prelude 'EQ').
 
 -}
 
@@ -91,7 +114,7 @@ fromInverse = fromFunction >>> invertMap
 
 --------------------------------------------------
 
--- | see 'fromInverse'  
+-- | See 'fromInverse'.
 fromInverseM :: (Enumerable a, Ord a, Ord b) => (Partial a b) -> (Map b (NonEmpty a))
 fromInverseM f = (fromFunctionM f) & invertMap
 
@@ -99,14 +122,14 @@ fromInverseM f = (fromFunctionM f) & invertMap
 
 --------------------------------------------------
 
-{- | convert the inverse of a total function to a map, assuming it is injective.
+{- | Convert the inverse of a total function to a map, assuming it is injective.
 
 if not injective, only the "first" of the multiple outputs for any given input is kept. 
 
-@
->>> fromInverse (==EQ)  -- Prelude 'EQ'
-fromList [(False,EQ),(True,LT)]
-@
+>>> fromInjective (==EQ)
+fromList [(False,GT),(True,EQ)]
+
+(with Prelude 'EQ').
 
 -}
 
@@ -117,14 +140,14 @@ fromInjective = fromInverse >>> Map.map NonEmpty.head
   
 --------------------------------------------------
 
--- | see 'fromInjective'
+-- | See 'fromInjective'.
 fromInjectiveM :: (Enumerable a, Ord a, Ord b) => (Partial a b) -> (Map b a)
 fromInjectiveM f = (fromInverseM f) & Map.map NonEmpty.head
 {-# INLINABLE fromInjectiveM #-}
   
 --------------------------------------------------
 
-{-| does the map contain every key in its domain?
+{-| Checks: "Does the map contain every key in its domain?".
 
 >>> isMapTotal (Map.fromList [(False,True),(True,False)])
 True
@@ -154,7 +177,7 @@ is the subset of the 'enumerated' input where it's defined.
 i.e. when @x \`member\` (domainM f)@ then @fromJust (f x)@ is defined.
 
 >>> domainM uppercasePartial
-['a','b','z']
+"abz"
 
 -}
 
@@ -261,7 +284,7 @@ invert f = invertM (return.f)
 
 a @Map@ is stored internally, with as many keys as the 'image' of @f@.
 
-see also 'isBijectiveM'.
+See also 'isBijectiveM'.
 
 -}
 
@@ -294,7 +317,7 @@ invertInjection f = invertInjectionM (return.f)
 
 --------------------------------------------------
 
-{-| see 'invertInjection'. 
+{-| See 'invertInjection'. 
 
 -}
 
@@ -332,7 +355,7 @@ isInjective f = isInjectiveM (return.f)
 
 --------------------------------------------------
 
-{-| returns the inverse of the injection, if injective.
+{-| Returns the inverse of the injection, if injective.
 
 refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> Maybe a)@.
 
@@ -350,7 +373,7 @@ isInjectiveM f = do             -- TODO make it "correct by construction", rathe
 
 --------------------------------------------------
 
-{-| converts the list into a set, if it has no duplicates.
+{-| Converts the list into a set, if it has no duplicates.
 
 -}
 
@@ -369,7 +392,7 @@ isSurjective f = isSurjectiveM (return.f)
 
 --------------------------------------------------
 
-{-| returns the inverse of the surjection, if surjective.
+{-| Returns the inverse of the surjection, if surjective.
 i.e. when a function's 'codomainM' equals its 'imageM'.
 
 refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> NonEmpty a)@.
@@ -396,7 +419,7 @@ isBijective f = isBijectiveM (return.f)
 
 --------------------------------------------------
 
-{-| returns the inverse of the bijection, if bijective.
+{-| Returns the inverse of the bijection, if bijective.
 
 refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> a)@.
 

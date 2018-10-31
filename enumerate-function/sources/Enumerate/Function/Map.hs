@@ -8,16 +8,8 @@
 
 @(for doctest)@
 
->>> :set +m
->>> :set -XLambdaCase
->>> :{
-let uppercasePartial :: (MonadThrow m) => Char -> m Char  -- :: Partial Char Char
-    uppercasePartial = \case
-     'a' -> return 'A'
-     'b' -> return 'B'
-     'z' -> return 'Z'
-     _   -> failed "uppercasePartial"
-:}
+@
+@
 
 a (safely-)partial function is isomorphic with a @Map@:
 
@@ -33,6 +25,7 @@ modulo the error thrown.
 module Enumerate.Function.Map where
 
 --------------------------------------------------
+-- Imports: (Internal) Project Libraries ---------
 --------------------------------------------------
 
 import Enumerate.Types
@@ -45,17 +38,18 @@ import Enumerate.Function.Reify
 import Enumerate.Function.Invert
 
 --------------------------------------------------
+-- Imports: (External) Dependency Libraries ------
 --------------------------------------------------
 
 import "exceptions" Control.Monad.Catch (MonadThrow(..))
 
 --------------------------------------------------
+-- Imports: Standard Library ---------------------
 --------------------------------------------------
 
 import qualified Data.Map as Map
 import           Data.Map (Map)
 
---------------------------------------------------
 --------------------------------------------------
 
 import           Control.Exception(PatternMatchFail(..))
@@ -65,7 +59,28 @@ import           Data.Maybe (fromJust)
 
 -- import GHC.TypeLits (Nat, type (^))
 
+
 --------------------------------------------------
+-- DocTest ---------------------------------------
+--------------------------------------------------
+
+-- $setup
+-- 
+-- >>> :set +m
+-- >>> :set -XLambdaCase
+-- >>> :{
+-- let uppercasePartial :: (MonadThrow m) => Char -> m Char  -- :: Partial Char Char
+--     uppercasePartial = \case
+--      'a' -> return 'A'
+--      'b' -> return 'B'
+--      'z' -> return 'Z'
+--      _   -> failed "uppercasePartial"
+-- :}
+--
+-- 
+
+--------------------------------------------------
+-- Definitions -----------------------------------
 --------------------------------------------------
 
 {- | convert a map to a function, if the map is total.
@@ -91,7 +106,6 @@ lookup failures are 'throwM'n as a 'PatternMatchFail'.
 >>> let idPartial = toFunctionM (Map.fromList [(True,True)])
 >>> idPartial True
 True
-
 >>> idPartial False
 *** Exception: toFunctionM
 
@@ -126,6 +140,9 @@ let myNotM :: Monad m => Bool -> m Bool
 >>> let (Just myNot) = isTotalM myNotM
 >>> myNot False
 True
+
+>>> isTotalM uppercasePartial
+False
 
 -}
 
@@ -342,7 +359,7 @@ mappingEnumeratedAt as bs = go (crossProduct as bs)
 
 --------------------------------------------------
 
-{-|
+{-| The cross-product of two lists.
 
 >>> let crossOrderingBoolean = crossProduct [LT,EQ,GT] [False,True]
 >>> printMappings $ crossOrderingBoolean
@@ -355,14 +372,14 @@ mappingEnumeratedAt as bs = go (crossProduct as bs)
 <BLANKLINE>
 (GT,False)
 (GT,True)
-
-the length of the outer list is the size of the first set, and
-the length of the inner list is the size of the second set.
-
 >>> print $ length crossOrderingBoolean
 3
 >>> print $ length (head crossOrderingBoolean)
 2
+
+
+The length of the outer list is the size of the first set, and
+the length of the inner list is the size of the second set.
 
 -}
 

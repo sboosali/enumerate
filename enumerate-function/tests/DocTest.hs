@@ -40,13 +40,38 @@ $ cat ... | sort | uniq | xargs | sed -e 's/ / /g'
 --------------------------------------------------
 
 main = do
+
+  pppppppppppppppppppppppppppppppppppppppp
+
+  print sources
+
+  pppppppppppppppppppppppppppppppppppppppp
+
+  print flags
+
+  pppppppppppppppppppppppppppppppppppppppp
+
   doctest (sources ++ flags)
+
+  pppppppppppppppppppppppppppppppppppppppp
 
 --------------------------------------------------
 
-sources = [  "sources/" ]
+sources =
+  
+  -- [ ("-i" ++ sourceDirectory)
+  -- ] ++
 
----sources = modules2filepaths "hs" "sources" $ ""
+  sourceFiles
+
+  where
+  sourceDirectory = "sources"
+
+  sourceFiles = modules2filepaths "hs" sourceDirectory $
+    "Enumerate.Function.Invert"
+
+--"Enumerate.Function.Reify Enumerate.Function.Invert Enumerate.Function.Map"
+--"Enumerate.Function Enumerate.Function.Types Enumerate.Function.Reify Enumerate.Function.Map Enumerate.Function.Invert"
 
 --------------------------------------------------
 
@@ -71,18 +96,17 @@ flags = extensions ++ options
 -- Utilities -------------------------------------
 --------------------------------------------------
 
+pppppppppppppppppppppppppppppppppppppppp :: IO ()
+pppppppppppppppppppppppppppppppppppppppp = do
+
+  putStrLn ""
+  putStrLn "----------------------------------------"
+  putStrLn ""
+
+--------------------------------------------------
+
 putStringsLine :: [String] -> IO ()
 putStringsLine = fmap (const ()) . traverse putStrLn
-
---------------------------------------------------
-
-printDivider :: IO ()
-printDivider = putStrLn "----------------------------------------\n"
-
---------------------------------------------------
-
-printBlank :: IO ()
-printBlank = putStrLn ""
 
 --------------------------------------------------
 
