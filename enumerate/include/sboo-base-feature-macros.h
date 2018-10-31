@@ -48,6 +48,8 @@
 
 /************************************************************************************************/
 
+/* « ghc-7.10 » ships with « base-4.8 ».
+
 #define HAS_APPLICATIVE_MONAD                     MIN_VERSION_base(4,8,0)
 /* the Applicative-Monad proposal */
 
@@ -91,6 +93,9 @@
 /* module Data.Functor.Sum     */
 /* module Data.Functor.Product */
 
+#define HAS_BASE_Type                             MIN_VERSION_base(4,9,0)
+/* import Data.Kind (Type) */
+
 #define HAS_BASE_UNARY_LIFTED_CLASSES             MIN_VERSION_base(4,9,0)
 /* module Data.Functor.Classes */
 /* Eq1, Ord1, Show1, Read1 */
@@ -98,6 +103,8 @@
 #define HAS_BASE_BINARY_LIFTED_CLASSES            MIN_VERSION_base(4,9,0)
 /* module Data.Functor.Classes */
 /* Eq2, Ord2, Show2, Read2 ... */
+
+/************************************************/
 
 #define HAS_GHC_HasCallStack                      MIN_VERSION_base(4,9,0) && defined(__GLASGOW_HASKELL__)
 /* module GHC.Stack */
@@ -183,6 +190,11 @@
 #define HAS_EXTENSION_BlockArguments          MIN_VERSION_GLASGOW_HASKELL(8,6,1,0) 
 #define HAS_EXTENSION_NumericUnderscores      MIN_VERSION_GLASGOW_HASKELL(8,6,1,0) 
 #define HAS_EXTENSION_StarIsType              MIN_VERSION_GLASGOW_HASKELL(8,6,1,0) 
+
+/************************************************************************************************/
+
+#define HAS_PRAGMA_COMPLETE                   MIN_VERSION_GLASGOW_HASKELL(8,2,1,0) 
+/* e.g. « {-# COMPLETE LeftChoice, RightChoice #-} » */
 
 /************************************************************************************************/
 #endif

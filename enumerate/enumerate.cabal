@@ -1,10 +1,19 @@
 cabal-version:       2.4
+                     -- ^ for « common » stanzas,
+
 build-type:          Simple
 
 --------------------------------------------------
 
 name:                enumerate
 version:             0.2.3
+                     -- ^ ❲ A.B.C.D ❳:
+                     --
+                     -- • ❲ A.B ❳ is the MajorVersion,
+                     -- • ❲ C ❳ is the MinorVersion,
+                     -- • ❲ D ❳ is a PatchVersion.
+
+-- x-revision:          1
 
 --------------------------------------------------
 -- Information -----------------------------------
@@ -36,7 +45,7 @@ tested-with: GHC == 8.6.1
            , GHC == 8.4.3
            , GHC == 8.2.2
            , GHC == 8.0.2
---           , GHC == 7.10.3
+           , GHC == 7.10.3
 
 -- `multi-ghc-travis` uses `Tested-With`. 
 -- ..\multi-ghc-travis\make_travis_yml.hs enumerate.cabal > .travis.yml
@@ -105,6 +114,238 @@ flag dump-core
   manual:      True
 
 --------------------------------------------------
+
+flag development
+  default:     False
+  description: Dynamic checking and exposed internals (for development).
+  manual:      True
+
+--------------------------------------------------
+-- Common Stanzas --------------------------------
+--------------------------------------------------
+
+common Haskell2020Library
+
+ ------------------------------
+
+ default-language: Haskell2010
+ 
+ ------------------------------
+ 
+ -- build-depends: base-noprelude >=4.10 && <5
+
+ ------------------------------
+
+ ghc-options:
+
+  --------------------
+  -- warning groups
+  --------------------
+
+             -Wall
+
+  --------------------
+  -- disabled warnings
+  --------------------
+
+             -Wno-unticked-promoted-constructors
+
+  --------------------
+  -- enabled warnings
+  --------------------
+
+             -fwarn-name-shadowing
+             -fwarn-tabs
+              
+  --------------------
+  -- (miscellaneous warnings)
+  --------------------
+
+  -- raise a warning into an error
+  -- -Werror=missing-fields
+
+ ------------------------------
+ 
+ if impl(ghc >= 8.0)
+    ghc-options:
+
+        --------------------
+        -- warning groups
+        --------------------
+
+                -Wcompat
+      
+        --------------------
+        -- disabled warnings
+        --------------------
+
+                -fno-warn-redundant-constraints
+
+        --------------------
+        -- enabled warnings
+        --------------------
+
+                -Wnoncanonical-monad-instances
+                -Wnoncanonical-monadfail-instances
+
+                -Wincomplete-record-updates
+                -Wincomplete-uni-patterns
+
+                -Wmissing-methods
+                -Widentities
+
+                -- -Wmissing-exported-signatures
+                -- -Whi-shadowing
+
+        --------------------
+
+                -Wtyped-holes
+
+ ------------------------------
+  
+ if flag(development) && impl(ghc >= 8.0)
+ 
+    ghc-options: -fdefer-typed-holes
+                 -- ^ Use `typed-holes`, not `undefined`, during development.
+
+ ------------------------------
+  
+ if impl(ghc >= 8.2)
+    ghc-options:
+
+        --------------------
+        -- enabled warnings
+        --------------------
+
+                -Wcpp-undef
+
+                -Wmissing-home-modules
+
+                -Wunbanged-strict-patterns
+
+ ------------------------------
+
+ default-extensions:
+
+   --------------------
+   -- "controversial"
+   --------------------
+                    NoImplicitPrelude
+
+   --------------------
+   -- `deriving`
+   --------------------
+                    AutoDeriveTypeable
+                    DeriveDataTypeable
+                    DeriveGeneric
+                    DeriveFunctor
+                    DeriveFoldable
+                    DeriveTraversable
+                    DeriveLift
+                    StandaloneDeriving
+
+                    DerivingStrategies
+                    DeriveAnyClass
+                    GeneralizedNewtypeDeriving
+
+   --------------------
+   -- syntax
+   --------------------
+                    PackageImports
+                    LambdaCase
+                    EmptyCase
+                    TypeOperators
+                    PostfixOperators
+                    BangPatterns
+                    KindSignatures
+                    NamedFieldPuns
+                    RecordWildCards
+                    TupleSections
+                    MultiWayIf
+                    DoAndIfThenElse
+                    EmptyDataDecls
+                    InstanceSigs
+                       
+   --------------------
+   -- typeclasses
+   --------------------
+                    MultiParamTypeClasses
+                    FlexibleContexts
+                    FlexibleInstances
+                    TypeFamilies
+                    FunctionalDependencies
+
+   --------------------
+   -- patterns
+   --------------------
+                    ViewPatterns
+                    PatternSynonyms
+
+   --------------------
+   -- (miscellaneous)
+   --------------------
+                    ScopedTypeVariables
+
+ ------------------------------
+
+ other-extensions:
+
+   --------------------
+   -- macros
+   --------------------
+                  TemplateHaskell
+   -- QuasiQuotes
+
+   --------------------
+   -- syntax (of literals)
+   --------------------
+                  OverloadedStrings
+                  OverloadedLists
+
+   --------------------
+   -- (miscellaneous)
+   --------------------
+
+   -- RebindableSyntax
+   -- kinds:
+   -- DataKinds ConstraintKinds
+   -- harmful to inference:
+   -- GADTs RankNTypes
+   -- (miscellaneous)
+
+--------------------------------------------------
+
+common Haskell2020Program
+
+ import: Haskell2020Library
+
+ ------------------------------
+
+ ghc-options:
+ 
+   --------------------
+   -- Compilation -----
+   --------------------
+ 
+             -O2
+
+   --------------------
+   -- Runtime ---------
+   --------------------
+ 
+             -threaded
+             -rtsopts -with-rtsopts=-N             
+ 
+   --------------------
+   -- Warnings --------
+   --------------------
+ 
+             -Wno-missing-signatures
+             -fno-warn-type-defaults
+             
+ ------------------------------
+
+--------------------------------------------------
 -- Library ---------------------------------------
 --------------------------------------------------
 
@@ -118,15 +359,18 @@ library
 
  exposed-modules:
                  Enumerate
+
                  Enumerate.Types
                  Enumerate.Enum
                  Enumerate.Cardinality
                  Enumerate.Between
                  Enumerate.Modular
 
+                 Enumerate.Extra
+                 Enumerate.Compatibility
+
                  Enumerate.Example
                  Enumerate.Test
-                 Enumerate.Extra
 
   -- Enumerate.Domain
   -- Data.CoRec
@@ -146,36 +390,6 @@ library
  if flag(orphans) && impl(ghc >= 8.0) && impl(ghc <= 8.2)
     exposed-modules:
                     Enumerate.Orphans.GHC       
-
-------------------------------
-
- ghc-options:
-             -Wall
-             -Wcompat
-
-  -- disable
-             -Wno-unticked-promoted-constructors
-
-  -- enable
-             -Wincomplete-uni-patterns
-             -Wincomplete-record-updates
-             -Widentities
-             -Wmissing-methods
-
-  -- raise a warning into an error
-  -- -Werror=missing-fields
-
-  -- use `typed-holes`, not `undefined`, during development
-             -fdefer-typed-holes
-             -Wtyped-holes
-
- -- if impl(ghc >= 8.0) && impl(ghc <= 8.4)
- --    exposed-modules:
- --       Enumerate.Orphans.GHC
- --       Enumerate.Orphans.Large
- -- else   
- --    exposed-modules:
- --       Enumerate.Orphans.Large
 
 ------------------------------
 
@@ -233,9 +447,6 @@ library
 ------------------------------
 
  if impl(ghc >= 8.0)
-    default-extensions: TemplateHaskellQuotes
-                        DuplicateRecordFields
-                        ApplicativeDo
 
  if impl(ghc >= 8.2)
     default-extensions: 
@@ -258,6 +469,19 @@ library
 
  include-dirs:     include
  install-includes: include/sboo-base-feature-macros.h
+
+------------------------------
+
+  -- raise a warning into an error
+  -- -Werror=missing-fields
+
+ -- if impl(ghc >= 8.0) && impl(ghc <= 8.4)
+ --    exposed-modules:
+ --       Enumerate.Orphans.GHC
+ --       Enumerate.Orphans.Large
+ -- else   
+ --    exposed-modules:
+ --       Enumerate.Orphans.Large
 
 ------------------------------
 

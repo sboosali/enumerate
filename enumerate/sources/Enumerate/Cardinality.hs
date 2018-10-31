@@ -3,27 +3,48 @@
 {-# LANGUAGE ScopedTypeVariables, FlexibleContexts #-}
 {-# LANGUAGE TypeOperators #-}
 
-{-| the cardinality of a finite type, at the type-level.
+--------------------------------------------------
+--------------------------------------------------
+
+{-| The cardinality of a finite type.
+
+This cardinality is known /statically/ and at the /type-level/.
 
 -}
+
 module Enumerate.Cardinality where
+
+--------------------------------------------------
+
 import Enumerate.Extra
+import Enumerate.Compatibility
 
-import Data.Vinyl (Rec)
+--------------------------------------------------
+-- Imports ---------------------------------------
+--------------------------------------------------
 
-import           GHC.Generics
--- import           Data.Proxy (Proxy)
-import           Data.Void (Void)
-import           Data.Word (Word8, Word16)
-import           Data.Int (Int8, Int16)
+import "vinyl" Data.Vinyl (Rec)
+
+--------------------------------------------------
+
 -- import Data.Set (Set)
+
+--------------------------------------------------
+
+-- import           Data.Proxy (Proxy)
+import           "base" Data.Void (Void)
+import           "base" Data.Word (Word8, Word16)
+import           "base" Data.Int (Int8, Int16)
+
 -- import Numeric.Natural (Natural)
 -- import           Data.Proxy 
 
---import Data.Kind (Type, Constraint)
+--------------------------------------------------
 
-import Data.Kind (Type)
-import GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^), type (<=?))
+import           "base" GHC.Generics
+import           "base" GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^), type (<=?))
+
+--------------------------------------------------
 
 -- alternatives:
 -- class Finite a where
@@ -38,6 +59,8 @@ import GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^), type (
  -- class GFinite a where
 -- default type (Generic a) => Cardinality a = GCardinality (Rep a)
 -- type instance {-# OVERLAPS #-} (Generic a) => Cardinality a = GCardinality (Rep a)
+
+--------------------------------------------------
 
 {-| a type is finite, i.e. has a bounded size.
 
@@ -55,6 +78,7 @@ e.g.
 2
 
 -}
+
 class Finite a where
   type Cardinality a :: Nat
   type Cardinality a = GCardinality (Rep a)
@@ -74,6 +98,8 @@ instance Finite Ordering
 
 instance Finite (Proxy a) where
  type Cardinality (Proxy a) = 1
+
+--------------------------------------------------
 
 -- | @2^8@
 instance Finite Int8 where
@@ -95,6 +121,8 @@ instance Finite Word16 where
 instance Finite Char where
  type Cardinality Char = 1114112
 
+--------------------------------------------------
+
 -- | @1 + a@
 instance (Finite a) => Finite (Maybe a) where
  type Cardinality (Maybe a) = 1 + (Cardinality a)
@@ -102,6 +130,8 @@ instance (Finite a) => Finite (Maybe a) where
 -- | @a + b@
 instance (Finite a, Finite b) => Finite (Either a b) where
  type Cardinality (Either a b) = (Cardinality a) + (Cardinality b)
+
+--------------------------------------------------
 
 {-| the cardinality is a product of cardinalities. -}
 instance (Finite (f a), Finite (Rec f as)) => Finite (Rec f (a ': as)) where
@@ -111,10 +141,14 @@ instance (Finite (f a), Finite (Rec f as)) => Finite (Rec f (a ': as)) where
 instance Finite (Rec f '[]) where
  type Cardinality (Rec f '[]) = 1
 
+--------------------------------------------------
+
 {-
 class Finite (Mod i n) where
  type Cardinality (Mod i n) = n
 -}
+
+--------------------------------------------------
 
 -- | @a*b@
 instance (Finite a, Finite b) => Finite (a, b)
@@ -168,13 +202,17 @@ reifyCardinality
  -> Natural
 reifyCardinality _ = fromInteger (natVal (Proxy::Proxy (Cardinality a)))
 
+--------------------------------------------------
 
 {-| typechecks only when the constraint is satisifed.
 
 a constaint.
 
 -}
+
 type CardinalityWithin n a = IsCardinalityWithin n a ~ True
+
+--------------------------------------------------
 
 {-|
 
@@ -189,7 +227,10 @@ False
 @
 
 -}
+
 type IsCardinalityWithin n a = Cardinality a <=? n
+
+--------------------------------------------------
 
 {-
 >>> :set -XDataKinds
@@ -221,3 +262,6 @@ False
 --   else Left theSize
 --  where
 --  theSize = cardinality (Proxy :: Proxy a)
+
+--------------------------------------------------
+--------------------------------------------------
