@@ -1,17 +1,30 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, LambdaCase #-}
 
+--------------------------------------------------
 
-{-|
+{-| A "static test".
+
+It makes sure that an example program typechecks, and that its types can be inferred.
+
+(See the source).
 
 -}
+
 module Enumerate.Function.Example where
+
+--------------------------------------------------
+
 import Enumerate.Types
 import Enumerate.Function.Extra
 import Enumerate.Function
 
+--------------------------------------------------
+--------------------------------------------------
+
 {-
 stack build && stack exec -- enumerate-function-example
 -}
+
 main :: IO ()
 main = do
 
@@ -41,6 +54,9 @@ main = do
   --   Just fromKeyBinding -> do
   --     putStrLn $ "`emacsEdit` is surjective:\n"
 
+--------------------------------------------------
+--------------------------------------------------
+
 data Edit = Edit Action Slice Region
  deriving (Show,Read,Eq,Ord,Generic,Enumerable)
 
@@ -63,6 +79,9 @@ data Region
  deriving (Show,Read,Eq,Ord,Enum,Bounded,Generic,Enumerable)
 
 type KeyBinding = [String]
+
+--------------------------------------------------
+--------------------------------------------------
 
 emacsEdit :: Edit -> KeyBinding
 emacsEdit = \case
@@ -101,3 +120,6 @@ emacsEndRegion = \case
 --  Edit Transpose _     region -> Nothing
 --  Edit Cut       slice region -> chromeSelect region slice ++ ["M-c"]
 --  Edit Delete    slice region -> chromeSelect region slice ++ ["<del>"]
+
+--------------------------------------------------
+--------------------------------------------------

@@ -3,6 +3,10 @@
 --------------------------------------------------
 --------------------------------------------------
 
+{- | 
+
+-}
+
 module Enumerate.Function.Invert where
 
 --------------------------------------------------
@@ -50,17 +54,23 @@ fromList [(False,True),(True,False)]
 @
 
 -}
+
 fromFunction :: (Enumerable a, Ord a) => (a -> b) -> Map a b
 fromFunction f = fromFunctionM (return.f)
+
 {-# INLINABLE fromFunction #-}
+
+--------------------------------------------------
 
 {- | convert a (safely-)partial function to a map.
 
 wraps 'reifyFunctionM'.
 
 -}
+
 fromFunctionM :: (Enumerable a, Ord a) => (Partial a b) -> Map a b
 fromFunctionM f = Map.fromList (reifyFunctionM f)
+
 {-# INLINABLE fromFunctionM #-}
 
 --------------------------------------------------
@@ -73,14 +83,21 @@ fromList [(False,EQ:|[]),(True,LT:|[GT])]
 @
 
 -}
+
 fromInverse :: (Enumerable a, Ord a, Ord b) => (a -> b) -> (Map b (NonEmpty a))
 fromInverse = fromFunction >>> invertMap
+
 {-# INLINABLE fromInverse #-}
+
+--------------------------------------------------
 
 -- | see 'fromInverse'  
 fromInverseM :: (Enumerable a, Ord a, Ord b) => (Partial a b) -> (Map b (NonEmpty a))
 fromInverseM f = (fromFunctionM f) & invertMap
+
 {-# INLINABLE fromInverseM #-}
+
+--------------------------------------------------
 
 {- | convert the inverse of a total function to a map, assuming it is injective.
 
@@ -92,10 +109,14 @@ fromList [(False,EQ),(True,LT)]
 @
 
 -}
+
 fromInjective :: (Enumerable a, Ord a, Ord b) => (a -> b) -> (Map b a)
 fromInjective = fromInverse >>> Map.map NonEmpty.head
+
 {-# INLINABLE fromInjective #-}
   
+--------------------------------------------------
+
 -- | see 'fromInjective'
 fromInjectiveM :: (Enumerable a, Ord a, Ord b) => (Partial a b) -> (Map b a)
 fromInjectiveM f = (fromInverseM f) & Map.map NonEmpty.head
@@ -112,12 +133,16 @@ True
 False
 
 -}
+
 isMapTotal :: (Enumerable a, Ord a) => Map a b -> Bool
 isMapTotal m = all (\x -> Map.member x m) enumerated
+
+--------------------------------------------------
 
 {-| safely invert any map.
 
 -}
+
 invertMap :: (Ord a, Ord b) => Map a b -> Map b (NonEmpty a)
 invertMap m = Map.fromListWith (<>) [(b, a:|[]) | (a, b) <- Map.toList m]
 
@@ -132,6 +157,7 @@ i.e. when @x \`member\` (domainM f)@ then @fromJust (f x)@ is defined.
 ['a','b','z']
 
 -}
+
 domainM :: (Enumerable a) => (Partial a b) -> [a]
 domainM f = foldMap go enumerated
  where
@@ -146,14 +172,18 @@ domainM f = foldMap go enumerated
 @corange _ = 'enumerated'@
 
 -}
+
 corange :: (Enumerable a) => (a -> b) -> [a]
 corange _ = enumerated
+
+--------------------------------------------------
 
 {-|
 
 @corangeM _ = 'enumerated'@
 
 -}
+
 corangeM :: (Enumerable a) => (Partial a b) -> [a]
 corangeM _ = enumerated
 
@@ -166,8 +196,11 @@ corangeM _ = enumerated
 includes duplicates.
 
 -}
+
 image :: (Enumerable a) => (a -> b) -> [b]
 image f = map f enumerated
+
+--------------------------------------------------
 
 {-| the image (not the 'codomain') of a partial function.
 
@@ -176,6 +209,7 @@ image f = map f enumerated
 includes duplicates.
 
 -}
+
 imageM :: (Enumerable a) => (Partial a b) -> [b]
 imageM f = mapMaybe f enumerated
 
@@ -186,8 +220,11 @@ imageM f = mapMaybe f enumerated
 @codomain _ = 'enumerated'@
 
 -}
+
 codomain :: (Enumerable b) => (a -> b) -> [b]
 codomain _ = enumerated
+
+--------------------------------------------------
 
 codomainM :: (Enumerable b) => (Partial a b) -> [b]
 codomainM _ = enumerated
@@ -205,9 +242,13 @@ codomainM _ = enumerated
 @invert f = 'invertM' (return.f)@
 
 -}
+
 invert :: (Enumerable a, Ord a, Ord b) => (a -> b) -> (b -> [a])
 invert f = invertM (return.f)
+
 {-# INLINABLE invert #-}
+
+--------------------------------------------------
 
 {-| invert a partial function.
 
@@ -223,11 +264,13 @@ a @Map@ is stored internally, with as many keys as the 'image' of @f@.
 see also 'isBijectiveM'.
 
 -}
+
 invertM :: (Enumerable a, Ord a, Ord b) => (Partial a b) -> (b -> [a])
 invertM f = g
  where
  g b = maybe [] NonEmpty.toList (Map.lookup b m)
  m = invertMap (fromFunctionM f) -- share the map
+
 {-# INLINABLE invertM #-}
  
 --------------------------------------------------
@@ -244,13 +287,17 @@ invertM f = g
 Unlike 'isInjective', we silently ignore duplicates. i.e. when two inputs map to the same output, we pick the "first" (w.r.t. the arbitrary ordering of 'enumerated', or its reversal thereof). 
 
 -}
+
 invertInjection :: (Enumerable a, Ord a, Ord b) => (a -> b) -> (b -> Maybe a)
 invertInjection f = invertInjectionM (return.f)
 {-# INLINABLE invertInjection #-}
 
+--------------------------------------------------
+
 {-| see 'invertInjection'. 
 
 -}
+
 invertInjectionM :: (Enumerable a, Ord a, Ord b) => (Partial a b) -> (b -> Maybe a)
 invertInjectionM f = g
  where
@@ -264,6 +311,7 @@ invertInjectionM f = g
 {-|
 
 -}
+
 getJectivityM :: (Enumerable a, Enumerable b, Ord a, Ord b) => (Partial a b) -> Maybe Jectivity
 getJectivityM f
  = case isBijectiveM f of       -- TODO pick the right Monoid, whose append picks the first non-nothing
@@ -276,8 +324,13 @@ getJectivityM f
 
 --------------------------------------------------
 
+{-| 
+-}
+
 isInjective :: (Enumerable a, Ord a, Ord b) => (a -> b) -> Maybe (b -> Maybe a)
 isInjective f = isInjectiveM (return.f)
+
+--------------------------------------------------
 
 {-| returns the inverse of the injection, if injective.
 
@@ -286,6 +339,7 @@ refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> Maybe a)@.
 unlike 'isBijectiveM', doesn't need an @(Enumerable b)@ constraint. this helps when you want to ensure a function into an infinite type (e.g. 'show') is injective. and still reasonably efficient, given the @(Ord b)@ constraint.
 
 -}
+
 isInjectiveM :: (Enumerable a, Ord a, Ord b) => (Partial a b) -> Maybe (b -> Maybe a)
 isInjectiveM f = do             -- TODO make it "correct by construction", rather than explicit validation
  _bs <- isUnique (imageM f)   -- Map.fromListWith (<>) [(b, a:|[]) | (a, b) <- Map.toList m]
@@ -294,9 +348,12 @@ isInjectiveM f = do             -- TODO make it "correct by construction", rathe
  g = listToMaybe . invertM f
 -- can short-circuit.
 
+--------------------------------------------------
+
 {-| converts the list into a set, if it has no duplicates.
 
 -}
+
 isUnique :: (Ord a) => [a] -> Maybe (Set a)
 isUnique l = if length l == length s then Nothing else Just s -- TODO make efficient, maybe single pass with Control.Foldl
  where
@@ -304,8 +361,13 @@ isUnique l = if length l == length s then Nothing else Just s -- TODO make effic
 
 --------------------------------------------------
 
+{-| 
+-}
+
 isSurjective :: (Enumerable a, Enumerable b, Ord a, Ord b) => (a -> b) -> Maybe (b -> NonEmpty a)
 isSurjective f = isSurjectiveM (return.f)
+
+--------------------------------------------------
 
 {-| returns the inverse of the surjection, if surjective.
 i.e. when a function's 'codomainM' equals its 'imageM'.
@@ -315,6 +377,7 @@ refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> NonEmpty a)@.
 can short-circuit.
 
 -}
+
 isSurjectiveM :: (Enumerable a, Enumerable b, Ord a, Ord b) => (Partial a b) -> Maybe (b -> NonEmpty a)
 isSurjectiveM f =  -- TODO make it "correct by construction", rather than explicit validation
  if (Set.fromList (codomainM f)) `Set.isSubsetOf` (Set.fromList (imageM f))  -- the reverse always holds, no need to check
@@ -325,8 +388,13 @@ isSurjectiveM f =  -- TODO make it "correct by construction", rather than explic
 
 --------------------------------------------------
 
+{-| 
+-}
+
 isBijective :: (Enumerable a, Enumerable b, Ord a, Ord b) => (a -> b) -> Maybe (b -> a)
 isBijective f = isBijectiveM (return.f)
+
+--------------------------------------------------
 
 {-| returns the inverse of the bijection, if bijective.
 
@@ -335,6 +403,7 @@ refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> a)@.
 can short-circuit.
 
 -}
+
 isBijectiveM :: (Enumerable a, Enumerable b, Ord a, Ord b) => (Partial a b) -> Maybe (b -> a)
 isBijectiveM f = do
  fIn    <- isInjectiveM f
@@ -343,4 +412,5 @@ isBijectiveM f = do
  return fBi
 -- let fOp = invertMap (fromFunctionM f) -- share the map
 
+--------------------------------------------------
 --------------------------------------------------

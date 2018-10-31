@@ -1,23 +1,41 @@
 {-# LANGUAGE RankNTypes, LambdaCase #-}
-{-| see 'reifyFunctionAtM'.
+
+--------------------------------------------------
+--------------------------------------------------
+
+{-| See 'reifyFunctionAtM'.
 
 @-- doctest@
 
 >>> :set +m
 
 -}
+
 module Enumerate.Function.Reify where
+
+--------------------------------------------------
+
 import Enumerate.Types
 import Enumerate.Function.Types
 import Enumerate.Function.Extra
 
-import Control.Monad.Catch (MonadThrow(..), SomeException(..))
-import Control.DeepSeq (NFData)
+--------------------------------------------------
+--------------------------------------------------
+
+import "exceptions" Control.Monad.Catch (MonadThrow(..), SomeException(..))
+
+--------------------------------------------------
+
+import "deepseq"    Control.DeepSeq (NFData)
+
+--------------------------------------------------
 
 import Control.Arrow ((&&&))
 
+--------------------------------------------------
+--------------------------------------------------
 
-{- | reify a total function.
+{- | Reify a total function.
 
 @
 
@@ -27,19 +45,29 @@ import Control.Arrow ((&&&))
 @
 
 -}
+
 reifyFunction :: (Enumerable a) => (a -> b) -> [(a,b)]
 reifyFunction f = reifyFunctionM (return . f)
+
 {-# INLINABLE reifyFunction #-}
+
+--------------------------------------------------
 
 -- | reify a total function at any subset of the domain.
 reifyFunctionAt :: [a] -> (a -> b) -> [(a,b)]
 reifyFunctionAt domain f = reifyFunctionAtM domain (return . f)
+
 {-# INLINABLE reifyFunctionAt #-}
+
+--------------------------------------------------
 
 -- | reify a (safely-)partial function into a map (which is implicitly partial, where @Map.lookup@ is like @($)@.
 reifyFunctionM :: (Enumerable a) => (forall m. MonadThrow m => a -> m b) -> [(a,b)]
 reifyFunctionM = reifyFunctionAtM enumerated
+
 {-# INLINABLE reifyFunctionM #-}
+
+--------------------------------------------------
 
 {- | reify a (safely-)partial function at any domain.
 
@@ -87,6 +115,7 @@ if your function doesn't fail under 'MonadThrow', see:
 * 'reifyFunctionAtEither'
 
 -}
+
 reifyFunctionAtM :: [a] -> (Partial a b) -> [(a,b)]
 -- reifyFunctionAtM :: (MonadThrow m) => [a] -> (a -> m b) -> m (Map a b)
 reifyFunctionAtM domain f
@@ -96,9 +125,12 @@ reifyFunctionAtM domain f
  where
  __bitraverse g h (x,y) = (,) <$> g x <*> h y  -- avoid bifunctors dependency
 
+--------------------------------------------------
+
 -- | @reifyPredicateAt = 'flip' 'filter'@
 reifyPredicateAt :: [a] -> (a -> Bool) -> [a]
 reifyPredicateAt = flip filter
+
 -- reifyPredicateAtM domain p = map fst (reifyFunctionAtM domain f)
 --  where
 --  f x = if p x then return x else throwM (ErrorCall "False")
@@ -107,22 +139,34 @@ reifyPredicateAt = flip filter
 -- (e ~ SomeException) => MonadThrow (Either e)
 -- MonadThrow []
 
+--------------------------------------------------
+
 -- | reify a (safely-)partial function that fails specifically under @Maybe@.
 reifyFunctionMaybeAt :: [a] -> (a -> Maybe b) -> [(a, b)]
 reifyFunctionMaybeAt domain f = reifyFunctionAtM domain (maybe2throw f)
+
 {-# INLINABLE reifyFunctionMaybeAt #-}
+
+--------------------------------------------------
 
 -- | reify a (safely-)partial function that fails specifically under @[]@.
 reifyFunctionListAt :: [a] -> (a -> [b]) -> [(a, b)]
 reifyFunctionListAt domain f = reifyFunctionAtM domain (list2throw f)
+
 {-# INLINABLE reifyFunctionListAt #-}
+
+--------------------------------------------------
 
 -- | reify a (safely-)partial function that fails specifically under @Either SomeException@.
 reifyFunctionEitherAt :: [a] -> (a -> Either SomeException b) -> [(a, b)]
 reifyFunctionEitherAt domain f = reifyFunctionAtM domain (either2throw f)
+
 {-# INLINABLE reifyFunctionEitherAt #-}
 
+--------------------------------------------------
+
 {-| reifies an *unsafely*-partial function (i.e. a function that throws exceptions or that has inexhaustive pattern matching).
+
 
 forces the function to be strict.
 
@@ -138,24 +182,39 @@ forces the function to be strict.
 normal caveats from violating purity (via @unsafePerformIO@) and from catchalls (via @(e :: SomeExceptions -> _)@) apply.
 
 -}
+
 reifyFunctionSpoonAt :: (NFData b) => [a] -> (a -> b) -> [(a, b)]
 reifyFunctionSpoonAt domain f = reifyFunctionMaybeAt domain (totalizeFunction f)
+
+--------------------------------------------------
 
 -- | reify a binary total function
 reifyFunction2 :: (Enumerable a, Enumerable b) => (a -> b -> c) -> [(a,[(b,c)])]
 reifyFunction2 f = reifyFunction2At enumerated enumerated f
+
 {-# INLINABLE reifyFunction2 #-}
+
+--------------------------------------------------
 
 -- | reify a binary total function at some domain
 reifyFunction2At :: [a] -> [b] -> (a -> b -> c) -> [(a,[(b,c)])]
 reifyFunction2At as bs f = reifyFunction2AtM as bs (\x y -> pure (f x y))
+
 {-# INLINABLE reifyFunction2At #-}
+
+--------------------------------------------------
 
 -- | reify a binary (safely-)partial function
 reifyFunction2M :: (Enumerable a, Enumerable b) => (forall m. MonadThrow m => a -> b -> m c) -> [(a,[(b,c)])]
 reifyFunction2M f = reifyFunction2AtM enumerated enumerated f
+
 {-# INLINABLE reifyFunction2M #-}
+
+--------------------------------------------------
 
 -- | reify a binary (safely-)partial function at some domain
 reifyFunction2AtM :: [a] -> [b] -> (forall m. MonadThrow m => a -> b -> m c) -> [(a,[(b,c)])]
 reifyFunction2AtM as bs f = reifyFunctionAt as (\a -> reifyFunctionAtM bs (f a))
+
+--------------------------------------------------
+--------------------------------------------------

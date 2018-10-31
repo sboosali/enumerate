@@ -75,10 +75,14 @@ import           Data.Maybe (fromJust)
 True
 
 -}
+
 toFunction :: (Enumerable a, Ord a) => Map a b -> Maybe (a -> b)
 toFunction m = if isMapTotal m then Just f else Nothing
  where f = unsafeToFunction m -- the fromJust is safe when the map is total
+
 {-# INLINABLE toFunction #-}
+
+--------------------------------------------------
 
 {- | convert a (safely-)partial function to a map.
 
@@ -92,19 +96,25 @@ True
 *** Exception: toFunctionM
 
 -}
+
 toFunctionM :: (Enumerable a, Ord a) => Map a b -> (Partial a b)
 toFunctionM m = f
  where
  f x = maybe (throwM (PatternMatchFail "toFunctionM")) return (Map.lookup x m)
+
 {-# INLINABLE toFunctionM #-}
+
+--------------------------------------------------
 
 {-| wraps 'Map.lookup'
 
 -}
+
 unsafeToFunction :: (Ord a) => Map a b -> (a -> b)
 unsafeToFunction m x = fromJust (Map.lookup x m)
 {-# INLINABLE unsafeToFunction #-}
 
+--------------------------------------------------
 
 {-| refines the partial function, if total.
 
@@ -118,10 +128,12 @@ let myNotM :: Monad m => Bool -> m Bool
 True
 
 -}
+
 isTotalM :: (Enumerable a, Ord a) => (Partial a b) -> Maybe (a -> b)
 isTotalM f = (toFunction) (fromFunctionM f)
 
 --------------------------------------------------------------------------------
+
 {-| wraps 'Map.lookup'
 
 >>> (unsafeFromList [(False,True),(True,False)]) False
@@ -130,15 +142,20 @@ True
 False
 
 -}
+
 unsafeFromList
  :: (Ord a)
  => [(a,b)]
  -> (a -> b)
 unsafeFromList
  = unsafeToFunction . Map.fromList
+
 {-# INLINABLE unsafeFromList #-}
 
+--------------------------------------------------
+
 {-| see 'mappingEnumeratedAt' -}
+
 functionEnumerated
  :: (Enumerable a, Enumerable b, Ord a, Ord b)
  => [a -> b]
@@ -147,6 +164,8 @@ functionEnumerated = functions
  functions = (unsafeToFunction . Map.fromList) <$> mappings
  mappings = mappingEnumeratedAt enumerated enumerated
 
+--------------------------------------------------
+
 -- | @|b| ^ |a|@
 functionCardinality
  :: forall a b proxy. (Enumerable a, Enumerable b)
@@ -154,7 +173,10 @@ functionCardinality
  -> Natural
 functionCardinality _
  = cardinality (Proxy :: Proxy b) ^ cardinality (Proxy :: Proxy a)
+
 {-# INLINABLE functionCardinality #-}
+
+--------------------------------------------------
 
 -- | are all pairs of outputs the same for the same input? (short-ciruits).
 extensionallyEqual
@@ -164,7 +186,10 @@ extensionallyEqual
  -> Bool
 extensionallyEqual f g
  = all ((==) <$> f <*> g) enumerated
+
 {-# INLINABLE extensionallyEqual #-}
+
+--------------------------------------------------
 
 -- | is any pair of outputs different for the same input? (short-ciruits).
 extensionallyUnequal
@@ -174,7 +199,10 @@ extensionallyUnequal
  -> Bool
 extensionallyUnequal f g
  = any ((/=) <$> f <*> g) enumerated
+
 {-# INLINABLE extensionallyUnequal #-}
+
+--------------------------------------------------
 
 -- | show all inputs and their outputs, as @unsafeFromList [...]@.
 functionShowsPrec
@@ -184,7 +212,10 @@ functionShowsPrec
  -> ShowS
 functionShowsPrec
  = showsPrecWith "unsafeFromList" reifyFunction
+
 {-# INLINABLE functionShowsPrec #-}
+
+--------------------------------------------------
 
 -- | show all inputs and their outputs, as @\case ...@.
 displayFunction
@@ -199,10 +230,17 @@ displayFunction
  where
  displayCase (x,y) = intercalate " " ["", show x, "->", show y]
 
+--------------------------------------------------
+
 -- displayPartialFunction
 --  :: (Enumerable a, Show a, Show b)
 --  => (Partial a b)
 --  -> String
+
+--------------------------------------------------
+
+{-| 
+-}
 
 displayInjective
  :: (Enumerable a, Ord a, Ord b, Show a, Show b)
@@ -229,6 +267,8 @@ displayInjective f = case isInjective f of
   --   displayCase = \case
   --    (y, Nothing) ->
   --    (y, Just x)  -> intercalate " " ["", show y, " <- ", show x]
+
+--------------------------------------------------
 
 {-| @[(a,b)]@ is a mapping, @[[(a,b)]]@ is a list of mappings.
 
@@ -287,6 +327,7 @@ is equivalent to the function:
 @
 
 -}
+
 mappingEnumeratedAt :: [a] -> [b] -> [[(a,b)]]           -- TODO diagonalize? performance?
 mappingEnumeratedAt as bs = go (crossProduct as bs)
  where
@@ -298,6 +339,8 @@ mappingEnumeratedAt as bs = go (crossProduct as bs)
   pair <- somePairs
   theExponent <- go theProduct
   return$ pair : theExponent
+
+--------------------------------------------------
 
 {-|
 
@@ -322,7 +365,11 @@ the length of the inner list is the size of the second set.
 2
 
 -}
+
 crossProduct :: [a] -> [b] -> [[(a,b)]]
 crossProduct [] _ = []
 crossProduct (aValue:theDomain) theCodomain =
  fmap (aValue,) theCodomain : crossProduct theDomain theCodomain
+
+--------------------------------------------------
+--------------------------------------------------

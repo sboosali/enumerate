@@ -1,20 +1,38 @@
 {-# LANGUAGE RankNTypes, DeriveAnyClass, TypeOperators #-}
+
+--------------------------------------------------
+--------------------------------------------------
+
 module Enumerate.Function.Types where
+
+--------------------------------------------------
+
 import Enumerate.Types
 import Enumerate.Function.Extra
 
-import Control.Monad.Catch (MonadThrow)
--- import Control.DeepSeq
+--------------------------------------------------
+--------------------------------------------------
 
-import Data.Ix (Ix)
+import "exceptions" Control.Monad.Catch (MonadThrow)
+-- import "deepseq" Control.DeepSeq
 
+--------------------------------------------------
+
+import "base" Data.Ix (Ix)
+
+--------------------------------------------------
+--------------------------------------------------
 
 {-| see "Enumerate.Function.Reify.getJectivityM"
 
 -}
+
 data Jectivity = Injective | Surjective | Bijective
  deriving (Show,Read,Eq,Ord,Enum,Bounded,Ix,Generic,Data
           ,NFData,Enumerable)
+
+--------------------------------------------------
+--------------------------------------------------
 
 {- with proof:
 
@@ -58,6 +76,9 @@ asSurjection (Bijection f g) = Surjection f ((:|[]) <$> g) -- pure
 
 -}
 
+--------------------------------------------------
+--------------------------------------------------
+
 {-| a (safely-)partial function. i.e. a function that:
 
 * fails only via the 'throwM' method of 'MonadThrow'
@@ -66,9 +87,13 @@ asSurjection (Bijection f g) = Surjection f ((:|[]) <$> g) -- pure
 -}
 type Partial a b = (forall m. MonadThrow m => a -> m b)
 
+--------------------------------------------------
+--------------------------------------------------
+
 type (a -?> b) = Partial a b
 
-----------------------------------------
+--------------------------------------------------
+--------------------------------------------------
 
  -- (by necessity) @'KnownNat' ('Cardinality' a)@
  --class (KnownNat (Cardinality a)) => Enumerable a where
@@ -91,3 +116,4 @@ type (a -?> b) = Partial a b
   instance (KnownNat (Cardinality Jectivity)) => Enumerable Jectivity
 
   -}
+
