@@ -1,5 +1,3 @@
-NoStarIsType
-
 
 -- * modular integers
 --import Data.Modular (not on stack)
@@ -7,52 +5,32 @@ NoStarIsType
 
 
 
-Build profile: -w ghc-7.10.3 -O1
 
-ghc: unrecognised flag: -Wcompat
-unrecognised flag: -Wno-unticked-promoted-constructors
-did you mean one of:
-  -fwarn-unticked-promoted-constructors
-  -fno-warn-unticked-promoted-constructors
-unrecognised flag: -Wincomplete-uni-patterns
-did you mean one of:
-  -fwarn-incomplete-uni-patterns
-unrecognised flag: -Wincomplete-record-updates
-did you mean one of:
-  -fwarn-incomplete-record-updates
-unrecognised flag: -Widentities
-unrecognised flag: -Wmissing-methods
-unrecognised flag: -Wtyped-holes
+--------------------------------------------------
 
+flags = extensions ++ options
 
+  where
 
+  ------------------------------
 
- default-extensions: CPP
-                   , PackageImports
+  extensions = extensions2flags $
+      "CPP NoImplicitPrelude ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveGeneric ExplicitNamespaces FlexibleContexts FlexibleInstances GADTs KindSignatures LambdaCase RankNTypes ScopedTypeVariables TupleSections TypeFamilies TypeOperators UndecidableInstances PackageImports"
+#if HAS_EXTENSION_DerivingStrategies
+   ++ " DerivingStrategies"
+#endif
 
- ------------------------------
+  ------------------------------
 
- if impl(ghc >= 7.4)
-    default-extensions: ConstraintKinds
-                   
- if impl(ghc >= 8.0)
-    default-extensions: TemplateHaskellQuotes
-                        DuplicateRecordFields
-                        DeriveLift
+  options = [
+#if !MIN_VERSION_GLASGOW_HASKELL(8,0,0,0)
+              ("-I" ++ "include/")
+            , ("-i" ++ "sources/")
+#endif
+            ]
 
- if impl(ghc >= 8.2)
-    default-extensions: DeriveLift
-                        DeriveAnyClass
+  ------------------------------
 
- if impl(ghc >= 8.4)
-    default-extensions: DerivingStrategies
-
- ------------------------------
-
- ghc-options:         -Wall
-
- if impl(ghc >= 8.2)
-    ghc-options: -Wcpp-undef
 
 
 

@@ -1,0 +1,25 @@
+-- You can disable the doctests test suite with -f-test-doctest.
+
+flag test-doctest
+  default:     False
+  description: Run the doctests (with the eponymous `doctest`), called the `test documentation` unit (in this cabal file). 
+  manual:      True
+
+--------------------------------------------------
+
+-- You can disable the HUnit test suite with -f-test-unit. 
+
+flag test-unit
+  default:     False
+  description: Run the unit tests, called the `test unit` unit (in this cabal file).  
+  manual:      True
+
+--------------------------------------------------
+
+
+
+
+
+
+
+
