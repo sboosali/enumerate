@@ -1,6 +1,7 @@
 {-# LANGUAGE TypeFamilies, ExplicitNamespaces, FlexibleInstances #-}
 {-# LANGUAGE DataKinds, UndecidableInstances, ConstraintKinds, KindSignatures #-}
 {-# LANGUAGE ScopedTypeVariables, FlexibleContexts #-}
+
 {-# LANGUAGE TypeOperators #-}
 
 --------------------------------------------------
@@ -17,7 +18,7 @@ module Enumerate.Cardinality where
 --------------------------------------------------
 
 import Enumerate.Extra
-import Enumerate.Compatibility
+--import Enumerate.Compatibility (MultiplyNats)
 
 --------------------------------------------------
 -- Imports ---------------------------------------
@@ -42,7 +43,8 @@ import           "base" Data.Int (Int8, Int16)
 --------------------------------------------------
 
 import           "base" GHC.Generics
-import           "base" GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (*), type (^), type (<=?))
+import qualified "base" GHC.TypeLits as GHC
+import           "base" GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (^), type (<=?))
 
 --------------------------------------------------
 
@@ -135,7 +137,7 @@ instance (Finite a, Finite b) => Finite (Either a b) where
 
 {-| the cardinality is a product of cardinalities. -}
 instance (Finite (f a), Finite (Rec f as)) => Finite (Rec f (a ': as)) where
- type Cardinality (Rec f (a ': as)) = (Cardinality (f a)) * (Cardinality (Rec f as))
+ type Cardinality (Rec f (a ': as)) = (Cardinality (f a)) GHC.* (Cardinality (Rec f as))
 
  -- | @1@
 instance Finite (Rec f '[]) where
@@ -174,7 +176,8 @@ instance (Finite a, Finite b) => Finite (a -> b) where
 
 --------------------------------------------------------------------------------
 
-type family GCardinality (f :: Type -> Type) :: Nat
+type family GCardinality (f :: * -> *) :: Nat
+-- NOTE Use « * », not « Type », for backwards-compatibility with GHC-7.10.
 
 type instance GCardinality (V1) = 0
 
@@ -184,7 +187,9 @@ type instance GCardinality (K1 i a) = Cardinality a
 
 type instance GCardinality (f :+: g) = (GCardinality f) + (GCardinality g)
 
-type instance GCardinality (f :*: g) = (GCardinality f) * (GCardinality g)
+type instance GCardinality (f :*: g) = (GCardinality f) GHC.* (GCardinality g)
+-- HACK « GHC.* » parses correctly (i.e. as a TypeOperator)
+--      both under GHC-8.6 (with -XStarIsType) and under GHC-7.10
 
 type instance GCardinality (M1 i t f) = GCardinality f
 

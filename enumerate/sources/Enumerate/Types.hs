@@ -1,7 +1,10 @@
+{-# LANGUAGE CPP #-}
+
+--------------------------------------------------
+
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, DefaultSignatures, TypeOperators #-}
 {-# LANGUAGE FlexibleInstances, FlexibleContexts, LambdaCase #-}
 {-# LANGUAGE TypeFamilies, ExplicitNamespaces, DataKinds, UndecidableInstances #-}
-
 {-# LANGUAGE DeriveGeneric, DeriveDataTypeable #-}
 
 --------------------------------------------------
@@ -95,6 +98,10 @@ module Enumerate.Types where
 
 --------------------------------------------------
 
+#include <sboo-base-feature-macros.h>
+
+--------------------------------------------------
+
 import Enumerate.Extra
 
 --------------------------------------------------
@@ -139,6 +146,8 @@ import Text.Printf              (FormatAdjustment(..),FormatSign(..))
 import Foreign.C                (CChar,CWchar,CSChar,CUChar,CShort,CUShort)
 
 --------------------------------------------------
+-- Imports: CPP ----------------------------------
+--------------------------------------------------
 
 import qualified "base" Data.Monoid    as Monoid
  ( Any, All
@@ -148,12 +157,16 @@ import qualified "base" Data.Monoid    as Monoid
  , Endo
  )
 
+--------------------------------------------------
+#if HAS_BASE_Semigroup
+
 import qualified "base" Data.Semigroup as Semigroup
  ( Option
  , First, Last
  , Min, Max
  )
 
+#endif
 --------------------------------------------------
 
 {-$setup
@@ -566,6 +579,7 @@ instance (Enumerable (a -> a)) => Enumerable (Monoid.Endo a)
 instance (Enumerable (f a))   => Enumerable (Monoid.Alt f a)
 
 --------------------------------------------------
+#if HAS_BASE_Semigroup
 
 instance (Enumerable a) => Enumerable (Semigroup.Option a)
 
@@ -575,6 +589,7 @@ instance (Enumerable a) => Enumerable (Semigroup.Last   a)
 instance (Enumerable a) => Enumerable (Semigroup.Min    a)
 instance (Enumerable a) => Enumerable (Semigroup.Max    a)
 
+#endif
 --------------------------------------------------
 
 instance (Enumerable a) => Enumerable (Complex a) where

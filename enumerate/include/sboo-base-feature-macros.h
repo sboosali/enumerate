@@ -1,3 +1,9 @@
+/* All "Feature Macros" (defined by this file) start with
+ * either « HAS_ » or « IS_ ».
+ * 
+ * 
+ */
+
 /************************************************/
 
 #if !defined(HS_SBOO_BASE_FEATURE_MACROS_H)
@@ -150,7 +156,7 @@
 #define HAS_EXTENSION_DeriveFunctor           MIN_VERSION_GLASGOW_HASKELL(7,10,1,0)
 #define HAS_EXTENSION_DeriveFoldable          MIN_VERSION_GLASGOW_HASKELL(7,10,1,0)
 #define HAS_EXTENSION_DeriveTraversable       MIN_VERSION_GLASGOW_HASKELL(7,10,1,0)
-/* DeriveFunctor */
+/* DeriveFunctor /*
 /* and DeriveFoldable */
 /* and DeriveTraversable */
 
