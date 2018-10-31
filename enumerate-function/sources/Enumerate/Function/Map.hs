@@ -1,6 +1,10 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE RankNTypes, LambdaCase, TupleSections #-}
-{-| converting between partial functions and maps.
+
+--------------------------------------------------
+--------------------------------------------------
+
+{-| Converting between partial functions and maps.
 
 @(for doctest)@
 
@@ -25,23 +29,44 @@ a (safely-)partial function is isomorphic with a @Map@:
 modulo the error thrown.
 
 -}
+
 module Enumerate.Function.Map where
+
+--------------------------------------------------
+--------------------------------------------------
+
 import Enumerate.Types
+
+--------------------------------------------------
+
 import Enumerate.Function.Extra
 import Enumerate.Function.Types
 import Enumerate.Function.Reify
 import Enumerate.Function.Invert
 
-import Control.Monad.Catch (MonadThrow(..))
+--------------------------------------------------
+--------------------------------------------------
 
--- import GHC.TypeLits (Nat, type (^))
+import "exceptions" Control.Monad.Catch (MonadThrow(..))
+
+--------------------------------------------------
+--------------------------------------------------
+
 import qualified Data.Map as Map
 import           Data.Map (Map)
+
+--------------------------------------------------
+--------------------------------------------------
+
 import           Control.Exception(PatternMatchFail(..))
-import           Data.Proxy
-import           Numeric.Natural
 import           Data.Maybe (fromJust)
 
+--------------------------------------------------
+
+-- import GHC.TypeLits (Nat, type (^))
+
+--------------------------------------------------
+--------------------------------------------------
 
 {- | convert a map to a function, if the map is total.
 

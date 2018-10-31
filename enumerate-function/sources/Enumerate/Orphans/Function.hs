@@ -1,5 +1,9 @@
 {-# LANGUAGE TypeFamilies, ExplicitNamespaces, DataKinds, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+
+--------------------------------------------------
+--------------------------------------------------
+
 {-| orphan instances, of 'Enumerate'\/'Eq'\/'Show', for functions:
 
 * @instance (Enumerable a, Enumerable b, Ord a,  Ord b)  => Enumerable (a -> b)@
@@ -23,12 +27,23 @@ rather than possible runtime non-termination).
 >>> :set -XLambdaCase
 
 -}
+
 module Enumerate.Orphans.Function where
+
+--------------------------------------------------
+--------------------------------------------------
+
 import Enumerate.Types
+
+--------------------------------------------------
+
+import Enumerate.Function.Extra
 import Enumerate.Function.Map
 
+--------------------------------------------------
+--------------------------------------------------
 
-{-| the exponential type.
+{-| The exponential type.
 
 the 'cardinality' is the cardinality of @b@ raised to the cardinality @a@, i.e. @|b|^|a|@.
 
@@ -47,12 +62,15 @@ instance ('Enumerable' a, Enumerable b, 'Ord' a, Ord b) => Enumerable (a -> b) w
 @
 
 -}
+
 instance (Enumerable a, Enumerable b, Ord a, Ord b) => Enumerable (a -> b) where --TODO, no (oprhan) instance, just the standalone function/type-instance?
  -- -- type Cardinality (a -> b) = (Cardinality b) ^ (Cardinality a)
  enumerated  = functionEnumerated
  cardinality = functionCardinality
 
-{-| brute-force function extensionality.
+--------------------------------------------------
+
+{-| Brute-Force function extensionality.
 
 warning: the size of the domain grows exponentially in the number of arguments.
 
@@ -71,9 +89,12 @@ True
 True
 
 -}
+
 instance (Enumerable a, Eq b) => Eq (a -> b) where
  (==) = extensionallyEqual
  (/=) = extensionallyUnequal
+
+--------------------------------------------------
 
 {-|
 
@@ -87,5 +108,9 @@ and it works on functions of any arity:
 -- unsafeFromList [(False,unsafeFromList [(False,False),(True,False)]),(True,unsafeFromList [(False,False),(True,True)])]
 
 -}
+
 instance (Enumerable a, Show a, Show b) => Show (a -> b) where
  showsPrec = functionShowsPrec
+
+--------------------------------------------------
+--------------------------------------------------

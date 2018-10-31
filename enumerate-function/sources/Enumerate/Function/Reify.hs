@@ -90,11 +90,11 @@ if your function doesn't fail under 'MonadThrow', see:
 reifyFunctionAtM :: [a] -> (Partial a b) -> [(a,b)]
 -- reifyFunctionAtM :: (MonadThrow m) => [a] -> (a -> m b) -> m (Map a b)
 reifyFunctionAtM domain f
- = concatMap (bitraverse pure id)
+ = concatMap (__bitraverse pure id)
  . fmap (id &&& f)
  $ domain
  where
- bitraverse g h (x,y) = (,) <$> g x <*> h y  -- avoid bifunctors dependency
+ __bitraverse g h (x,y) = (,) <$> g x <*> h y  -- avoid bifunctors dependency
 
 -- | @reifyPredicateAt = 'flip' 'filter'@
 reifyPredicateAt :: [a] -> (a -> Bool) -> [a]

@@ -1,45 +1,62 @@
 {-# LANGUAGE RankNTypes, LambdaCase, ScopedTypeVariables #-}
+
+--------------------------------------------------
+--------------------------------------------------
+
 module Enumerate.Function.Extra
+
  ( module Enumerate.Function.Extra
+ , module Prelude.Spiros
 
  , module Control.DeepSeq
  , module Data.Semigroup
 
- , module GHC.Generics
- , module Data.Data
  , module Control.Arrow
-
  , module Data.Function
  , module Data.List
  , module Data.Foldable
+
+ , module Data.Data
+ , module GHC.Generics
+
  ) where
 
+--------------------------------------------------
+--------------------------------------------------
+
+import "deepseq"    Control.DeepSeq     (NFData(..), deepseq)
+
+--------------------------------------------------
+
+import "exceptions" Control.Monad.Catch (MonadThrow(..), SomeException(..))
+
+--------------------------------------------------
+--------------------------------------------------
+
 import Data.Semigroup (Semigroup)
-import Control.DeepSeq (NFData(..), deepseq)
-import Control.Monad.Catch (MonadThrow(..), SomeException(..))
 
-import GHC.Generics (Generic)
-import Data.Data (Data)
-import Control.Arrow ((>>>),(<<<))
 import System.IO.Unsafe (unsafePerformIO)
-import Control.Exception (catches, throwIO, Handler(..), AsyncException, ArithException, ArrayException, ErrorCall, PatternMatchFail)
+import Control.Exception
+  ( Handler(..)
+  , AsyncException, ArithException, ArrayException, ErrorCall, PatternMatchFail
+  , catches, throwIO
+  )
 
+import Control.Arrow ((>>>),(<<<))
 import Data.Function ((&))
 import Data.List (intercalate)
 import Data.Foldable (traverse_)
+import Data.Data (Data)
 
+import GHC.Generics (Generic)
 
-nothing :: (Monad m) => m ()
-nothing = return ()
+--------------------------------------------------
+--------------------------------------------------
 
-maybe2bool :: Maybe a -> Bool
-maybe2bool = maybe False (const True)
+import "spiros" Prelude.Spiros
 
-either2maybe :: Either e a -> Maybe a
-either2maybe = either (const Nothing) Just
-
-either2bool :: Either e a -> Bool
-either2bool = either (const False) (const True)
+--------------------------------------------------
+--------------------------------------------------
 
 {-| @failed = 'throwM' . 'userError'@
 
@@ -128,8 +145,11 @@ visible constructors (like @Map@ which is shown as a list).
 
 -}
 showsPrecWith :: (Show b) => String -> (a -> b) -> Int -> a -> ShowS
-showsPrecWith stringFrom functionInto p x = showParen (p > 10) $
+showsPrecWith stringFrom functionInto p x = showParen (p >= 11) $
   showString stringFrom . showString " " . shows (functionInto x)
 -- showsPrecWith :: (Show a, Show b) => Name -> (a -> b) -> Int -> a -> ShowS
 -- showsPrecWith nameFrom functionInto p x = showParen (p > 10) $
 --   showString (nameBase nameFrom) . showString " " . shows (functionInto x)
+
+--------------------------------------------------
+--------------------------------------------------

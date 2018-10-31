@@ -83,6 +83,15 @@ source-repository head
 
 --------------------------------------------------
 
+flag large-types
+
+  default:     False
+
+  description: `Enumerate` instances for finite-but-huge types.
+  manual:      True
+
+--------------------------------------------------
+
 flag orphans
 
   default:     False
@@ -442,21 +451,21 @@ library
 
  -----------------------------
 
- build-depends:
-
-               base >= 4.7 && < 5
+ build-depends: base >= 4.7 && < 5
 
                ---base             >= 4.7 && < 5
                ---base-noprelude   >= 4.7 && < 5
 
-             , spiros           >=0.2
-             , ghc-prim         >=0.3
-             , array            >=0.5
-             , template-haskell >=2.9
-             , containers       >=0.5
-             , vinyl            >=0.5
-             , deepseq          >= 1.3
--- , modular-arithmetic==1.2.*
+              , spiros           >=0.2
+
+              , ghc-prim         >=0.3
+              , array            >=0.5
+              , template-haskell >=2.9
+              , containers       >=0.5
+              , vinyl            >=0.5
+              , deepseq          >= 1.3
+
+           -- , modular-arithmetic==1.2.*
 
  -----------------------------
 

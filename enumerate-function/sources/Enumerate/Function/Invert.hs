@@ -1,22 +1,45 @@
 {-# LANGUAGE RankNTypes #-}
+
+--------------------------------------------------
+--------------------------------------------------
+
 module Enumerate.Function.Invert where
+
+--------------------------------------------------
+--------------------------------------------------
+
 import Enumerate.Types
+
+--------------------------------------------------
+
+import Enumerate.Function.Extra
 import Enumerate.Function.Types
 import Enumerate.Function.Reify
+
+--------------------------------------------------
+--------------------------------------------------
+
+import qualified Data.Map as Map
+import           Data.Map (Map)
+
+--------------------------------------------------
+
+import qualified Data.Set as Set
+import           Data.Set (Set)
+
+--------------------------------------------------
+--------------------------------------------------
 
 import           Data.List.NonEmpty (NonEmpty(..))
 import qualified Data.List.NonEmpty as NonEmpty
 import Data.Semigroup                   ((<>))
 
-import qualified Data.Map as Map
-import           Data.Map (Map)
-import qualified Data.Set as Set
-import           Data.Set (Set)
 import           Data.Maybe (fromJust, mapMaybe, listToMaybe)
 import           Control.Arrow ((>>>))
 import           Data.Function ((&))
 
-----------------------------------------
+--------------------------------------------------
+--------------------------------------------------
 
 {- | convert a total function to a map.
 
@@ -40,7 +63,7 @@ fromFunctionM :: (Enumerable a, Ord a) => (Partial a b) -> Map a b
 fromFunctionM f = Map.fromList (reifyFunctionM f)
 {-# INLINABLE fromFunctionM #-}
 
-----------------------------------------
+--------------------------------------------------
 
 {- | convert the inverse of a total function to a map.
 
@@ -78,7 +101,7 @@ fromInjectiveM :: (Enumerable a, Ord a, Ord b) => (Partial a b) -> (Map b a)
 fromInjectiveM f = (fromInverseM f) & Map.map NonEmpty.head
 {-# INLINABLE fromInjectiveM #-}
   
-----------------------------------------
+--------------------------------------------------
 
 {-| does the map contain every key in its domain?
 
@@ -98,7 +121,7 @@ isMapTotal m = all (\x -> Map.member x m) enumerated
 invertMap :: (Ord a, Ord b) => Map a b -> Map b (NonEmpty a)
 invertMap m = Map.fromListWith (<>) [(b, a:|[]) | (a, b) <- Map.toList m]
 
-----------------------------------------
+--------------------------------------------------
 
 {-| the <https://en.wikipedia.org/wiki/Partial_function#Basic_concepts domain> of a partial function
 is the subset of the 'enumerated' input where it's defined.
@@ -116,7 +139,7 @@ domainM f = foldMap go enumerated
    Nothing -> []
    Just{}  -> [a]
 
-----------------------------------------
+--------------------------------------------------
 
 {-| (right name?)
 
@@ -134,7 +157,7 @@ corange _ = enumerated
 corangeM :: (Enumerable a) => (Partial a b) -> [a]
 corangeM _ = enumerated
 
-----------------------------------------
+--------------------------------------------------
 
 {-| the image of a total function.
 
@@ -156,7 +179,7 @@ includes duplicates.
 imageM :: (Enumerable a) => (Partial a b) -> [b]
 imageM f = mapMaybe f enumerated
 
-----------------------------------------
+--------------------------------------------------
 
 {-| the codomain of a function. it contains the 'image'.
 
@@ -169,7 +192,7 @@ codomain _ = enumerated
 codomainM :: (Enumerable b) => (Partial a b) -> [b]
 codomainM _ = enumerated
 
-----------------------------------------
+--------------------------------------------------
 
 {-| invert a total function.
 
@@ -207,7 +230,7 @@ invertM f = g
  m = invertMap (fromFunctionM f) -- share the map
 {-# INLINABLE invertM #-}
  
-----------------------------------------
+--------------------------------------------------
 
 {-| invert a total function, assuming injectivity.
 
@@ -233,12 +256,10 @@ invertInjectionM f = g
  where
  g = f' >>> list2maybe -- NonEmpty.head  
  f' = invertM f
- list2maybe = \case
-   []    -> Nothing
-   (x:_) -> Just x
+
 {-# INLINABLE invertInjectionM #-}
 
-----------------------------------------
+--------------------------------------------------
 
 {-|
 
@@ -253,7 +274,7 @@ getJectivityM f
                             Just{}  -> Just Surjective
                             Nothing -> Nothing
 
-----------------------------------------
+--------------------------------------------------
 
 isInjective :: (Enumerable a, Ord a, Ord b) => (a -> b) -> Maybe (b -> Maybe a)
 isInjective f = isInjectiveM (return.f)
@@ -281,7 +302,7 @@ isUnique l = if length l == length s then Nothing else Just s -- TODO make effic
  where
  s = Set.fromList l
 
-----------------------------------------
+--------------------------------------------------
 
 isSurjective :: (Enumerable a, Enumerable b, Ord a, Ord b) => (a -> b) -> Maybe (b -> NonEmpty a)
 isSurjective f = isSurjectiveM (return.f)
@@ -302,7 +323,7 @@ isSurjectiveM f =  -- TODO make it "correct by construction", rather than explic
  where
  g = NonEmpty.fromList . invertM f  -- safe, by validation
 
-----------------------------------------
+--------------------------------------------------
 
 isBijective :: (Enumerable a, Enumerable b, Ord a, Ord b) => (a -> b) -> Maybe (b -> a)
 isBijective f = isBijectiveM (return.f)
@@ -322,4 +343,4 @@ isBijectiveM f = do
  return fBi
 -- let fOp = invertMap (fromFunctionM f) -- share the map
 
-----------------------------------------
+--------------------------------------------------
