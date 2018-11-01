@@ -14,6 +14,9 @@ import Enumerate.Function.Extra
 --------------------------------------------------
 
 import "exceptions" Control.Monad.Catch (MonadThrow)
+
+--------------------------------------------------
+
 -- import "deepseq" Control.DeepSeq
 
 --------------------------------------------------
@@ -23,13 +26,23 @@ import "base" Data.Ix (Ix)
 --------------------------------------------------
 --------------------------------------------------
 
-{-| see "Enumerate.Function.Reify.getJectivityM"
+{-| Used by "Enumerate.Function.Reify.getJectivityM".
 
 -}
 
-data Jectivity = Injective | Surjective | Bijective
- deriving (Show,Read,Eq,Ord,Enum,Bounded,Ix,Generic,Data
-          ,NFData,Enumerable)
+data Jectivity
+
+  = Injective
+  | Surjective
+  | Bijective
+
+ deriving
+   ( Enum, Bounded, Ix
+   , Show, Read
+   , Eq, Ord
+   , Generic, Data
+   , NFData, Enumerable
+   )
 
 --------------------------------------------------
 --------------------------------------------------
@@ -79,16 +92,25 @@ asSurjection (Bijection f g) = Surjection f ((:|[]) <$> g) -- pure
 --------------------------------------------------
 --------------------------------------------------
 
-{-| a (safely-)partial function. i.e. a function that:
+{-| A /safely/-partial function.
 
-* fails only via the 'throwM' method of 'MonadThrow'
-* succeeds only via the 'return' method of 'Monad'
+i.e. a function that:
+
+* Fails only via the 'throwM' method of 'MonadThrow'.
+* Succeeds only via the 'return' method of 'Monad'.
 
 -}
+
 type Partial a b = (forall m. MonadThrow m => a -> m b)
 
 --------------------------------------------------
 --------------------------------------------------
+
+{-| Operator (infix) for 'Partial'.
+
+NAMING: Looks like the "function arrow" @(->)@.
+
+-}
 
 type (a -?> b) = Partial a b
 
@@ -117,3 +139,4 @@ type (a -?> b) = Partial a b
 
   -}
 
+--------------------------------------------------

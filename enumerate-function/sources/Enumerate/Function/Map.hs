@@ -292,15 +292,16 @@ i.e. @\\case ...@.
 
 displayFunction
   :: (Enumerable a, Show a, Show b)
-  => (a -> b)
-  -> String
-displayFunction
-    = reifyFunction
-  >>> fmap displayCase
-  >>> ("\\case":)
-  >>> intercalate "\n"
- where
- displayCase (x,y) = intercalate " " ["", show x, "->", show y]
+  => (a -> b) -> String
+
+displayFunction = reifyFunction
+             >>> fmap displayCase
+             >>> ("\\case":)
+             >>> intercalate "\n"
+
+  where
+
+  displayCase (x,y) = intercalate " " ["", show x, "->", show y]
 
 --------------------------------------------------
 
@@ -330,15 +331,21 @@ displayInjective
  :: (Enumerable a, Ord a, Ord b, Show a, Show b)
  => (a -> b)
  -> Maybe String
-displayInjective f = case isInjective f of
-  Nothing -> Nothing
-  Just{}  -> Just (go f)
+
+displayInjective f =
+
+  case isInjective f of
+    Nothing -> Nothing
+    Just{}  -> Just (go f)
+
   where
-  go   = reifyFunction
-     >>> fmap displayCase
-     >>> (["\\case"]++)
-     >>> (++[" _ <- Nothing"])
-     >>> intercalate "\n"
+
+  go  = reifyFunction
+    >>> fmap displayCase
+    >>> (["\\case"]++)
+    >>> (++[" _ <- Nothing"])
+    >>> intercalate "\n"
+
   displayCase (x,y) = intercalate " " ["", show y, "<-", show (Just x)]
 
   -- displayInjective f = go <$> isInjective f
