@@ -59,8 +59,8 @@ main = do
 
 sources =
   
-  -- [ ("-i" ++ sourceDirectory)
-  -- ] ++
+  [ ("-i" ++ sourceDirectory)
+  ] ++
 
   sourceFiles
 

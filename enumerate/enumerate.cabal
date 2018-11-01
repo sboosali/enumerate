@@ -535,7 +535,7 @@ test-suite doc
 
  -----------------------------
 
- hs-source-dirs:      test
+ hs-source-dirs:      tests
  main-is:             DocTests.hs
  type:                exitcode-stdio-1.0
 
@@ -561,7 +561,7 @@ test-suite unit
 
  -----------------------------
 
- hs-source-dirs:      test
+ hs-source-dirs:      tests
  main-is:             UnitTests.hs
  type:                exitcode-stdio-1.0
 

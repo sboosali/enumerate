@@ -491,49 +491,73 @@ executable example-enumerate-function
 
 test-suite doc
 
+ -----------------------------
+
  import: Haskell2020Program
 
- if (!impl(ghc))
+ -----------------------------
+
+ if !impl(ghc)
     buildable: False
     -- ^ Because « ghcjsi » doesn't work.
 
+ -----------------------------
+
  hs-source-dirs:      tests
- main-is:             DocTest.hs
+ main-is:             DocTests.hs
  type:                exitcode-stdio-1.0
+
+ -----------------------------
 
  default-language:    Haskell2010
  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
 
- build-depends:
-               base
-             , enumerate-function
-             , doctest
+ -----------------------------
 
--- $ stack test doctest
+ build-depends: base
+              , enumerate
+
+              , doctest
 
 --------------------------------------------------
 
 test-suite unit
 
+ -----------------------------
+
  import: Haskell2020Program
 
+ -----------------------------
+
  hs-source-dirs:      tests
- main-is:             UnitTest.hs
+ main-is:             UnitTests.hs
  type:                exitcode-stdio-1.0
+
+ -----------------------------
+
+ other-modules:
+               Enumerate.Function.Test
+
+ -----------------------------
 
  default-language:    Haskell2010
  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
 
- other-modules:
-               Enumerate.Test
+ -----------------------------
 
- build-depends:
-               base
-             , enumerate-function
-             , hspec >=2.2
-             , QuickCheck >=2.8
-  -- , tasty
-  -- , tasty-quickcheck
+ build-depends: base
+              , enumerate
+
+              , HUnit      
+              , QuickCheck >=2.8
+              , smallcheck >=1.1
+
+              , tasty
+              , tasty-hunit
+              , tasty-quickcheck
+              , smallcheck
+
+ -----------------------------
 
 -- $ stack test unittest
 
