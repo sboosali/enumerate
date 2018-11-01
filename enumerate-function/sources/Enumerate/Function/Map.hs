@@ -6,11 +6,6 @@
 
 {-| Converting between partial functions and maps.
 
-@(for doctest)@
-
-@
-@
-
 a (safely-)partial function is isomorphic with a @Map@:
 
 @
@@ -22,7 +17,15 @@ modulo the error thrown.
 
 -}
 
-module Enumerate.Function.Map where
+module Enumerate.Function.Map
+
+  (
+   -- * Doctest Context:
+   -- $setup
+
+    module Enumerate.Function.Map
+
+  ) where
 
 --------------------------------------------------
 -- Imports: (Internal) Project Libraries ---------
@@ -64,30 +67,30 @@ import           Data.Maybe (fromJust)
 -- DocTest ---------------------------------------
 --------------------------------------------------
 
--- $setup
--- 
--- >>> :set +m
--- >>> :set -XLambdaCase
--- >>> :{
--- let uppercasePartial :: (MonadThrow m) => Char -> m Char  -- :: Partial Char Char
---     uppercasePartial = \case
---      'a' -> return 'A'
---      'b' -> return 'B'
---      'z' -> return 'Z'
---      _   -> failed "uppercasePartial"
--- :}
---
--- 
+{- $setup
+
+>>> :set +m
+>>> :set -XLambdaCase
+>>> import qualified Prelude
+>>> :{
+let myNotM :: Monad m => Bool -> m Bool
+    myNotM False = return True
+    myNotM True  = return False
+:}
+
+-}
 
 --------------------------------------------------
 -- Definitions -----------------------------------
 --------------------------------------------------
 
-{- | convert a map to a function, if the map is total.
+{- | Convert a map to a function, if the map is total.
 
->>> let (Just not_) = toFunction (Map.fromList [(False,True),(True,False)])
+>>> Just not_ <- return $ toFunction (Map.fromList [(False,True),(True,False)])
 >>> not_ False
 True
+>>> not_ True
+False
 
 -}
 
@@ -99,11 +102,11 @@ toFunction m = if isMapTotal m then Just f else Nothing
 
 --------------------------------------------------
 
-{- | convert a (safely-)partial function to a map.
+{- | Convert a (safely-)partial function to a map.
 
-lookup failures are 'throwM'n as a 'PatternMatchFail'.
+Lookup failures are 'throwM'n as a 'PatternMatchFail'.
 
->>> let idPartial = toFunctionM (Map.fromList [(True,True)])
+>>> idPartial = toFunctionM (Map.fromList [(True,True)])
 >>> idPartial True
 True
 >>> idPartial False
@@ -120,7 +123,7 @@ toFunctionM m = f
 
 --------------------------------------------------
 
-{-| wraps 'Map.lookup'
+{-| Wraps 'Map.lookup'
 
 -}
 
@@ -132,17 +135,26 @@ unsafeToFunction m x = fromJust (Map.lookup x m)
 
 {-| refines the partial function, if total.
 
->>> :{
-let myNotM :: Monad m => Bool -> m Bool
-    myNotM False = return True
-    myNotM True  = return False
-:}
->>> let (Just myNot) = isTotalM myNotM
+>>> Just myNot = isTotalM myNotM
 >>> myNot False
 True
-
->>> isTotalM uppercasePartial
+>>> myNot True
 False
+
+>>> :{
+let uppercasePartial :: (MonadThrow m) => Char -> m Char  -- :: Partial Char Char
+    uppercasePartial = \case
+     'a' -> return 'A'
+     'b' -> return 'B'
+     'z' -> return 'Z'
+     _   -> failed "uppercasePartial"
+in maybe False (const True) $ isTotalM uppercasePartial
+:}
+False
+>>> maybe False (const True) $ isTotalM (return :: Partial Char Char)
+True
+
+(with @uppercasePartial@ defined above, and 'Partial' defined internally).
 
 -}
 
@@ -151,7 +163,7 @@ isTotalM f = (toFunction) (fromFunctionM f)
 
 --------------------------------------------------------------------------------
 
-{-| wraps 'Map.lookup'
+{-| Wraps 'Map.lookup'
 
 >>> (unsafeFromList [(False,True),(True,False)]) False
 True
@@ -171,7 +183,8 @@ unsafeFromList
 
 --------------------------------------------------
 
-{-| see 'mappingEnumeratedAt' -}
+{-| See 'mappingEnumeratedAt'.
+-}
 
 functionEnumerated
  :: (Enumerable a, Enumerable b, Ord a, Ord b)
@@ -195,7 +208,7 @@ functionCardinality _
 
 --------------------------------------------------
 
--- | are all pairs of outputs the same for the same input? (short-ciruits).
+-- | Are all pairs of outputs the same for the same input? (short-ciruits).
 extensionallyEqual
  :: (Enumerable a, Eq b)
  => (a -> b)
@@ -208,7 +221,7 @@ extensionallyEqual f g
 
 --------------------------------------------------
 
--- | is any pair of outputs different for the same input? (short-ciruits).
+-- | Is any pair of outputs different for the same input? (short-ciruits).
 extensionallyUnequal
  :: (Enumerable a, Eq b)
  => (a -> b)
@@ -221,7 +234,7 @@ extensionallyUnequal f g
 
 --------------------------------------------------
 
--- | show all inputs and their outputs, as @unsafeFromList [...]@.
+-- | Show all inputs and their outputs, as @unsafeFromList [...]@.
 functionShowsPrec
  :: (Enumerable a, Show a, Show b)
  => Int
@@ -234,7 +247,7 @@ functionShowsPrec
 
 --------------------------------------------------
 
--- | show all inputs and their outputs, as @\case ...@.
+-- | Show all inputs and their outputs, as @\case ...@.
 displayFunction
   :: (Enumerable a, Show a, Show b)
   => (a -> b)
@@ -287,12 +300,14 @@ displayInjective f = case isInjective f of
 
 --------------------------------------------------
 
-{-| @[(a,b)]@ is a mapping, @[[(a,b)]]@ is a list of mappings.
+{-| 
 
->>> let orderingPredicates = mappingEnumeratedAt [LT,EQ,GT] [False,True]
->>> print $ length orderingPredicates
+@[(a,b)]@ is a mapping, @[[(a,b)]]@ is a list of mappings.
+
+>>> orderingPredicates = mappingEnumeratedAt [LT,EQ,GT] [False,True]
+>>> length orderingPredicates
 8
->>> printMappings $ orderingPredicates
+>>> printMappings orderingPredicates
 <BLANKLINE>
 (LT,False)
 (EQ,False)
@@ -329,9 +344,10 @@ displayInjective f = case isInjective f of
 where the (total) mapping:
 
 @
-(LT,False)
-(EQ,False)
-(GT,True)
+[ (LT, False)
+, (EQ, False)
+, (GT, True)
+]
 @
 
 is equivalent to the function:
@@ -342,6 +358,8 @@ is equivalent to the function:
  EQ -> False
  GT -> True
 @
+
+(with 'printMappings' defined internally).
 
 -}
 
@@ -361,8 +379,12 @@ mappingEnumeratedAt as bs = go (crossProduct as bs)
 
 {-| The cross-product of two lists.
 
->>> let crossOrderingBoolean = crossProduct [LT,EQ,GT] [False,True]
->>> printMappings $ crossOrderingBoolean
+>>> crossOrderingBoolean = crossProduct [LT,EQ,GT] [False,True]
+>>> length crossOrderingBoolean
+3
+>>> length (Prelude.head crossOrderingBoolean)
+2
+>>> printMappings crossOrderingBoolean
 <BLANKLINE>
 (LT,False)
 (LT,True)
@@ -372,11 +394,8 @@ mappingEnumeratedAt as bs = go (crossProduct as bs)
 <BLANKLINE>
 (GT,False)
 (GT,True)
->>> print $ length crossOrderingBoolean
-3
->>> print $ length (head crossOrderingBoolean)
-2
 
+(with 'printMappings' defined internally).
 
 The length of the outer list is the size of the first set, and
 the length of the inner list is the size of the second set.

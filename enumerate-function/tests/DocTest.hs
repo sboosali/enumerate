@@ -43,11 +43,11 @@ main = do
 
   pppppppppppppppppppppppppppppppppppppppp
 
-  print sources
+  putStringsLine flags
 
   pppppppppppppppppppppppppppppppppppppppp
 
-  print flags
+  putStringsLine sources
 
   pppppppppppppppppppppppppppppppppppppppp
 
@@ -68,7 +68,7 @@ sources =
   sourceDirectory = "sources"
 
   sourceFiles = modules2filepaths "hs" sourceDirectory $
-    "Enumerate.Function.Invert"
+    "Enumerate.Function.Reify Enumerate.Function.Invert Enumerate.Function.Map"
 
 --"Enumerate.Function.Reify Enumerate.Function.Invert Enumerate.Function.Map"
 --"Enumerate.Function Enumerate.Function.Types Enumerate.Function.Reify Enumerate.Function.Map Enumerate.Function.Invert"

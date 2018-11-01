@@ -7,7 +7,15 @@
 
 -}
 
-module Enumerate.Function.Invert where
+module Enumerate.Function.Invert
+
+  (
+   -- * Doctest Context:
+   -- $setup
+
+    module Enumerate.Function.Invert
+
+  ) where
 
 --------------------------------------------------
 --------------------------------------------------
@@ -178,6 +186,8 @@ i.e. when @x \`member\` (domainM f)@ then @fromJust (f x)@ is defined.
 
 >>> domainM uppercasePartial
 "abz"
+
+(with @uppercasePartial@ defined above).
 
 -}
 
