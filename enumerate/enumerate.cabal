@@ -5,7 +5,7 @@ build-type:          Simple
 --------------------------------------------------
 
 name:                enumerate
-version:             0.2.3
+version:             0.3
 
                      -- ^ ❲ A.B.C.D ❳:
                      --
