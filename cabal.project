@@ -9,3 +9,11 @@ constraints:
   -- see https://github.com/haskell-infra/hackage-trustees/issues/119
   foundation >=0.0.14
 
+--------------------------------------------------
+
+--TODO with-compiler: /nix/store/gzsn9cig6pmy13374k62q8l4jah9siq7-ghcjs-8.4.0.1-with-packages/bin/ghcjs
+--     -- from reflex-platform
+--     compiler: ghcjs
+
+--------------------------------------------------
+

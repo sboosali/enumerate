@@ -296,8 +296,8 @@ displayFunction
 
 displayFunction = reifyFunction
              >>> fmap displayCase
-             >>> ("\\case":)
-             >>> intercalate "\n"
+             >>> ("\\case" :)
+             >>> intercalate "\n" --TODO or, optionally with parameter, a semicolon.
 
   where
 
@@ -312,16 +312,20 @@ displayFunction = reifyFunction
 
 --------------------------------------------------
 
-{-| Display a function as a @case@ expression, if injective.
+{-| Display a function, if injective, in a "@esac@" expression.
+
+@esac@ is some (pseudo-Haskell) syntax for defining injective functions.
+NAMING: "esac" is "case" backwards.
 
 >>> const_True = const True :: Bool -> Bool
 >>> Nothing = displayInjective const_True
 
 >>> Just f = displayInjective not
 >>> putStrLn f
-\case
- False -> True
- True -> False
+\esac
+ True <- Just False
+ False <- Just True
+ _ <- Nothing
 
 Calls 'isInjective'.
 
@@ -342,9 +346,9 @@ displayInjective f =
 
   go  = reifyFunction
     >>> fmap displayCase
-    >>> (["\\case"]++)
-    >>> (++[" _ <- Nothing"])
-    >>> intercalate "\n"
+    >>> (["\\esac"]++)
+    >>> (++ [" _ <- Nothing"])
+    >>> intercalate "\n"      --TODO or, optionally with parameter, a semicolon.
 
   displayCase (x,y) = intercalate " " ["", show y, "<-", show (Just x)]
 

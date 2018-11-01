@@ -1,12 +1,12 @@
 cabal-version:       2.4
                      -- ^ for « common » stanzas,
-
 build-type:          Simple
 
 --------------------------------------------------
 
 name:                enumerate
 version:             0.2.3
+
                      -- ^ ❲ A.B.C.D ❳:
                      --
                      -- • ❲ A.B ❳ is the MajorVersion,
@@ -37,7 +37,7 @@ category:    Data
 
 author:              Spiros Boosalis
 maintainer:          samboosalis@gmail.com
-homepage:            https://github.com/sboosali/enumerate
+homepage:            https://github.com/sboosali/enumerate#readme
 
 --------------------------------------------------
 
@@ -46,6 +46,8 @@ tested-with: GHC == 8.6.1
            , GHC == 8.2.2
            , GHC == 8.0.2
            , GHC == 7.10.3
+
+           , GHCJS == 8.4.0.1
 
 -- `multi-ghc-travis` uses `Tested-With`. 
 -- ..\multi-ghc-travis\make_travis_yml.hs enumerate.cabal > .travis.yml
@@ -456,7 +458,7 @@ library
                ---base             >= 4.7 && < 5
                ---base-noprelude   >= 4.7 && < 5
 
-              , spiros           >=0.2
+              , spiros           >=0.3
 
               , ghc-prim         >=0.3
               , array            >=0.5
@@ -553,38 +555,38 @@ test-suite doc
 
 --------------------------------------------------
 
-test-suite unit
+-- test-suite unit
 
- -----------------------------
+--  -----------------------------
 
- import: Haskell2020Program
+--  import: Haskell2020Program
 
- -----------------------------
+--  -----------------------------
 
- hs-source-dirs:      tests
- main-is:             UnitTests.hs
- type:                exitcode-stdio-1.0
+--  hs-source-dirs:      tests
+--  main-is:             UnitTests.hs
+--  type:                exitcode-stdio-1.0
 
- other-modules:
-               Enumerate.Test
+--  other-modules:
+--                Enumerate.Test
 
- -----------------------------
+--  -----------------------------
 
- default-language:    Haskell2010
- ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+--  default-language:    Haskell2010
+--  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
 
- -----------------------------
+--  -----------------------------
 
- build-depends: base
-              , enumerate
+--  build-depends: base
+--               , enumerate
 
-              , HUnit      
-              , QuickCheck >=2.8
-              , smallcheck >=1.1
+--               , HUnit      
+--               , QuickCheck >=2.8
+--               , smallcheck >=1.1
 
-              , tasty
-              , tasty-hunit
-              , tasty-quickcheck
-              , smallcheck
+--               , tasty
+--               , tasty-hunit
+--               , tasty-quickcheck
+--               , smallcheck
 
 --------------------------------------------------

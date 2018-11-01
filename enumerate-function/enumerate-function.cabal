@@ -1,10 +1,19 @@
 cabal-version:       2.4
+                     -- ^ for « common » stanzas,
 build-type:          Simple
 
 --------------------------------------------------
 
 name:                enumerate-function
 version:             0.2.3
+
+                     -- ^ ❲ A.B.C.D ❳:
+                     --
+                     -- • ❲ A.B ❳ is the MajorVersion,
+                     -- • ❲ C ❳ is the MinorVersion,
+                     -- • ❲ D ❳ is a PatchVersion.
+
+-- x-revision:          1
 
 --------------------------------------------------
 -- Information -----------------------------------
@@ -33,7 +42,7 @@ category:    Data
 
 author:              Spiros Boosalis
 maintainer:          samboosalis@gmail.com
-homepage:            https://github.com/sboosali/enumerate
+homepage:            https://github.com/sboosali/enumerate#readme
 
 --------------------------------------------------
 
@@ -42,6 +51,8 @@ tested-with: GHC == 8.6.1
            , GHC == 8.2.2
            , GHC == 8.0.2
            , GHC == 7.10.3
+
+           , GHCJS == 8.4.0.1
 
 --------------------------------------------------
 
@@ -384,14 +395,16 @@ library
 
  -----------------------------
 
- build-depends: base >=4.7 && <5 
-              , spiros           >=0.2
+ build-depends: base   >=4.8 && <5 
+              , spiros >=0.3
 
-              , enumerate 
-   -- >=0.2.2
+              , enumerate >=0.3
+                -- 
+                -- NOTE all « enumerate-* » packages in this project
+                --      have lockstep versioning.
+                --
 
               , containers >=0.5
-
 
               , semigroups >=0.18
               , exceptions >=0.8
@@ -521,43 +534,43 @@ test-suite doc
 
 --------------------------------------------------
 
-test-suite unit
+-- test-suite unit
 
- -----------------------------
+--  -----------------------------
 
- import: Haskell2020Program
+--  import: Haskell2020Program
 
- -----------------------------
+--  -----------------------------
 
- hs-source-dirs:      tests
- main-is:             UnitTests.hs
- type:                exitcode-stdio-1.0
+--  hs-source-dirs:      tests
+--  main-is:             UnitTests.hs
+--  type:                exitcode-stdio-1.0
 
- -----------------------------
+--  -----------------------------
 
- other-modules:
-               Enumerate.Function.Test
+--  other-modules:
+--                Enumerate.Function.Test
 
- -----------------------------
+--  -----------------------------
 
- default-language:    Haskell2010
- ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+--  default-language:    Haskell2010
+--  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
 
- -----------------------------
+--  -----------------------------
 
- build-depends: base
-              , enumerate
+--  build-depends: base
+--               , enumerate
 
-              , HUnit      
-              , QuickCheck >=2.8
-              , smallcheck >=1.1
+--               , HUnit      
+--               , QuickCheck >=2.8
+--               , smallcheck >=1.1
 
-              , tasty
-              , tasty-hunit
-              , tasty-quickcheck
-              , smallcheck
+--               , tasty
+--               , tasty-hunit
+--               , tasty-quickcheck
+--               , smallcheck
 
- -----------------------------
+--  -----------------------------
 
 -- $ stack test unittest
 
