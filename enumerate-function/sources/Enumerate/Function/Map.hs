@@ -62,7 +62,6 @@ import           Data.Maybe (fromJust)
 
 -- import GHC.TypeLits (Nat, type (^))
 
-
 --------------------------------------------------
 -- DocTest ---------------------------------------
 --------------------------------------------------
@@ -96,7 +95,12 @@ False
 
 toFunction :: (Enumerable a, Ord a) => Map a b -> Maybe (a -> b)
 toFunction m = if isMapTotal m then Just f else Nothing
- where f = unsafeToFunction m -- the fromJust is safe when the map is total
+ where
+
+ f = unsafeToFunction m
+ --
+ -- the cast (unsafeToFunction) is safe.
+ -- when the map is total (isMapTotal).
 
 {-# INLINABLE toFunction #-}
 
@@ -124,16 +128,16 @@ toFunctionM m = f
 --------------------------------------------------
 
 {-| Wraps 'Map.lookup'
-
 -}
 
 unsafeToFunction :: (Ord a) => Map a b -> (a -> b)
 unsafeToFunction m x = fromJust (Map.lookup x m)
+
 {-# INLINABLE unsafeToFunction #-}
 
 --------------------------------------------------
 
-{-| refines the partial function, if total.
+{-| Refines a partial function, if total.
 
 >>> Just myNot = isTotalM myNotM
 >>> myNot False
@@ -157,19 +161,27 @@ True
 
 (with @uppercasePartial@ defined above, and 'Partial' defined internally).
 
+@
+'isTotalM' = 'toFunction' . 'fromFunctionM'
+@
+
 -}
 
 isTotalM :: (Enumerable a, Ord a) => (Partial a b) -> Maybe (a -> b)
-isTotalM f = (toFunction) (fromFunctionM f)
+isTotalM f = toFunction (fromFunctionM f)
 
 --------------------------------------------------------------------------------
 
-{-| Wraps 'Map.lookup'
+{-| Wraps 'Map.lookup'.
 
 >>> (unsafeFromList [(False,True),(True,False)]) False
 True
 >>> (unsafeFromList [(False,True),(True,False)]) True
 False
+
+@
+'unsafeFromList' = 'unsafeToFunction' . 'Map.fromList'
+@
 
 -}
 
@@ -184,7 +196,14 @@ unsafeFromList
 
 --------------------------------------------------
 
-{-| See 'mappingEnumeratedAt'.
+{-| All functions from @a@ to @b@.
+
+@
+'functionEnumerated' ≡ 'mappingEnumeratedAt' 'enumerated' 'enumerated'
+
+-- (modulo 'toFunction')
+@
+
 -}
 
 functionEnumerated
@@ -210,32 +229,37 @@ functionCardinality _
 --------------------------------------------------
 
 -- | Are all pairs of outputs the same for the same input? (short-ciruits).
-extensionallyEqual
+extensionallyEqualTo
  :: (Enumerable a, Eq b)
  => (a -> b)
  -> (a -> b)
  -> Bool
-extensionallyEqual f g
+extensionallyEqualTo f g
  = all ((==) <$> f <*> g) enumerated
 
-{-# INLINABLE extensionallyEqual #-}
+{-# INLINABLE extensionallyEqualTo #-}
 
 --------------------------------------------------
 
 -- | Is any pair of outputs different for the same input? (short-ciruits).
-extensionallyUnequal
+extensionallyUnequalTo
  :: (Enumerable a, Eq b)
  => (a -> b)
  -> (a -> b)
  -> Bool
-extensionallyUnequal f g
+extensionallyUnequalTo f g
  = any ((/=) <$> f <*> g) enumerated
 
-{-# INLINABLE extensionallyUnequal #-}
+{-# INLINABLE extensionallyUnequalTo #-}
 
 --------------------------------------------------
 
--- | Show all inputs and their outputs, as @unsafeFromList [...]@.
+{- | Show all inputs and their outputs, as @'unsafeFromList' [...]@.
+
+Useful for defining (orphan) 'Show' instances for functions.
+(See "Enumerate.OrphansFunction").
+
+-}
 functionShowsPrec
  :: (Enumerable a, Show a, Show b)
  => Int
@@ -248,7 +272,24 @@ functionShowsPrec
 
 --------------------------------------------------
 
--- | Show all inputs and their outputs, as @\case ...@.
+{-| Display a function as a @case@ expression.
+
+Show /all/ inputs and their outputs, as a @-XLambdaCase@ expression,
+i.e. @\\case ...@.
+
+>>> Prelude.putStrLn (displayFunction Prelude.not)
+\case
+ False -> True
+ True -> False
+
+>>> const_True = const True :: Bool -> Bool
+>>> Prelude.putStrLn (displayFunction const_True)
+\case
+ False -> True
+ True -> True
+
+-}
+
 displayFunction
   :: (Enumerable a, Show a, Show b)
   => (a -> b)
@@ -270,7 +311,19 @@ displayFunction
 
 --------------------------------------------------
 
-{-| 
+{-| Display a function as a @case@ expression, if injective.
+
+>>> const_True = const True :: Bool -> Bool
+>>> Nothing = displayInjective const_True
+
+>>> Just f = displayInjective not
+>>> putStrLn f
+\case
+ False -> True
+ True -> False
+
+Calls 'isInjective'.
+
 -}
 
 displayInjective
@@ -301,9 +354,12 @@ displayInjective f = case isInjective f of
 
 --------------------------------------------------
 
-{-| 
+{-| Construct all mappings, with explicit domain and image.
 
-@[(a,b)]@ is a mapping, @[[(a,b)]]@ is a list of mappings.
+NOTE:
+
+* @[(a,b)]@ is a "mapping".
+* @[[(a,b)]]@ is a list of mappings.
 
 >>> orderingPredicates = mappingEnumeratedAt [LT,EQ,GT] [False,True]
 >>> length orderingPredicates
@@ -368,10 +424,13 @@ is equivalent to the function:
 mappingEnumeratedAt :: [a] -> [b] -> [[(a,b)]]           -- TODO diagonalize? performance?
 mappingEnumeratedAt as bs = go (crossProduct as bs)
  where
- go [] = []
- go [somePairs] = do
+
+ go []                     = []
+
+ go [somePairs]            = do
   pair <- somePairs
   return$ [pair]
+
  go (somePairs:theProduct) = do
   pair <- somePairs
   theExponent <- go theProduct

@@ -4,27 +4,22 @@
 --------------------------------------------------
 --------------------------------------------------
 
-{-| orphan instances, of 'Enumerate'\/'Eq'\/'Show', for functions:
+{-| Orphan instances, of 'Enumerate'\/'Eq'\/'Show', for functions:
 
 * @instance (Enumerable a, Enumerable b, Ord a,  Ord b)  => Enumerable (a -> b)@
 * @instance (Enumerable a,               Eq b)           => Eq         (a -> b)@
-* @instance (Enumerable a,               Show a, Show b) => Show       (a -> b)@
+* @instance ('Enumerable' a,               Show a, Show b) => Show       (a -> b)@
 
-see:
+See:
 
-* 'functionEnumerated', 'functionCardinality'
-* 'extensionallyEqual', 'extensionallyUnequal'
-* 'functionShowsPrec'
+* 'functionEnumerated', 'functionCardinality';
+* 'extensionallyEqualTo', 'extensionallyUnequalTo';
+* 'functionShowsPrec';
 
 (that are included for completeness, but not exported by default
 (i.e. by "Enumerate").
 you probably want build-time instance-resolution errors,
 rather than possible runtime non-termination).
-
-
-@-- doctest@
-
->>> :set -XLambdaCase
 
 -}
 
@@ -39,6 +34,15 @@ import Enumerate.Types
 
 import Enumerate.Function.Extra
 import Enumerate.Function.Map
+
+--------------------------------------------------
+--------------------------------------------------
+
+{- $setup
+
+>>> :set -XLambdaCase
+
+-}
 
 --------------------------------------------------
 --------------------------------------------------
@@ -91,8 +95,8 @@ True
 -}
 
 instance (Enumerable a, Eq b) => Eq (a -> b) where
- (==) = extensionallyEqual
- (/=) = extensionallyUnequal
+ (==) = extensionallyEqualTo
+ (/=) = extensionallyUnequalTo
 
 --------------------------------------------------
 

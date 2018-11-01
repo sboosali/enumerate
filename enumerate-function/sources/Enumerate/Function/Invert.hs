@@ -357,7 +357,12 @@ getJectivityM f
 
 --------------------------------------------------
 
-{-| 
+{-| Returns the inverse of the injection, if injective.
+
+@
+isInjective f = 'isInjectiveM' (return.f)
+@
+
 -}
 
 isInjective :: (Enumerable a, Ord a, Ord b) => (a -> b) -> Maybe (b -> Maybe a)
@@ -367,9 +372,12 @@ isInjective f = isInjectiveM (return.f)
 
 {-| Returns the inverse of the injection, if injective.
 
-refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> Maybe a)@.
+Refines @(b -> [a])@ (i.e. the type of 'invertM') to @(b -> Maybe a)@.
 
-unlike 'isBijectiveM', doesn't need an @(Enumerable b)@ constraint. this helps when you want to ensure a function into an infinite type (e.g. 'show') is injective. and still reasonably efficient, given the @(Ord b)@ constraint.
+Unlike 'isBijectiveM', 'isInjectiveM' doesn't need an @('Enumerable' b)@ constraint.
+This helps out when you want to ensure that a function into an infinite type
+(e.g. 'show', the infinite type being @String@) is injective.
+It's still reasonably efficient, given the @(Ord b)@ constraint.
 
 -}
 
@@ -388,8 +396,14 @@ isInjectiveM f = do             -- TODO make it "correct by construction", rathe
 -}
 
 isUnique :: (Ord a) => [a] -> Maybe (Set a)
-isUnique l = if length l == length s then Nothing else Just s -- TODO make efficient, maybe single pass with Control.Foldl
+isUnique l =
+  if   length l == length s
+  then Just s
+  else Nothing
+
+ -- TODO make efficient, maybe single pass with Control.Foldl
  where
+
  s = Set.fromList l
 
 --------------------------------------------------
