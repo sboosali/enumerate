@@ -151,6 +151,7 @@ let uppercasePartial :: (MonadThrow m) => Char -> m Char  -- :: Partial Char Cha
 in maybe False (const True) $ isTotalM uppercasePartial
 :}
 False
+
 >>> maybe False (const True) $ isTotalM (return :: Partial Char Char)
 True
 
@@ -307,6 +308,7 @@ displayInjective f = case isInjective f of
 >>> orderingPredicates = mappingEnumeratedAt [LT,EQ,GT] [False,True]
 >>> length orderingPredicates
 8
+>>> import Enumerate.Function.Extra (printMappings)
 >>> printMappings orderingPredicates
 <BLANKLINE>
 (LT,False)
@@ -384,6 +386,7 @@ mappingEnumeratedAt as bs = go (crossProduct as bs)
 3
 >>> length (Prelude.head crossOrderingBoolean)
 2
+>>> import Enumerate.Function.Extra (printMappings)
 >>> printMappings crossOrderingBoolean
 <BLANKLINE>
 (LT,False)

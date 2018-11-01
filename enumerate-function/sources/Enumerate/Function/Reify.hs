@@ -190,8 +190,7 @@ reifyFunctionEitherAt domain f = reifyFunctionAtM domain (either2throw f)
 
 {-| Reifies an *unsafely*-partial function (i.e. a function that throws exceptions or that has inexhaustive pattern matching).
 
-
-forces the function to be strict.
+Forces the function to be strict.
 
 (TODO these hang) For example:
 

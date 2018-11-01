@@ -16,11 +16,17 @@ module Enumerate.Extra
 --------------------------------------------------
 --------------------------------------------------
 
+import qualified "containers" Data.Set as Set
+
+--------------------------------------------------
+--------------------------------------------------
+
 -- import Language.Haskell.TH.Syntax (Name,nameBase)
 import Numeric.Natural
-import qualified Data.Set as Set
-import qualified Data.List as List
-import qualified Data.Ord as Ord
+
+--------------------------------------------------
+--------------------------------------------------
+
 import Prelude.Spiros hiding ((:*:),C) -- shadows GHC.Generics
 
 --------------------------------------------------
@@ -58,25 +64,6 @@ dropEach :: (Ord a) => Set a -> Set (Set a)
 dropEach values = Set.map dropOne values
  where
  dropOne value = Set.delete value values
-
---------------------------------------------------
-
-{-| convert a power set to an isomorphic matrix, sorting the entries.
-
-(for doctest)
-
--}
-
-powerset2matrix :: Set (Set a) -> [[a]]
-powerset2matrix = (List.sortBy (Ord.comparing length) . fmap Set.toList . Set.toList)
-
---------------------------------------------------
-
-{-| (for doctest)
--}
-
-printMappings :: (Show a) => [[a]] -> IO ()
-printMappings mappings = traverse_ (\mapping -> (putStrLn"") >> (traverse print) mapping) mappings >> return()
 
 --------------------------------------------------
 --------------------------------------------------
