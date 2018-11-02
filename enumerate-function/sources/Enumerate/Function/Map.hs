@@ -4,26 +4,17 @@
 --------------------------------------------------
 --------------------------------------------------
 
-{-| Converting between partial functions and maps.
-
-a (safely-)partial function is isomorphic with a @Map@:
-
-@
-'fromFunctionM' . 'toFunctionM' = 'id'
-'toFunctionM' . 'fromFunctionM' = 'id'
-@
-
-modulo the error thrown.
-
--}
-
 module Enumerate.Function.Map
 
   (
-   -- * Doctest Context:
-   -- $setup
+
+   -- * @Enumerate.Function.Map@
+   -- $module
 
     module Enumerate.Function.Map
+
+   -- * (doctest context)
+   -- $setup
 
   ) where
 
@@ -63,7 +54,26 @@ import           Data.Maybe (fromJust)
 -- import GHC.TypeLits (Nat, type (^))
 
 --------------------------------------------------
--- DocTest ---------------------------------------
+-- Documentation: Module -------------------------
+--------------------------------------------------
+
+{- $module
+
+Converting between (partial) functions and maps.
+
+'Partial' (a.k.a. a safely-partial function) is isomorphic to @Map@:
+
+@
+'fromFunctionM' . 'toFunctionM' ≡ 'id'
+'toFunctionM' . 'fromFunctionM' ≡ 'id'
+@
+
+modulo which error is thrown.
+
+-}
+
+--------------------------------------------------
+-- Documentation: DocTest ------------------------
 --------------------------------------------------
 
 {- $setup
@@ -93,14 +103,22 @@ False
 
 -}
 
-toFunction :: (Enumerable a, Ord a) => Map a b -> Maybe (a -> b)
-toFunction m = if isMapTotal m then Just f else Nothing
- where
+toFunction
+  :: (Enumerable a, Ord a)
+  => Map a b -> Maybe (a -> b)
 
- f = unsafeToFunction m
- --
- -- the cast (unsafeToFunction) is safe.
- -- when the map is total (isMapTotal).
+toFunction m =
+
+  if   isMapTotal m
+  then Just f
+  else Nothing
+
+  where
+
+  f = unsafeToFunction m
+  --
+  -- the cast (unsafeToFunction) is safe.
+  -- when the map is total (isMapTotal).
 
 {-# INLINABLE toFunction #-}
 
@@ -110,31 +128,33 @@ toFunction m = if isMapTotal m then Just f else Nothing
 
 Lookup failures are 'throwM'n as a 'PatternMatchFail'.
 
->>> idPartial = toFunctionM (Map.fromList [(True,True)])
->>> idPartial True
+>>> id_partial = toFunctionM (Map.fromList [(True,True)])
+>>> id_partial True
 True
->>> idPartial False
+>>> id_partial False
 *** Exception: toFunctionM
 
 -}
 
-toFunctionM :: (Enumerable a, Ord a) => Map a b -> (Partial a b)
+toFunctionM
+  :: (Enumerable a, Ord a)
+  => Map a b -> (Partial a b)
+
 toFunctionM m = f
- where
- f x = maybe (throwM (PatternMatchFail "toFunctionM")) return (Map.lookup x m)
+
+  where
+
+  f x = maybe (throwM (PatternMatchFail message))
+              return
+              (Map.lookup x m)
+        where
+        message = "toFunctionM"
+        -- NOTE Enriching the message with « show x »
+        --      would require a « Show a » constraint.
 
 {-# INLINABLE toFunctionM #-}
 
 --------------------------------------------------
-
-{-| Wraps 'Map.lookup'
--}
-
-unsafeToFunction :: (Ord a) => Map a b -> (a -> b)
-unsafeToFunction m x = fromJust (Map.lookup x m)
-
-{-# INLINABLE unsafeToFunction #-}
-
 --------------------------------------------------
 
 {-| Refines a partial function, if total.
@@ -162,15 +182,35 @@ True
 (with @uppercasePartial@ defined above, and 'Partial' defined internally).
 
 @
-'isTotalM' = 'toFunction' . 'fromFunctionM'
+'isTotalM' ≡ 'toFunction' '.' 'fromFunctionM'
 @
 
 -}
 
-isTotalM :: (Enumerable a, Ord a) => (Partial a b) -> Maybe (a -> b)
+isTotalM
+  :: (Enumerable a, Ord a)
+  => (Partial a b) -> Maybe (a -> b)
+
 isTotalM f = toFunction (fromFunctionM f)
 
---------------------------------------------------------------------------------
+{-# INLINABLE isTotalM #-}
+
+--------------------------------------------------
+--------------------------------------------------
+
+{-| Wrapper around 'Map.lookup'
+
+-}
+
+unsafeToFunction
+  :: (Ord a)
+  => Map a b -> (a -> b)
+
+unsafeToFunction m x = fromJust (Map.lookup x m)
+
+{-# INLINABLE unsafeToFunction #-}
+
+--------------------------------------------------
 
 {-| Wraps 'Map.lookup'.
 
@@ -189,14 +229,19 @@ unsafeFromList
  :: (Ord a)
  => [(a,b)]
  -> (a -> b)
+
 unsafeFromList
  = unsafeToFunction . Map.fromList
 
 {-# INLINABLE unsafeFromList #-}
 
 --------------------------------------------------
+--------------------------------------------------
 
-{-| All functions from @a@ to @b@.
+{-| __/All/__ functions from @a@ to @b@.
+
+In particular, all mappings /modulo/ extensional-equality
+(i.e. 'extensionallyEqualTo').
 
 @
 'functionEnumerated' ≡ 'mappingEnumeratedAt' 'enumerated' 'enumerated'
@@ -204,36 +249,113 @@ unsafeFromList
 -- (modulo 'toFunction')
 @
 
+Used by the 'Enumerable' instance for functions 
+(see "Enumerate.Orphans.Function").
+
 -}
 
 functionEnumerated
  :: (Enumerable a, Enumerable b, Ord a, Ord b)
  => [a -> b]
+
 functionEnumerated = functions
- where
- functions = (unsafeToFunction . Map.fromList) <$> mappings
- mappings = mappingEnumeratedAt enumerated enumerated
+  where
+
+  functions = (unsafeToFunction . Map.fromList) <$> mappings
+  mappings  = mappingEnumeratedAt enumerated enumerated
+
+{-# INLINABLE functionEnumerated #-}
 
 --------------------------------------------------
 
--- | @|b| ^ |a|@
+{-| The number of functions from @a@ to @b@.
+
+In particular, the number of mappings /modulo/ extensional-equality
+(i.e. 'extensionallyEqualTo').
+
+Arithmetically:
+
+@≡ |b| ^ |a|
+@
+
+Example:
+
+>>> import Prelude
+>>> import Data.Ord (Ordering)
+>>> functionCardinality (Nothing :: Maybe (Ordering -> Bool))
+8
+>>> cardinality (Just True)
+2
+>>> cardinality (Just EQ)
+3
+>>> 2 ^ 3
+8
+
+Used by the 'Enumerable' instance for functions 
+(see "Enumerate.Orphans.Function").
+
+-}
+
 functionCardinality
  :: forall a b proxy. (Enumerable a, Enumerable b)
  => proxy (a -> b)
  -> Natural
-functionCardinality _
- = cardinality (Proxy :: Proxy b) ^ cardinality (Proxy :: Proxy a)
+
+functionCardinality _ = b ^ a
+  where
+
+  a = cardinality (Proxy :: Proxy a)
+  b = cardinality (Proxy :: Proxy b)
 
 {-# INLINABLE functionCardinality #-}
 
 --------------------------------------------------
 
+{-| The number of functions from @a@ to @b@.
+
+See 'functionCardinality'.
+
+Example:
+
+>>> import Prelude
+>>> import Data.Ord (Ordering(..))
+>>> functionCardinalityOf (==EQ)
+8
+
+Specializations:
+
+* Unifying @proxy@ with the function-arrow @(->)@:
+
+    @
+    'functionCardinalityOf' :: (Enumerable a, Enumerable b) => (a -> b) -> Natural
+    @
+
+-}
+
+functionCardinalityOf
+ :: forall a b proxy. (Enumerable a, Enumerable b)
+ => proxy a b
+ -> Natural
+
+functionCardinalityOf _ = b ^ a
+  where
+
+  a = cardinality (Proxy :: Proxy a)
+  b = cardinality (Proxy :: Proxy b)
+
+{-# INLINABLE functionCardinalityOf #-}
+
+--------------------------------------------------
+--------------------------------------------------
+
 -- | Are all pairs of outputs the same for the same input? (short-ciruits).
+
 extensionallyEqualTo
  :: (Enumerable a, Eq b)
  => (a -> b)
  -> (a -> b)
  -> Bool
+
 extensionallyEqualTo f g
  = all ((==) <$> f <*> g) enumerated
 
@@ -242,16 +364,19 @@ extensionallyEqualTo f g
 --------------------------------------------------
 
 -- | Is any pair of outputs different for the same input? (short-ciruits).
+
 extensionallyUnequalTo
  :: (Enumerable a, Eq b)
  => (a -> b)
  -> (a -> b)
  -> Bool
+
 extensionallyUnequalTo f g
  = any ((/=) <$> f <*> g) enumerated
 
 {-# INLINABLE extensionallyUnequalTo #-}
 
+--------------------------------------------------
 --------------------------------------------------
 
 {- | Show all inputs and their outputs, as @'unsafeFromList' [...]@.
@@ -312,10 +437,10 @@ displayFunction = reifyFunction
 
 --------------------------------------------------
 
-{-| Display a function, if injective, in a "@esac@" expression.
+{-| Display a function, if injective, as an "@esac@" expression.
 
-@esac@ is some (pseudo-Haskell) syntax for defining injective functions.
-NAMING: "esac" is "case" backwards.
+@esac@ is some ad-hoc (pseudo-Haskell) syntax for defining injective functions.
+Naming: "esac" is "case" backwards.
 
 >>> const_True = const True :: Bool -> Bool
 >>> Nothing = displayInjective const_True
@@ -363,6 +488,7 @@ displayInjective f =
   --    (y, Nothing) ->
   --    (y, Just x)  -> intercalate " " ["", show y, " <- ", show x]
 
+--------------------------------------------------
 --------------------------------------------------
 
 {-| Construct all mappings, with explicit domain and image.
@@ -446,39 +572,6 @@ mappingEnumeratedAt as bs = go (crossProduct as bs)
   pair <- somePairs
   theExponent <- go theProduct
   return$ pair : theExponent
-
---------------------------------------------------
-
-{-| The cross-product of two lists.
-
->>> crossOrderingBoolean = crossProduct [LT,EQ,GT] [False,True]
->>> length crossOrderingBoolean
-3
->>> length (Prelude.head crossOrderingBoolean)
-2
->>> import Enumerate.Function.Extra (printMappings)
->>> printMappings crossOrderingBoolean
-<BLANKLINE>
-(LT,False)
-(LT,True)
-<BLANKLINE>
-(EQ,False)
-(EQ,True)
-<BLANKLINE>
-(GT,False)
-(GT,True)
-
-(with 'printMappings' defined internally).
-
-The length of the outer list is the size of the first set, and
-the length of the inner list is the size of the second set.
-
--}
-
-crossProduct :: [a] -> [b] -> [[(a,b)]]
-crossProduct [] _ = []
-crossProduct (aValue:theDomain) theCodomain =
- fmap (aValue,) theCodomain : crossProduct theDomain theCodomain
 
 --------------------------------------------------
 --------------------------------------------------

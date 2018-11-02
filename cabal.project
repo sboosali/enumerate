@@ -1,19 +1,68 @@
+--------------------------------------------------
+--------------------------------------------------
 packages:
   ./enumerate/
   ./enumerate-function/
 
+--------------------------------------------------
 optional-packages:
   ../spiros/spiros/
+
+--------------------------------------------------
+-- LocalFlags (i.e. only for project/vendored packages)
+--------------------------------------------------
+
+documentation:            True
+haddock-hyperlink-source: True
+
+--------------------------------------------------
+-- GlobalFlags (i.e. only for installed/dependency packages)
+--------------------------------------------------
+
+---profiling:    True
+---optimization: 2
+
+--------------------------------------------------
 
 constraints:
   -- see https://github.com/haskell-infra/hackage-trustees/issues/119
   foundation >=0.0.14
 
 --------------------------------------------------
+-- Meta
+--------------------------------------------------
+
+jobs: 6
+
+--------------------------------------------------
+
+repository stackage-lts-12.12
+  url: https://www.stackage.org/lts-12.12
+
+  -- From:
+  -- https://www.stackage.org/lts-12.12/cabal.config?global=true
+
+--------------------------------------------------
+-- Notes -----------------------------------------
+--------------------------------------------------
 
 --TODO with-compiler: /nix/store/gzsn9cig6pmy13374k62q8l4jah9siq7-ghcjs-8.4.0.1-with-packages/bin/ghcjs
 --     -- from reflex-platform
 --     compiler: ghcjs
+
+-- by omitting a `compiler:` field in `cabal.project`,
+-- we can easily test multiple compiler versions by specifying that same field
+-- via the `-w` command line option
+-- (also see the `Makefile`'s `configure-8-2` target).
+--
+-- e.g. verify by seeing the `Build profile: ...` message that `cabal` prints:
+-- 
+--     $ cabal new-configure -w ghc-8.4.3
+--     $ cabal new-build all
+--     Build profile: -w ghc-8.4.3 -O1
+--     ...
+--
+-- 
 
 --------------------------------------------------
 

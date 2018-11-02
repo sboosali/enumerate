@@ -36,6 +36,7 @@ import "exceptions" Control.Monad.Catch (MonadThrow(..), SomeException(..))
 import Data.Semigroup (Semigroup)
 
 import System.IO.Unsafe (unsafePerformIO)
+
 import Control.Exception
   ( Handler(..)
   , AsyncException, ArithException, ArrayException, ErrorCall, PatternMatchFail
@@ -147,6 +148,7 @@ totalizeFunction f = g
 * 'ArrayException'
 * 'ErrorCall'
 * 'PatternMatchFail'
+* 'SomeException': \[TODO rm]
 
 -}
 
@@ -197,11 +199,45 @@ showsPrecWith stringFrom functionInto p x = showParen (p >= 11) $
 
 --------------------------------------------------
 --------------------------------------------------
+
+{-| The cross-product of two lists.
+
+>>> crossOrderingBoolean = crossProduct [LT,EQ,GT] [False,True]
+>>> length crossOrderingBoolean
+3
+>>> length (Prelude.head crossOrderingBoolean)
+2
+>>> import Enumerate.Function.Extra (printMappings)
+>>> printMappings crossOrderingBoolean
+<BLANKLINE>
+(LT,False)
+(LT,True)
+<BLANKLINE>
+(EQ,False)
+(EQ,True)
+<BLANKLINE>
+(GT,False)
+(GT,True)
+
+(with 'printMappings' defined internally).
+
+The length of the outer list is the size of the first set, and
+the length of the inner list is the size of the second set.
+
+-}
+
+crossProduct :: [a] -> [b] -> [[(a,b)]]
+crossProduct [] _ = []
+crossProduct (aValue:theDomain) theCodomain =
+ fmap (aValue,) theCodomain : crossProduct theDomain theCodomain
+
+--------------------------------------------------
+--------------------------------------------------
 -- for doctests:
 
 {-| convert a power set to an isomorphic matrix, sorting the entries.
 
-(for doctest)
+(for @doctest@)
 
 -}
 
@@ -210,7 +246,7 @@ powerset2matrix = (List.sortBy (Ord.comparing length) . fmap Set.toList . Set.to
 
 --------------------------------------------------
 
-{-| (for doctest)
+{-| (for @doctest@)
 -}
 
 printMappings :: (Show a) => [[a]] -> IO ()

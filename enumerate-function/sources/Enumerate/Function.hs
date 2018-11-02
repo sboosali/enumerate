@@ -1,5 +1,13 @@
 
-{-|
+{-| 
+
+== Modules
+
+* "Enumerate.Function.Reify": 
+* "Enumerate.Function.Map": 
+* "Enumerate.Function.Invert": 
+
+== Example
 
 e.g.
 
@@ -7,25 +15,25 @@ e.g.
 
 @
 data Edit = Edit Action Slice Region
- deriving (Show,Read,Eq,Ord,Generic,Enumerable)
+ deriving ('Show',Read,Eq,'Ord','Generic','Enumerable')
 
 data Action
  = Transpose
  | Copy
  | Delete
- deriving (Show,Read,Eq,Ord,Enum,Bounded,Generic,Enumerable)
+ deriving ('Show',Read,Eq,'Ord',Enum,Bounded,'Generic','Enumerable')
 
 data Slice
  = Whole
  | Backwards
  | Forwards
- deriving (Show,Read,Eq,Ord,Enum,Bounded,Generic,Enumerable)
+ deriving ('Show',Read,Eq,'Ord',Enum,Bounded,'Generic','Enumerable')
 
 data Region
  = Character
  | Token
  | Line
- deriving (Show,Read,Eq,Ord,Enum,Bounded,Generic,Enumerable)
+ deriving ('Show',Read,Eq,'Ord',Enum,Bounded,'Generic','Enumerable')
 @
 
 we can enumerate every possible editing action:

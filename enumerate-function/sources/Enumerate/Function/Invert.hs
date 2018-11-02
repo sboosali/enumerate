@@ -10,7 +10,7 @@
 module Enumerate.Function.Invert
 
   (
-   -- * Doctest Context:
+   -- * (doctest context)
    -- $setup
 
     module Enumerate.Function.Invert

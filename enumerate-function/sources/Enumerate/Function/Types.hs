@@ -26,7 +26,7 @@ import "base" Data.Ix (Ix)
 --------------------------------------------------
 --------------------------------------------------
 
-{-| Used by "Enumerate.Function.Reify.getJectivityM".
+{-| Used by 'Enumerate.Function.Reify.getJectivityM'.
 
 -}
 

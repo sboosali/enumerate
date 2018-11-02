@@ -67,10 +67,14 @@ instance ('Enumerable' a, Enumerable b, 'Ord' a, Ord b) => Enumerable (a -> b) w
 
 -}
 
-instance (Enumerable a, Enumerable b, Ord a, Ord b) => Enumerable (a -> b) where --TODO, no (oprhan) instance, just the standalone function/type-instance?
- -- -- type Cardinality (a -> b) = (Cardinality b) ^ (Cardinality a)
+instance (Enumerable a, Enumerable b, Ord a, Ord b) => Enumerable (a -> b) where
+
  enumerated  = functionEnumerated
  cardinality = functionCardinality
+
+ -- type Cardinality (a -> b) = (Cardinality b) ^ (Cardinality a)
+
+ --TODO, no (oprhan) instance, just the standalone function/type-instance?
 
 --------------------------------------------------
 

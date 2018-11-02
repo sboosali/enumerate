@@ -23,3 +23,16 @@ flag test-unit
 
 
 
+
+-- reifyPredicateAtM domain p = map fst (reifyFunctionAtM domain f)
+--  where
+--  f x = if p x then return x else throwM (ErrorCall "False")
+
+-- MonadThrow Maybe
+-- (e ~ SomeException) => MonadThrow (Either e)
+-- MonadThrow []
+
+
+
+
+
