@@ -34,8 +34,30 @@ Hspec Manual: <http://hspec.github.io/>
 ## `tasty` Testing Framework
 
 
+## `class` `Ix`
 
-## 
+```haskell
+class (Ord a) => Ix a where
+
+    {-# MINIMAL range, (index | unsafeIndex), inRange #-}
+
+    -- | The list of values in the subrange defined by a bounding pair.
+    range               :: (a,a) -> [a]
+
+    -- | The position of a subscript in the subrange.
+    index               :: (a,a) -> a -> Int
+
+    -- | Like 'index', but without checking that the value is in range.
+    unsafeIndex         :: (a,a) -> a -> Int
+
+    -- | Returns 'True' the given subscript lies in the range defined
+    -- the bounding pair.
+    inRange             :: (a,a) -> a -> Bool
+
+    -- | The size of the subrange defined by a bounding pair.
+    rangeSize           :: (a,a) -> Int
+```
+
 
 ## 
 

@@ -66,3 +66,51 @@ import "exceptions" Control.Monad.Catch (MonadThrow(..))
 
 
 
+
+--------------------------------------------------
+-- « Ix » ----------------------------------------
+--------------------------------------------------
+
+    -- | The list of values in the subrange defined by a bounding pair.
+    range               :: (a,a) -> [a]
+
+--------------------------------------------------
+--------------------------------------------------
+
+    -- | The position of a subscript in the subrange.
+    index               :: (a,a) -> a -> Int
+
+--------------------------------------------------
+--------------------------------------------------
+
+    -- | Returns 'True' the given subscript lies in the range defined
+    -- the bounding pair.
+    inRange             :: (a,a) -> a -> Bool
+
+--------------------------------------------------
+--------------------------------------------------
+
+
+
+
+
+
+
+
+--------------------------------------------------
+#if HAS_BASE_Contravariant
+
+import qualified "base" Data.Contravariant as Contravariant
+ ( Contravariant
+ )
+
+#endif
+
+
+
+
+
+
+
+
+
