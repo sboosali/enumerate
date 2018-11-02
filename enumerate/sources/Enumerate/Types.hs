@@ -8,11 +8,14 @@
 {-# LANGUAGE DeriveGeneric, DeriveDataTypeable #-}
 
 --------------------------------------------------
+-- Classes ---------------------------------------
 --------------------------------------------------
 
 {- | Enumerate all values in a finite type.
 
-e.g.
+Every type in @base@, which can be an instance, is an instance.
+
+e.g. TODO
 
 @
 data A
@@ -68,29 +71,6 @@ also provides instances for:
 * sets
 
 * vinyl records
-
-related packages:
-
-* <http://hackage.haskell.org/package/enumerable enumerable>.
-no @Generic@ instance.
-
-* <http://hackage.haskell.org/package/universe universe>
-no @Generic@ instance.
-
-* <http://hackage.haskell.org/package/prelude-safeenum-0.1.1.2/docs/Prelude-SafeEnum.html SafeEnum>
-only @Enum@s
-
-* <http://hackage.haskell.org/package/emgm-0.4/docs/Generics-EMGM-Functions-Enum.html emgm>.
-  allows infinite lists (by convention). too heavyweight.
-
-* <https://hackage.haskell.org/package/testing-feat-0.4.0.2/docs/Test-Feat-Class.html#t:Enumerable testing-feat>.
-too heavyweight (testing framework).
-
-* <https://hackage.haskell.org/package/smallcheck smallcheck>
-too heavyweight (testing framework). Series enumerates up to some depth and can enumerated infinitely-inhabited types.
-
-* <https://hackage.haskell.org/package/quickcheck quickcheck>
-too heavyweight (testing framework, randomness unnecessary).
 
 -}
 
@@ -167,16 +147,19 @@ import qualified "base" Data.Semigroup as Semigroup
  )
 
 #endif
+
+--------------------------------------------------
+-- DocTest ---------------------------------------
 --------------------------------------------------
 
-{-$setup
+{- $setup
 
 >>> import Prelude
 
 -}
 
 --------------------------------------------------
--- Types -----------------------------------------
+-- Classes ---------------------------------------
 --------------------------------------------------
 
 {- | Enumerate the set of all values in a (finitely enumerable) type.
@@ -190,37 +173,33 @@ enumerates depth first.
 
 @Enumerable@ can be implemented automatically via its 'Generic' instance.
 
-laws:
+= Laws
 
-* finite:
+[Finite] @'cardinality' /= _|_@
 
-    * @'cardinality' /= _|_@
+[Consistent] @'cardinality' _ = 'length' 'enumerated'@.
+So you can index the 'enumerated' with a nonnegative index below the 'cardinality'.
 
-* consistent:
+[Distinct] @(Eq a) => 'nub' 'enumerated' == 'enumerated'@
 
-    * @'cardinality' _ = 'length' 'enumerated'@
+[Complete] @x `'elem'` 'enumerated'@
 
-    so you can index the 'enumerated' with a nonnegative index below the 'cardinality'.
+[Coincides with @Bounded@ @Enum@s]:
 
-* distinct:
-
-    * @(Eq a) => 'nub' 'enumerated' == 'enumerated'@
-
-* complete:
-
-    * @x `'elem'` 'enumerated'@
-
-* coincides with @Bounded@ @Enum@s:
-
-    * @('Enum' a, 'Bounded' a) => 'enumerated' == 'boundedEnumerated'@
+   * @('Enum' a, 'Bounded' a) => 'enumerated' == 'boundedEnumerated'@
 
     * @('Enum' a) => 'enumerated' == 'enumEnumerated'@
 
-(@Bounded@ constraint elided for convenience, but relevant.)
+(The @Bounded@ constraint is elided for convenience, but relevant.)
 
 ("inputs" a type, outputs a list of values).
 
-Every type in `base` (that can be an instance) is an instance.
+= Examples
+
+>>> enumerated :: [Bool]
+[False,True]
+>>> cardinality ([] :: [Bool])
+2
 
 -}
 
@@ -268,6 +247,10 @@ instance (Enumerable a) => Enumerable (X a) where
 
 -}
 
+--------------------------------------------------
+-- DataTypes -------------------------------------
+--------------------------------------------------
+
 {-| wrap any @(Bounded a, Enum a)@ to be a @Enumerable@ via 'boundedEnumerated'.
 
 (avoids @OverlappingInstances@).
@@ -276,6 +259,9 @@ instance (Enumerable a) => Enumerable (X a) where
 newtype WrappedBoundedEnum a = WrappedBoundedEnum { unwrapBoundedEnum :: a }
 
 --------------------------------------------------
+-- Instances -------------------------------------
+--------------------------------------------------
+
  -- main base types
 
 {- NOTE: to declare instances:

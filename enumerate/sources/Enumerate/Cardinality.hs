@@ -16,6 +16,7 @@ This cardinality is known /statically/ and at the /type-level/.
 module Enumerate.Cardinality where
 
 --------------------------------------------------
+--------------------------------------------------
 
 import Enumerate.Extra
 --import Enumerate.Compatibility (MultiplyNats)
@@ -63,20 +64,22 @@ import           "base" GHC.TypeLits (Nat, KnownNat, natVal, type (+), type (^),
 -- type instance {-# OVERLAPS #-} (Generic a) => Cardinality a = GCardinality (Rep a)
 
 --------------------------------------------------
+-- Instances -------------------------------------
+--------------------------------------------------
 
-{-| a type is finite, i.e. has a bounded size.
+{-| Typeclass for types that are finite, i.e. have bounded size.
 
-laws:
+The 'Cardinality' associated @type family@ is the type-level
+analogue to the 'cardinality' method.
 
- * consistent with "Enumerate.Enumerable":
+= Laws
 
-     * @'cardinality' = 'reifyCardinality'@
+[Consistency of Cardinality] @'cardinality' == 'reifyCardinality'@.
+i.e. the value-level (a 'Natural') matches the type-level (a 'Nat')
 
-     i.e. the value-level (a 'Natural') matches the type-level (a 'Nat')
+= Examples
 
-e.g.
-
->>> reifyCardinality ([]::[Bool])
+>>> reifyCardinality ([] :: [Bool])
 2
 
 -}
@@ -85,7 +88,9 @@ class Finite a where
   type Cardinality a :: Nat
   type Cardinality a = GCardinality (Rep a)
 
-----------------------------------------
+--------------------------------------------------
+-- Instances -------------------------------------
+--------------------------------------------------
 
 -- base types. TODO any more?
 

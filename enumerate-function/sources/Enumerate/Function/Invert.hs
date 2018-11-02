@@ -156,6 +156,7 @@ fromInjectiveM f = (fromInverseM f) & Map.map NonEmpty.head
 {-# INLINABLE fromInjectiveM #-}
   
 --------------------------------------------------
+-- Mappings --------------------------------------
 --------------------------------------------------
 
 {-| Checks: "Does the map contain every key in its domain?".
@@ -180,6 +181,33 @@ isMapTotal m = all _isMember_ enumerated
 {-# INLINABLE isMapTotal #-}
 
 --------------------------------------------------
+
+-- {-| The coverage of a mapping. 
+
+-- Checks: "What fraction of the range is covered by the mapping's codomain
+-- (i.e. the @Map@'s values)?".
+
+-- >>> getCoverageFraction (Map.fromList [(False,True),(True,False)])
+-- 1 % 1
+
+-- >>> getCoverageFraction (Map.fromList TODO ascii-mapping)
+-- 1 % 1
+
+-- -}
+
+-- getCoverageFraction
+--   :: (Enumerable a, Enumerable b, Ord a, Ord b)
+--   => Map a b -> Ratio Natural
+
+-- getCoverageFraction m = 
+--   where
+--   
+--   q = m
+
+-- {-# INLINABLE getCoverageFraction #-}
+
+--------------------------------------------------
+-- Sets: Input and Output ------------------------
 --------------------------------------------------
 
 {-| The domain of the (given, partial) function.

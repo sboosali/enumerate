@@ -153,8 +153,13 @@ toFunctionM m = f
         --      would require a « Show a » constraint.
 
 {-# INLINABLE toFunctionM #-}
-
+  
 --------------------------------------------------
+-- Totality --------------------------------------
+--------------------------------------------------
+
+-- TODO getCoverageM
+
 --------------------------------------------------
 
 {-| Refines a partial function, if total.
@@ -572,6 +577,11 @@ mappingEnumeratedAt as bs = go (crossProduct as bs)
   pair <- somePairs
   theExponent <- go theProduct
   return$ pair : theExponent
+
+--------------------------------------------------
+--------------------------------------------------
+
+-- fromPredicateM
 
 --------------------------------------------------
 --------------------------------------------------

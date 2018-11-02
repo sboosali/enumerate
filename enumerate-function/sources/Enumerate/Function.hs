@@ -1,13 +1,108 @@
 
-{-| 
+{-| Reify function into mappings.
 
-== Modules
 
-* "Enumerate.Function.Reify": 
-* "Enumerate.Function.Map": 
-* "Enumerate.Function.Invert": 
+= Modules
 
-== Example
+== @module@ "Enumerate.Function.Reify"
+
+    Reify a function @(a -> b)@ into a mapping @[(a, b)]@.
+
+    See:
+
+    * 'reifyFunctionAtM'
+
+== @module@ "Enumerate.Function.Map"
+
+    Isomorphisms between @(->)@ and @Map@.
+
+    See:
+
+    * 'toFunctionM'
+    * 'isTotalM'
+    * 'extensionallyEqualTo'
+    * 'displayFunction'
+
+== @module@ "Enumerate.Function.Invert"
+
+    Invert functions. Prove functions' "jectivity".
+
+    See:
+
+    * 'invertM'
+    * 'isInjectiveM'
+    * 'isSurjectiveM'
+    * 'isBijectiveM'
+
+
+= API
+
+== API: Conversion
+
+Convert functions between representations, and to derived functions:
+
+* Get Inverses:
+
+    * 'invertM'
+
+* To\/From @Map@s:
+
+    * 'fromFunctionM'
+
+* To\/From @Set@s:
+
+    * 'fromPredicateM'
+
+== API: Properties
+
+Ensure a function's properties, or discover them:
+
+* Totality:
+
+    * 'isTotalM'
+    * 'getCoverageM'
+
+* \"Jectivity\":
+
+    * Check injectivity:
+
+        * 'isInjectiveM'
+        * 'isInjective'
+
+    * Check surjectivity:
+
+        * 'isSurjectiveM'
+        * 'isSurjective'
+
+    * Check bijectivity:
+
+        * 'isBijectiveM'
+        * 'isBijective'
+
+    * Discover properites:
+
+        * 'getJectivityM'
+
+== API: Enumeration
+
+Get all possible functions (modulo extensional equality) between two types:
+
+    * 'functionEnumerated'
+
+How many possible functions (modulo extensional equality) exist between two types (fast):
+
+    * 'functionCardinality'
+
+Render a function (as its mapping):
+
+* For debugging: 'displayFunction'
+
+* For efficient serialization: @TODO@.
+
+
+= Examples
+
+== Example: Emacs KeyBindings
 
 e.g.
 
@@ -49,7 +144,7 @@ type KeyBinding = [String]
 emacsEdit :: Edit -> KeyBinding
 @
 
-the `enumerate-function` package can:
+The `enumerate-function` package can:
 
 * verify that @emacsEdit@ doesn't map different editing actions
 to the same keybindings, which would mean that one would shadow the other

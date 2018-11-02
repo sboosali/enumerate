@@ -19,21 +19,22 @@ version:             0.3
 -- Information -----------------------------------
 --------------------------------------------------
 
-synopsis:    Invert functions via enumeration
+synopsis:    Functions: Invert, Render, Validate them (via Enumeration)
 
 description: Invert functions by brute-force, enumerating their domain.
              .
-             Once a function is "reified" into its inputs\/outputs, we can check properties like:
+             Once a function is "reified" into its inputs\/outputs, we can use it like any other value.
+             We can:
              .
-             * Totality
-             * Injectivity
-             * Surjectivity
+             * Render i(and serialize) it.
+             * Get its inverse.
+             * Check its properties (like totality, injectivity, surjectivity)
              .
              See the "Enumerate.Function" module for examples for documentation.
              .
-             (The <https://hackage.haskell.org/package/enumerate @enumerate@> package,
-             a (version-locked) dependency, provides a generalized @Enum@,
-             which is used to brute-force all inputs of a function)
+             See also the @<https://hackage.haskell.org/package/enumerate enumerate>@ package
+             (a version-locked dependency, providing a generalized @Enum@,
+             with which all inputs of a function can be enumerated).
              .
 
 category:    Data

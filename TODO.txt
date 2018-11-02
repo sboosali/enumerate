@@ -114,3 +114,40 @@ import qualified "base" Data.Contravariant as Contravariant
 
 
 
+data These a b
+
+  = This  a
+  | That    b
+  | These a b
+
+  deriving (Show, Eq, Ord, Generic, Enumerable)
+
+
+
+
+
+
+
+
+
+@Ix@ instance:
+
+@
+instance ('Enumerable' a, 'Enumerable' b) => 'Ix' (These a b) where
+
+  '' = ''
+  '' = ''
+  '' = ''
+@
+
+
+
+
+
+
+instance (Enumerable a, Enumerable b) => Enum (These a b) where toEnum   = toEnum_enumerable   array_enumerable; fromEnum = fromEnum_enumerable table_enumerable
+
+
+
+
+
