@@ -85,12 +85,12 @@ source-repository head
 
 --------------------------------------------------
 
-flag large-types
+-- flag large-types
 
-  default:     False
+--   default:     False
 
-  description: `Enumerate` instances for finite-but-huge types.
-  manual:      True
+--   description: `Enumerate` instances for finite-but-huge types.
+--   manual:      True
 
 --------------------------------------------------
 
@@ -383,7 +383,7 @@ common Haskell2020Program
    -- Compilation -----
    --------------------
  
-             -O2
+   --          -O2
 
    --------------------
    -- Runtime ---------

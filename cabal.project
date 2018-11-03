@@ -24,6 +24,12 @@ haddock-hyperlink-source: True
 
 --------------------------------------------------
 
+package *
+  documentation:            True
+  haddock-hyperlink-source: True
+
+--------------------------------------------------
+
 constraints:
   -- see https://github.com/haskell-infra/hackage-trustees/issues/119
   foundation >=0.0.14

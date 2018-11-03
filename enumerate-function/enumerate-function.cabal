@@ -65,8 +65,6 @@ license-file:        LICENSE
 
 extra-source-files: README.md
                     .travis.yml
-                    HLint.hs
-                    stack.yaml
 
 --data-files:
 --  data/

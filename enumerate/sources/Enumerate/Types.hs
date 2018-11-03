@@ -149,6 +149,17 @@ import qualified "base" Data.Semigroup as Semigroup
 #endif
 
 --------------------------------------------------
+#if HAS_BASE_Contravariant
+
+import "base" Data.Functor.Contravariant
+ ( Predicate(..)
+ --TODO , Comparison(..)
+ --TODO , Equivalence(..)
+ )
+
+#endif
+
+--------------------------------------------------
 -- DocTest ---------------------------------------
 --------------------------------------------------
 
@@ -256,6 +267,7 @@ instance (Enumerable a) => Enumerable (X a) where
 (avoids @OverlappingInstances@).
 
 -}
+
 newtype WrappedBoundedEnum a = WrappedBoundedEnum { unwrapBoundedEnum :: a }
 
 --------------------------------------------------
@@ -437,10 +449,15 @@ Could not deduce (Generic (a, b, c, d, e, f, g, h))
 
 {-|
 
-the 'cardinality' is the cardinality of the 'powerSet' of @a@, i.e. @2^|a|@.
-warning: it grows quickly. don't try to take the power set of 'Char'! or even 'Word8'.
+Arithmetically:
 
-the 'cardinality' call is efficient (depending on the efficiency of the base type's call).
+@≡ 2^|a|
+@
+
+The 'cardinality' is the cardinality of the 'powerSet' of @a@, i.e. @2^|a|@.
+Warning: it grows quickly. don't try to take the power set of 'Char'! or even 'Word8'.
+
+The 'cardinality' call is efficient (depending on the efficiency of the base type's call).
 you should be able to safely call 'enumerateBelow', unless the arithmetic itself becomes too large.
 
 >>> enumerated :: [Set Bool]
@@ -449,9 +466,47 @@ you should be able to safely call 'enumerateBelow', unless the arithmetic itself
 -}
 
 instance (Enumerable a, Ord a) => Enumerable (Set a) where
- -- type Cardinality (Set a) = 2 ^ (Cardinality a)
- enumerated    = (Set.toList . powerSet . Set.fromList) enumerated
+
  cardinality _ = 2 ^ cardinality (Proxy :: Proxy a)
+ -- type Cardinality (Predicate a) = 2 ^ (Cardinality a)
+
+ enumerated    = (Set.toList . powerSet . Set.fromList) enumerated
+
+--------------------------------------------------
+
+#if HAS_BASE_Contravariant
+
+{-|
+
+Arithmetically:
+
+@≡ 2^|a|
+@
+
+'Predicate's are isomorphic to 'Set's.
+
+-}
+
+instance (Enumerable a, Ord a) => Enumerable (Predicate a) where
+
+ cardinality _ = 2 ^ cardinality (Proxy :: Proxy a)
+ -- type Cardinality (Set a) = 2 ^ (Cardinality a)
+
+ enumerated = allPredicatesAt enumerated
+
+--------------------------------------------------
+
+{-| TODO
+
+-}
+
+allPredicatesAt
+  :: ()
+  => [a] -> [Predicate a]
+
+allPredicatesAt _ = []
+
+#endif
 
 --------------------------------------------------
 -- more base types:

@@ -97,15 +97,6 @@ import "exceptions" Control.Monad.Catch (MonadThrow(..))
 
 
 
---------------------------------------------------
-#if HAS_BASE_Contravariant
-
-import qualified "base" Data.Contravariant as Contravariant
- ( Contravariant
- )
-
-#endif
-
 
 
 

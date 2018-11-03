@@ -107,7 +107,7 @@ toFunction
   :: (Enumerable a, Ord a)
   => Map a b -> Maybe (a -> b)
 
-toFunction m =
+toFunction m = 
 
   if   isMapTotal m
   then Just f
