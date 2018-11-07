@@ -9,7 +9,11 @@
 --------------------------------------------------
 --------------------------------------------------
 
-{-| see 'Between', 'clipBetween', 'isBetween', 'readBetween'. 
+{-| Type-Safe Bounded Intervals (Quick n Dirty).
+
+
+
+See 'Between', 'clipBetween', 'isBetween', 'readBetween'. 
 
 -}
 

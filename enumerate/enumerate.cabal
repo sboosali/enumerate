@@ -390,7 +390,8 @@ common Haskell2020Program
    --------------------
  
              -threaded
-             -rtsopts -with-rtsopts=-N             
+             -rtsopts
+             -with-rtsopts=-N             
  
    --------------------
    -- Warnings --------
@@ -425,6 +426,7 @@ library
                  Enumerate.Cardinality
                  Enumerate.Between
                  Enumerate.Modular
+                 Enumerate.Derived
 
                  Enumerate.Extra
                  Enumerate.Compatibility
@@ -447,6 +449,7 @@ library
 
  -----------------------------
 
+ --TODO add instance for each version.
  if flag(orphans) && impl(ghc >= 8.0) && impl(ghc <= 8.2)
     exposed-modules:
                     Enumerate.Orphans.GHC       
@@ -468,10 +471,6 @@ library
               , deepseq          >= 1.3
 
            -- , modular-arithmetic==1.2.*
-
- -----------------------------
-
- default-language: Haskell2010
 
  -----------------------------
 
@@ -509,6 +508,7 @@ library
   -- raise a warning into an error
   -- -Werror=missing-fields
 
+ -- TODO uncomment:
  -- if impl(ghc >= 8.0) && impl(ghc <= 8.4)
  --    exposed-modules:
  --       Enumerate.Orphans.GHC
@@ -516,8 +516,6 @@ library
  -- else   
  --    exposed-modules:
  --       Enumerate.Orphans.Large
-
- -----------------------------
 
 --------------------------------------------------
 -- Tests -----------------------------------------

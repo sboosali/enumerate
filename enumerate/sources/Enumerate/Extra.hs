@@ -32,6 +32,11 @@ import Prelude.Spiros hiding ((:*:),C) -- shadows GHC.Generics
 --------------------------------------------------
 --------------------------------------------------
 
+nat2int :: Natural -> Int
+nat2int = fromInteger . fromIntegral
+
+--------------------------------------------------
+
 int2natural :: Int -> Natural
 int2natural = fromInteger . toInteger
 
@@ -46,12 +51,15 @@ int2natural = fromInteger . toInteger
 
 powerSet :: (Ord a) => Set a -> Set (Set a) --TODO use [[a]]
 powerSet values =
-   Set.singleton values `Set.union` _Set_bind powerSet (dropEach values)
- where
- _Set_bind :: (Ord a, Ord b) => (a -> Set b) -> Set a -> Set b
- _Set_bind f = _Set_join . Set.map f
- _Set_join :: (Ord a) => Set (Set a) -> Set a
- _Set_join = Set.unions . Set.toList
+  Set.singleton values `Set.union` _Set_bind powerSet (dropEach values)
+
+  where
+
+  _Set_bind :: (Ord a, Ord b) => (a -> Set b) -> Set a -> Set b
+  _Set_bind f = _Set_join . Set.map f
+
+  _Set_join :: (Ord a) => Set (Set a) -> Set a
+  _Set_join = Set.unions . Set.toList
 
 --------------------------------------------------
 
@@ -62,8 +70,9 @@ powerSet values =
 
 dropEach :: (Ord a) => Set a -> Set (Set a)
 dropEach values = Set.map dropOne values
- where
- dropOne value = Set.delete value values
+
+  where
+  dropOne value = Set.delete value values
 
 --------------------------------------------------
 --------------------------------------------------

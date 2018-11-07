@@ -41,7 +41,7 @@ import "exceptions" Control.Monad.Catch (MonadThrow(..))
 -- Imports: Standard Library ---------------------
 --------------------------------------------------
 
-import qualified Data.Map as Map
+import qualified "containers" Data.Map as Map
 import           Data.Map (Map)
 
 --------------------------------------------------
@@ -431,7 +431,7 @@ displayFunction = reifyFunction
 
   where
 
-  displayCase (x,y) = intercalate " " ["", show x, "->", show y]
+  displayCase (x,y) = intercalate " " ["", show x, "->", show y] --TODO refactor to Text.Printf for clarity(?)
 
 --------------------------------------------------
 
