@@ -89,14 +89,12 @@ import Enumerate.Extra
 --------------------------------------------------
 
 import Data.Vinyl               (Rec(..))
-import Control.DeepSeq          (force)
 
 --------------------------------------------------
 
 import qualified Data.Set as Set
 import           GHC.Generics
-import System.Timeout           (timeout)
-import Data.Ix                  (Ix(..))
+-- import System.Timeout           (timeout)
 -- import GHC.TypeLits          (Nat, KnownNat, natVal, type (+), type (*), type (^))
 
 --------------------------------------------------
@@ -834,6 +832,109 @@ instance (GEnumerable (f)) => GEnumerable (M1 D t f) where
  genumerated    = M1 <$> genumerated
  gcardinality _ = gcardinality (Proxy :: Proxy (f))
  {-# INLINE gcardinality #-}
+
+--------------------------------------------------
+-- Utilities -------------------------------------
+--------------------------------------------------
+
+{- | 
+
+@'boundedEnumerated' = 'enumFromTo' 'minBound' 'maxBound'
+@
+
+= Usage
+
+for non-'Generic' Bounded Enums:
+
+@
+instance Enumerable ... where
+ 'enumerated'  = 'boundedEnumerated'
+ 'cardinality' = 'boundedCardinality'
+@
+
+-}
+
+boundedEnumerated :: (Bounded a, Enum a) => [a]
+boundedEnumerated = enumFromTo minBound maxBound
+
+{-# INLINE boundedEnumerated #-}
+
+--------------------------------------------------
+
+{-| for non-'Generic' Bounded Enums.
+
+Assuming 'Bounded' is correct, safely stop the enumeration
+(and know where to start).
+
+behavior may be undefined when the cardinality of @a@ is larger than
+the cardinality of @Int@. this should be okay, as @Int@ is at least as big as
+@Int64@, which is at least as big as all the monomorphic types in @base@ that
+instantiate @Bounded@. you can double-check with:
+
+>>> boundedCardinality (const (undefined::Int))   -- platform specific
+18446744073709551616
+
+@
+-- i.e. 1 + 9223372036854775807 - (-9223372036854775808)
+@
+
+Works with non-zero-based Enum instances, like @Int64@ or a custom
+@toEnum/fromEnum@. Assumes the enumeration's numbering is
+contiguous,. e.g. if @fromEnum 0@ and @fromEnum 2@
+both exist, then @fromEnum 1@ should exist too.
+
+-}
+
+boundedCardinality
+  :: forall proxy a. (Bounded a, Enum a)
+  => proxy a -> Natural
+
+boundedCardinality _ = fromInteger (1 + maxA - minA)
+
+  where
+  minA = (toInteger (fromEnum (minBound :: a)))
+  maxA = (toInteger (fromEnum (maxBound :: a)))
+
+{-# INLINE boundedCardinality #-}
+
+--------------------------------------------------
+
+{- | 
+
+@'enumEnumerated' = 'enumFrom' ('toEnum' 0)
+@
+
+= Usage
+
+for non-'Generic' Enums:
+
+@
+instance Enumerable ... where
+ 'enumerated' = 'enumEnumerated'
+@
+
+the enum should still be bounded.
+
+WARNING the default 'cardinality' is slow
+(@O(n)@ in the 'length' of 'enumerated').
+
+-}
+
+enumEnumerated :: (Enum a) => [a]
+enumEnumerated = enumFrom (toEnum 0)
+
+{-# INLINE enumEnumerated #-}
+
+--------------------------------------------------
+
+{-| Type-Cast 'cardinality'.
+
+-}
+
+intCardinality :: (Enumerable a) => proxy a -> Int
+intCardinality proxy = nat2int (cardinality proxy)
+
+{-# INLINE intCardinality #-}
 
 --------------------------------------------------
 --------------------------------------------------
