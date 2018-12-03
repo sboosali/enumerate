@@ -200,7 +200,7 @@ range_Enumerable
   :: forall a. (Enumerable a, Ord a)
   => (a,a) -> [a]
 
-range_Enumerable = _
+range_Enumerable = rangeE
 
 {-# INLINE range_Enumerable #-}
 

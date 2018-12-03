@@ -227,7 +227,9 @@ class Enumerable a where
  -- cardinality _ = gcardinality (Proxy :: Proxy (Rep a))
  -- TODO merge both methods into one that returns their pair
 
- rangeE :: (Eq a) => (a,a) -> [a]
+ rangeE :: (a,a) -> [a]
+
+ default rangeE :: (Eq a) => (a,a) -> [a]
  rangeE = rangeWith enumerated
 
  -- indexE :: (a,a) -> a -> Int
@@ -306,12 +308,12 @@ instance Enumerable (Proxy a)
 
 --------------------------------------------------
 
-instance (Enumerable a) => Enumerable (Identity a) where
+instance (Eq a, Enumerable a) => Enumerable (Identity a) where
   enumerated = Identity <$> enumerated
 
 --------------------------------------------------
 
-instance (Enumerable a) => Enumerable (Const a b) where
+instance (Eq a, Enumerable a) => Enumerable (Const a b) where
   enumerated = Const <$> enumerated
 
 --------------------------------------------------
@@ -400,7 +402,7 @@ the 'cardinality' is the sum of the cardinalities of @a@ and @b@.
 
 -}
 
-instance (Enumerable a, Enumerable b) => Enumerable (Either a b) where
+instance (Eq a, Enumerable a, Eq b, Enumerable b) => Enumerable (Either a b) where
  -- type Cardinality (Either a b) = (Cardinality a) + (Cardinality b)
  enumerated    = (Left <$> enumerated) ++ (Right <$> enumerated)
  cardinality _ = cardinality (Proxy :: Proxy a) + cardinality (Proxy :: Proxy b)
@@ -409,7 +411,7 @@ instance (Enumerable a, Enumerable b) => Enumerable (Either a b) where
 
 {-| -}
 
-instance (Enumerable a) => Enumerable (Maybe a) where
+instance (Eq a, Enumerable a) => Enumerable (Maybe a) where
  -- type Cardinality (Maybe a) = 1 + (Cardinality a)
  enumerated    = Nothing : (Just <$> enumerated)
  cardinality _ = 1 + cardinality (Proxy :: Proxy a)
@@ -425,26 +427,26 @@ the 'cardinality' is the product of the cardinalities of @a@ and @b@.
 
 -}
 
-instance (Enumerable a, Enumerable b) => Enumerable (a, b) --where
+instance (Eq a, Enumerable a, Eq b, Enumerable b) => Enumerable (a, b) --where
  -- enumerated    = (,) <$> enumerated <*> enumerated
  -- cardinality _ = cardinality (Proxy :: Proxy a) * cardinality (Proxy :: Proxy b)
 
 --------------------------------------------------
 
 -- | 3
-instance (Enumerable a, Enumerable b, Enumerable c) => Enumerable (a, b, c)
+instance (Eq a, Eq b, Eq c, Enumerable a, Enumerable b, Enumerable c) => Enumerable (a, b, c)
 -- | 4
-instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d) => Enumerable (a, b, c, d)
+instance (Eq a, Eq b, Eq c, Eq d, Enumerable a, Enumerable b, Enumerable c, Enumerable d) => Enumerable (a, b, c, d)
 -- | 5
-instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e) => Enumerable (a, b, c, d, e)
+instance (Eq a, Eq b, Eq c, Eq d, Eq e, Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e) => Enumerable (a, b, c, d, e)
 -- | 6
-instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f) => Enumerable (a, b, c, d, e, f)
+instance (Eq a, Eq b, Eq c, Eq d, Eq e, Eq f, Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f) => Enumerable (a, b, c, d, e, f)
 -- | 7
-instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g) => Enumerable (a, b, c, d, e, f, g)
+instance (Eq a, Eq b, Eq c, Eq d, Eq e, Eq f, Eq g, Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g) => Enumerable (a, b, c, d, e, f, g)
 
 --------------------------------------------------
 
--- instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g, Enumerable h) => Enumerable (a, b, c, d, e, f, g, h)
+-- instance (Eq a, ..., Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g, Enumerable h) => Enumerable (a, b, c, d, e, f, g, h)
 {-
 Could not deduce (Generic (a, b, c, d, e, f, g, h))
      arising from a use of `Enumerate.Types.$gdmenumerated'
@@ -613,12 +615,12 @@ instance Enumerable FormatSign where
 instance Enumerable Monoid.All
 instance Enumerable Monoid.Any
 
-instance (Enumerable a) => Enumerable (Monoid.Dual    a)
-instance (Enumerable a) => Enumerable (Monoid.First   a)
-instance (Enumerable a) => Enumerable (Monoid.Last    a)
+instance (Eq a, Enumerable a) => Enumerable (Monoid.Dual    a)
+instance (Eq a, Enumerable a) => Enumerable (Monoid.First   a)
+instance (Eq a, Enumerable a) => Enumerable (Monoid.Last    a)
 
-instance (Enumerable a) => Enumerable (Monoid.Sum     a)
-instance (Enumerable a) => Enumerable (Monoid.Product a)
+instance (Eq a, Enumerable a) => Enumerable (Monoid.Sum     a)
+instance (Eq a, Enumerable a) => Enumerable (Monoid.Product a)
 
 instance (Enumerable (a -> a)) => Enumerable (Monoid.Endo a)
 
@@ -627,24 +629,24 @@ instance (Enumerable (f a))   => Enumerable (Monoid.Alt f a)
 --------------------------------------------------
 #if HAS_BASE_Semigroup
 
-instance (Enumerable a) => Enumerable (Semigroup.Option a)
+instance (Eq a, Enumerable a) => Enumerable (Semigroup.Option a)
 
-instance (Enumerable a) => Enumerable (Semigroup.First  a)
-instance (Enumerable a) => Enumerable (Semigroup.Last   a)
+instance (Eq a, Enumerable a) => Enumerable (Semigroup.First  a)
+instance (Eq a, Enumerable a) => Enumerable (Semigroup.Last   a)
 
-instance (Enumerable a) => Enumerable (Semigroup.Min    a)
-instance (Enumerable a) => Enumerable (Semigroup.Max    a)
+instance (Eq a, Enumerable a) => Enumerable (Semigroup.Min    a)
+instance (Eq a, Enumerable a) => Enumerable (Semigroup.Max    a)
 
 #endif
 --------------------------------------------------
 
-instance (Enumerable a) => Enumerable (Complex a) where
+instance (Eq a, Enumerable a) => Enumerable (Complex a) where
   enumerated = (:+) <$> enumerated <*> enumerated
 
 {-| (@a@ can be any @Enumerable@,
 unlike the @Enum@ instance where @a@ is an @Integral@).
 -}
--- instance (Enumerable a) => Enumerable (Ratio a) where
+-- instance (Eq a, Enumerable a) => Enumerable (Ratio a) where
 --   enumerated = (%) <$> enumerated <*> enumerated
 
 --------------------------------------------------
@@ -789,7 +791,7 @@ instance GEnumerable (U1) where
 {-| call 'enumerated'
 -}
 
-instance (Enumerable a) => GEnumerable (K1 R a) where
+instance (Eq a, Enumerable a) => GEnumerable (K1 R a) where
  -- type GCardinality (K1 R a) = Cardinality a
  genumerated    = K1 <$> enumerated
  gcardinality _ = cardinality (Proxy :: Proxy a)
