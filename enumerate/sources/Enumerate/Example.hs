@@ -243,19 +243,19 @@ demoEnumerated :: [Demo Bool]
 demoEnumerated = enumerated
 
 instance Bounded (Demo Bool) where
- minBound = minBound_enumerable array_DemoBool
- maxBound = maxBound_enumerable array_DemoBool
+ minBound = minBound_Enumerable array_DemoBool
+ maxBound = maxBound_Enumerable array_DemoBool
 
 instance Enum (Demo Bool) where
- toEnum   = toEnum_enumerable   array_DemoBool
- fromEnum = fromEnum_enumerable table_DemoBool
+ toEnum   = toEnum_Enumerable   array_DemoBool
+ fromEnum = fromEnum_Enumerable table_DemoBool
 
 -- CAF
 array_DemoBool :: Array Int (Demo Bool)
-array_DemoBool = array_enumerable
+array_DemoBool = array_Enumerable
 
 -- CAF
 table_DemoBool :: Map (Demo Bool) Int
-table_DemoBool = table_enumerable
+table_DemoBool = table_Enumerable
 
 -------------------------------------------------------

@@ -227,6 +227,13 @@ class Enumerable a where
  -- cardinality _ = gcardinality (Proxy :: Proxy (Rep a))
  -- TODO merge both methods into one that returns their pair
 
+ rangeE :: (Eq a) => (a,a) -> [a]
+ rangeE = rangeWith enumerated
+
+ -- indexE :: (a,a) -> a -> Int
+
+ -- withinE :: (a,a) -> a -> Bool
+
 --------------------------------------------------
 
 {-ERROR

@@ -21,10 +21,21 @@ import Enumerate.Extra
 --------------------------------------------------
 
 --TODO IntMap
-import qualified Data.Array as Array
-import Data.Array (Array, (!))
-import qualified Data.Map as Map
-import Data.Map (Map)
+
+-- import qualified Data.Array as Array
+-- import Data.Array (Array, (!))
+
+-- import qualified Data.Map as Map
+-- import Data.Map (Map)
+
+--------------------------------------------------
+
+import "base" System.Timeout (timeout)
+
+import "base" Data.Ix
+
+--------------------------------------------------
+
 import Prelude (error)
 
 --------------------------------------------------

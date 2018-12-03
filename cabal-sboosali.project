@@ -1,0 +1,80 @@
+-- Usage
+-- =====
+-- 
+-- $ cabal new-build all --project-file="cabal-sboosali.project"
+-- 
+-- $ cp cabal-sboosali.project cabal.project.local
+-- 
+
+--------------------------------------------------
+--------------------------------------------------
+packages: ./enumerate/
+          ./enumerate-function/
+
+--------------------------------------------------
+optional-packages: ../spiros/spiros/
+
+--------------------------------------------------
+-- LocalFlags (i.e. only for project/vendored packages)
+--------------------------------------------------
+
+flags: +develop
+
+-- > Flags are per-package, so it doesn’t make much sense to specify flags at the top-level, unless you happen to know that all of your local packages support the same named flags. If a flag is not supported by a package, it is ignored.
+
+--------------------------------------------------
+
+tests:      True
+benchmarks: True
+coverage:   True
+
+--------------------------------------------------
+
+documentation:            True
+haddock-hyperlink-source: True
+
+--------------------------------------------------
+
+-- package enumerate
+-- package enumerate-function/
+
+--------------------------------------------------
+-- GlobalFlags (i.e. only for installed/dependency packages)
+--------------------------------------------------
+
+---profiling:    True
+---optimization: 2
+
+--------------------------------------------------
+
+package *
+  documentation:            True
+  haddock-hyperlink-source: True
+
+--------------------------------------------------
+
+constraints:
+  -- see https://github.com/haskell-infra/hackage-trustees/issues/119
+  foundation >=0.0.14
+
+--------------------------------------------------
+-- Meta
+--------------------------------------------------
+
+jobs: 6
+
+--------------------------------------------------
+
+repository stackage-lts-12.12
+  url: https://www.stackage.org/lts-12.12
+
+  -- From:
+  -- https://www.stackage.org/lts-12.12/cabal.config?global=true
+
+--------------------------------------------------
+-- Notes -----------------------------------------
+--------------------------------------------------
+
+-- this « cabal-*.project » file is for « sboosali »'s local development.
+
+--------------------------------------------------

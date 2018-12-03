@@ -27,12 +27,12 @@ data B a
   deriving (Show,Eq,Ord,Generic,Enumerable)
 
 instance Bounded (B Bool) where
- minBound = minBound_enumerable' -- fast via laziness of lists, but arrays are spine-strict
- maxBound = maxBound_enumerable' 
+ minBound = minBound_Enumerable' -- fast via laziness of lists, but arrays are spine-strict
+ maxBound = maxBound_Enumerable' 
 
 instance Enum (B Bool) where
- toEnum   = toEnum_enumerable' 
- fromEnum = fromEnum_enumerable' -- needs Ord
+ toEnum   = toEnum_Enumerable' 
+ fromEnum = fromEnum_Enumerable' -- needs Ord
 
-things = [minBound_enumerable', maxBound_enumerable', toEnum_enumerable' 9] :: [B Bool]
+things = [minBound_Enumerable', maxBound_Enumerable', toEnum_Enumerable' 9] :: [B Bool]
 

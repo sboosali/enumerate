@@ -1,5 +1,5 @@
 cabal-version:       2.4
-                     -- ^ for « common » stanzas,
+                     -- ^ « v2.2 » provides « common » stanzas.
 build-type:          Simple
 
 --------------------------------------------------
@@ -80,7 +80,7 @@ source-repository head
 -- Flags -----------------------------------------
 --------------------------------------------------
 
-flag development
+flag develop
 
   default:     False
 
@@ -186,9 +186,16 @@ common Haskell2020Library
 
                 -Wtyped-holes
 
- ------------------------------
-  
- if flag(development) && impl(ghc >= 8.0)
+ -----------------------------
+
+ if flag(develop)
+ 
+    cpp-options: -DDEVELOP
+                 -- ^ Define the « DEVELOP » symbol for CPP.
+
+ -----------------------------
+
+ if flag(develop) && impl(ghc >= 8.0)
  
     ghc-options: -fdefer-typed-holes
                  -- ^ Use `typed-holes`, not `undefined`, during development.

@@ -14,6 +14,7 @@ module Enumerate.Extra
  ) where
 
 --------------------------------------------------
+-- Imports ---------------------------------------
 --------------------------------------------------
 
 import qualified "containers" Data.Set as Set
@@ -22,7 +23,12 @@ import qualified "containers" Data.Set as Set
 --------------------------------------------------
 
 -- import Language.Haskell.TH.Syntax (Name,nameBase)
-import Numeric.Natural
+import "base" Numeric.Natural
+
+--------------------------------------------------
+
+import qualified "base" Data.List as List
+import qualified "base" Data.Ord  as Ord
 
 --------------------------------------------------
 --------------------------------------------------
@@ -39,6 +45,18 @@ nat2int = fromInteger . fromIntegral
 
 int2natural :: Int -> Natural
 int2natural = fromInteger . toInteger
+
+--------------------------------------------------
+--------------------------------------------------
+
+{-| convert a power set to an isomorphic matrix, sorting the entries.
+
+(for @doctest@)
+
+-}
+
+powerset2matrix :: Set (Set a) -> [[a]]
+powerset2matrix = (List.sortBy (Ord.comparing length) . fmap Set.toList . Set.toList)
 
 --------------------------------------------------
 
@@ -73,6 +91,75 @@ dropEach values = Set.map dropOne values
 
   where
   dropOne value = Set.delete value values
+
+--------------------------------------------------
+--------------------------------------------------
+
+{-| 
+
+>>> digitRange = rangeWith [1..10]
+>>> digitRange (2,2)
+[2]
+>>> digitRange (2,3)
+[2,3]
+>>> digitRange (2,4)
+[2,3,4]
+>>> digitRange (0,10)
+[]
+
+--TODO:
+-- >>> digitRange (4,2)
+-- []
+
+-}
+
+rangeWith
+  :: (Eq a)
+  => [a] -> (a,a) -> [a]
+rangeWith ordered = go
+  where
+
+  go (x, y)                     -- i.e. « (LowerBound, UpperBound) ».
+    = if   x == y
+      then [x]
+      else ( appendUnlessEmpty y
+           . takeWhile (/= y)
+           . dropWhile (/= x)
+           )
+           ordered
+
+  appendUnlessEmpty y xs = case xs of -- TODO hacky
+          []    -> []
+          (_:_) -> xs ++ [y] 
+
+ -- . (++ [y])
+
+{-# INLINE rangeWith #-}
+
+--------------------------------------------------
+
+--------------------------------------------------
+
+-- {-| 
+
+-- >>> betweenOneAndTen = withinWith [1..10]
+-- >>> betweenOneAndTen 0
+-- False
+-- >>> betweenOneAndTen 10
+-- True
+
+-- -}
+
+-- withinWith
+--   :: (Eq a)
+--   => [a] -> (a,a) -> a -> Bool
+-- withinWith ordered = go
+--   where
+
+--   go (a, c) b
+--     = _
+
+-- {-# INLINE withinWith #-}
 
 --------------------------------------------------
 --------------------------------------------------

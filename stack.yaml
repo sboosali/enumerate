@@ -1,8 +1,9 @@
-resolver: nightly-2017-12-09
+resolver: nightly-2018-12-09
 
 packages:
 - enumerate/
 - enumerate-function/ 
 
 extra-deps: 
-- spiros-0.0.0
+- ../spiros/spiros
+

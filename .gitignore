@@ -11,7 +11,7 @@ temporary/
 dist/
 dist-*/
 .ghc.environment.*
-cabal.project.local
+*.local
 *.o
 *.hi
 *.chi

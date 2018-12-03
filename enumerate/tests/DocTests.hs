@@ -62,7 +62,7 @@ main = do
 --------------------------------------------------
 
 sources = modules2filepaths "hs" "sources" $
-  "Enumerate Enumerate.Types Enumerate.Enum Enumerate.Cardinality Enumerate.Between Enumerate.Modular Enumerate.Example"
+  "Enumerate Enumerate.Types Enumerate.Enum Enumerate.Cardinality Enumerate.Between Enumerate.Modular Enumerate.Example Enumerate.Extra"
 
 --------------------------------------------------
 
@@ -73,15 +73,20 @@ flags = extensions ++ options
   ------------------------------
 
   extensions = extensions2flags $
-      "CPP NoImplicitPrelude ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveGeneric ExplicitNamespaces FlexibleContexts FlexibleInstances GADTs KindSignatures LambdaCase RankNTypes ScopedTypeVariables TupleSections TypeFamilies TypeOperators UndecidableInstances PackageImports"
+      "CPP NoImplicitPrelude ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveGeneric ExplicitNamespaces FlexibleContexts FlexibleInstances GADTs KindSignatures LambdaCase RankNTypes ScopedTypeVariables TupleSections TypeFamilies TypeOperators UndecidableInstances PackageImports ConstrainedClassMethods"
 #if HAS_EXTENSION_DerivingStrategies
    ++ " DerivingStrategies"
 #endif
 
   ------------------------------
 
-  options = [
-            ]
+  options = compilerFlags $
+      ""
+#if DEVELOP
+   ++ " defer-typed-holes"
+#endif
+
+  ------------------------------
 
 --------------------------------------------------
 -- Utilities -------------------------------------
@@ -104,6 +109,11 @@ printBlank = putStrLn ""
 
 extensions2flags :: String -> [String]
 extensions2flags = fmap ("-X"++) . words
+
+--------------------------------------------------
+
+compilerFlags :: String -> [String]
+compilerFlags = fmap ("-f"++) . words
 
 --------------------------------------------------
 
