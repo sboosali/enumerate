@@ -595,12 +595,11 @@ benchmark command
  default-language: Haskell2010
  ghc-options:      -Wall -threaded -rtsopts -with-rtsopts=-N
 
- build-depends:
-               base
-             , enumerate-function
-             , criterion
-             , deepseq
+ build-depends: base
+              , enumerate
+              , enumerate-function
 
--- $ stack bench
+              , criterion
+              , deepseq
 
 --------------------------------------------------
