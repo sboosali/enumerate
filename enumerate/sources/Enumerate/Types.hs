@@ -182,7 +182,7 @@ enumerates depth first.
 
 @Enumerable@ can be implemented automatically via its 'Generic' instance.
 
-= Laws
+== Laws
 
 [Finite] @'cardinality' /= _|_@
 
@@ -203,7 +203,56 @@ So you can index the 'enumerated' with a nonnegative index below the 'cardinalit
 
 ("inputs" a type, outputs a list of values).
 
-= Examples
+== Methods
+
+@Enumerable@'s methods are:
+
+* @'enumerated' :: [a]@
+* @'enumeratedArray' :: 'Array' Int a
+* @'enumeratedTable' :: 'IntMap' a@
+* @'enumeratedIndex' :: 'Map' a 'Int'@
+* @'toEnumerable' :: 'Int' -> a@
+* @'fromEnumerable' :: a -> 'Int'@
+* @'cardinality' :: _ -> 'Natural'@
+
+All methods are optional (being either generically-deriveable or defaultable-from-other-methods).
+
+These methods are isomorphic:
+
+* 'enumerated'
+* 'enumeratedArray'
+* 'enumeratedTable'
+* 'toEnumerable'
+
+A list is, implicitly: a partial mapping from (a prefix-sequence of) the naturals to some type.
+
+Also, these methods are isomorphic:
+
+* @'enumeratedIndex', which inverts 'enumeratedTable';
+* @'fromEnumerable', which inverts 'toEnumerable';
+
+These methods are "structural representations":
+
+* 'enumerated'
+* 'enumeratedTable'
+* 'enumeratedArray'
+* 'enumeratedIndex'
+
+While these methods are "functional representations":
+
+* 'toEnumerable'
+* 'fromEnumerable'
+
+Each has different time/space characteristics w.r.t. access.
+
+'cardinality' can (and should) be overriden for performance (but don't lie!).
+
+== Usage
+
+@TODO
+@
+
+== Examples
 
 >>> enumerated :: [Bool]
 [False,True]
@@ -214,23 +263,54 @@ So you can index the 'enumerated' with a nonnegative index below the 'cardinalit
 
 class Enumerable a where
 
- enumerated :: [a]
+ ----------------------------
+
+ enumerated      :: [a]
+
+ -- enumeratedArray :: Array Int a
+ -- enumeratedArray = Array.fromList (zipWithIndicesL enumerated)
+
+ -- enumeratedTable :: IntMap a
+ -- enumeratedTable = IntMap.fromList (zipWithIndicesL enumerated)
+
+ -- enumeratedIndex :: Map a Int
+ -- enumeratedIndex = Map.fromList (zipWithIndicesR enumerated)
+
+ -- toEnumerable :: Int -> Maybe a
+ -- toEnumerable i = Array.lookup i enumeratedArray  --TODO
+
+ -- fromEnumerable :: a -> Int
+ -- fromEnumerable x = fromJust (Map.lookup x enumeratedIndex)
+
+ cardinality :: proxy a -> Natural
+ cardinality _ = genericLength (enumerated :: [a])
+
+ ----------------------------
 
  default enumerated :: (Generic a, GEnumerable (Rep a)) => [a]
  enumerated = to <$> genumerated
 
- cardinality :: proxy a -> Natural
- cardinality _ = genericLength (enumerated :: [a])
- -- overrideable for performance, but don't lie!
+ -- default enumeratedArray :: (Generic a, GEnumerableArray (Rep a)) => Array Int a
+ -- enumeratedArray = to <$> genumeratedArray
+
+ -- default enumeratedTable :: (Generic a, GEnumerableTable (Rep a)) => IntMap a
+ -- enumeratedTable = to <$> genumeratedTable
+
+ -- default enumeratedIndex :: (Generic a, GEnumerableIndex (Rep a)) => Map a Int
+ -- enumeratedIndex = from >$< genumeratedIndex
+
+ -- default toEnumerable :: Int -> Maybe a
+ -- toEnumerable = gtoEnumerable
+
+ -- default fromEnumerable :: a -> Int
+ -- fromEnumerable = gfromEnumerable
 
  -- default cardinality :: (Generic a, GEnumerable (Rep a)) => proxy a -> Natural
  -- cardinality _ = gcardinality (Proxy :: Proxy (Rep a))
  -- TODO merge both methods into one that returns their pair
 
- rangeE :: (a,a) -> [a]
-
- default rangeE :: (Eq a) => (a,a) -> [a]
- rangeE = rangeWith enumerated
+ -- rangeE :: (Eq a) => (a,a) -> [a]
+ -- rangeE = rangeWith enumerated
 
  -- indexE :: (a,a) -> a -> Int
 
@@ -308,12 +388,12 @@ instance Enumerable (Proxy a)
 
 --------------------------------------------------
 
-instance (Eq a, Enumerable a) => Enumerable (Identity a) where
+instance (Enumerable a) => Enumerable (Identity a) where
   enumerated = Identity <$> enumerated
 
 --------------------------------------------------
 
-instance (Eq a, Enumerable a) => Enumerable (Const a b) where
+instance (Enumerable a) => Enumerable (Const a b) where
   enumerated = Const <$> enumerated
 
 --------------------------------------------------
@@ -402,7 +482,7 @@ the 'cardinality' is the sum of the cardinalities of @a@ and @b@.
 
 -}
 
-instance (Eq a, Enumerable a, Eq b, Enumerable b) => Enumerable (Either a b) where
+instance (Enumerable a, Enumerable b) => Enumerable (Either a b) where
  -- type Cardinality (Either a b) = (Cardinality a) + (Cardinality b)
  enumerated    = (Left <$> enumerated) ++ (Right <$> enumerated)
  cardinality _ = cardinality (Proxy :: Proxy a) + cardinality (Proxy :: Proxy b)
@@ -411,7 +491,7 @@ instance (Eq a, Enumerable a, Eq b, Enumerable b) => Enumerable (Either a b) whe
 
 {-| -}
 
-instance (Eq a, Enumerable a) => Enumerable (Maybe a) where
+instance (Enumerable a) => Enumerable (Maybe a) where
  -- type Cardinality (Maybe a) = 1 + (Cardinality a)
  enumerated    = Nothing : (Just <$> enumerated)
  cardinality _ = 1 + cardinality (Proxy :: Proxy a)
@@ -427,26 +507,26 @@ the 'cardinality' is the product of the cardinalities of @a@ and @b@.
 
 -}
 
-instance (Eq a, Enumerable a, Eq b, Enumerable b) => Enumerable (a, b) --where
+instance (Enumerable a, Enumerable b) => Enumerable (a, b) --where
  -- enumerated    = (,) <$> enumerated <*> enumerated
  -- cardinality _ = cardinality (Proxy :: Proxy a) * cardinality (Proxy :: Proxy b)
 
 --------------------------------------------------
 
 -- | 3
-instance (Eq a, Eq b, Eq c, Enumerable a, Enumerable b, Enumerable c) => Enumerable (a, b, c)
+instance (Enumerable a, Enumerable b, Enumerable c) => Enumerable (a, b, c)
 -- | 4
-instance (Eq a, Eq b, Eq c, Eq d, Enumerable a, Enumerable b, Enumerable c, Enumerable d) => Enumerable (a, b, c, d)
+instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d) => Enumerable (a, b, c, d)
 -- | 5
-instance (Eq a, Eq b, Eq c, Eq d, Eq e, Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e) => Enumerable (a, b, c, d, e)
+instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e) => Enumerable (a, b, c, d, e)
 -- | 6
-instance (Eq a, Eq b, Eq c, Eq d, Eq e, Eq f, Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f) => Enumerable (a, b, c, d, e, f)
+instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f) => Enumerable (a, b, c, d, e, f)
 -- | 7
-instance (Eq a, Eq b, Eq c, Eq d, Eq e, Eq f, Eq g, Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g) => Enumerable (a, b, c, d, e, f, g)
+instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g) => Enumerable (a, b, c, d, e, f, g)
 
 --------------------------------------------------
 
--- instance (Eq a, ..., Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g, Enumerable h) => Enumerable (a, b, c, d, e, f, g, h)
+-- instance (Enumerable a, Enumerable b, Enumerable c, Enumerable d, Enumerable e, Enumerable f, Enumerable g, Enumerable h) => Enumerable (a, b, c, d, e, f, g, h)
 {-
 Could not deduce (Generic (a, b, c, d, e, f, g, h))
      arising from a use of `Enumerate.Types.$gdmenumerated'
@@ -615,12 +695,12 @@ instance Enumerable FormatSign where
 instance Enumerable Monoid.All
 instance Enumerable Monoid.Any
 
-instance (Eq a, Enumerable a) => Enumerable (Monoid.Dual    a)
-instance (Eq a, Enumerable a) => Enumerable (Monoid.First   a)
-instance (Eq a, Enumerable a) => Enumerable (Monoid.Last    a)
+instance (Enumerable a) => Enumerable (Monoid.Dual    a)
+instance (Enumerable a) => Enumerable (Monoid.First   a)
+instance (Enumerable a) => Enumerable (Monoid.Last    a)
 
-instance (Eq a, Enumerable a) => Enumerable (Monoid.Sum     a)
-instance (Eq a, Enumerable a) => Enumerable (Monoid.Product a)
+instance (Enumerable a) => Enumerable (Monoid.Sum     a)
+instance (Enumerable a) => Enumerable (Monoid.Product a)
 
 instance (Enumerable (a -> a)) => Enumerable (Monoid.Endo a)
 
@@ -629,24 +709,24 @@ instance (Enumerable (f a))   => Enumerable (Monoid.Alt f a)
 --------------------------------------------------
 #if HAS_BASE_Semigroup
 
-instance (Eq a, Enumerable a) => Enumerable (Semigroup.Option a)
+instance (Enumerable a) => Enumerable (Semigroup.Option a)
 
-instance (Eq a, Enumerable a) => Enumerable (Semigroup.First  a)
-instance (Eq a, Enumerable a) => Enumerable (Semigroup.Last   a)
+instance (Enumerable a) => Enumerable (Semigroup.First  a)
+instance (Enumerable a) => Enumerable (Semigroup.Last   a)
 
-instance (Eq a, Enumerable a) => Enumerable (Semigroup.Min    a)
-instance (Eq a, Enumerable a) => Enumerable (Semigroup.Max    a)
+instance (Enumerable a) => Enumerable (Semigroup.Min    a)
+instance (Enumerable a) => Enumerable (Semigroup.Max    a)
 
 #endif
 --------------------------------------------------
 
-instance (Eq a, Enumerable a) => Enumerable (Complex a) where
+instance (Enumerable a) => Enumerable (Complex a) where
   enumerated = (:+) <$> enumerated <*> enumerated
 
 {-| (@a@ can be any @Enumerable@,
 unlike the @Enum@ instance where @a@ is an @Integral@).
 -}
--- instance (Eq a, Enumerable a) => Enumerable (Ratio a) where
+-- instance (Enumerable a) => Enumerable (Ratio a) where
 --   enumerated = (%) <$> enumerated <*> enumerated
 
 --------------------------------------------------
@@ -791,7 +871,7 @@ instance GEnumerable (U1) where
 {-| call 'enumerated'
 -}
 
-instance (Eq a, Enumerable a) => GEnumerable (K1 R a) where
+instance (Enumerable a) => GEnumerable (K1 R a) where
  -- type GCardinality (K1 R a) = Cardinality a
  genumerated    = K1 <$> enumerated
  gcardinality _ = cardinality (Proxy :: Proxy a)

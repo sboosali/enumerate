@@ -200,7 +200,7 @@ range_Enumerable
   :: forall a. (Enumerable a, Ord a)
   => (a,a) -> [a]
 
-range_Enumerable = rangeE
+range_Enumerable = rangeWith enumerated
 
 {-# INLINE range_Enumerable #-}
 
@@ -216,7 +216,7 @@ unsafeIndex_Enumerable
   :: forall a. (Enumerable a, Ord a)
   => (a,a) -> a -> Int
 
-unsafeIndex_Enumerable = _
+unsafeIndex_Enumerable = _indexWith _enumerated
 
 {-# INLINE unsafeIndex_Enumerable #-}
 
@@ -233,7 +233,7 @@ inRange_Enumerable
   :: forall a. (Enumerable a, Ord a)
   => (a,a) -> a -> Bool
 
-inRange_Enumerable = _
+inRange_Enumerable = _withinWith _enumerated
 
 {-# INLINE inRange_Enumerable #-}
 

@@ -12,7 +12,7 @@ optional-packages:
 -- LocalFlags (i.e. only for project/vendored packages)
 --------------------------------------------------
 
-documentation:            True
+documentation:            False
 haddock-hyperlink-source: True
 
 --------------------------------------------------
@@ -42,11 +42,18 @@ jobs: 6
 
 --------------------------------------------------
 
-repository stackage-lts-12.12
-  url: https://www.stackage.org/lts-12.12
+repository stackage-lts-13.9
+  url: https://www.stackage.org/lts-13.9
 
-  -- From:
-  -- https://www.stackage.org/lts-12.12/cabal.config?global=true
+-- LTS Haskell 13.09 (ghc-8.6.3)
+
+--------------------------------------------------
+
+repository stackage-lts-12.26
+  url: https://www.stackage.org/lts-12.26
+
+-- LTS Haskell 12.22 (ghc-8.4.4)
+-- Published on 2018-12-09
 
 --------------------------------------------------
 -- Notes -----------------------------------------

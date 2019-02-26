@@ -54,13 +54,14 @@ tested-with: GHC == 8.6.1
 
 --------------------------------------------------
 
-license:             BSD-4-Clause
-copyright:           2018 Sam Boosalis
+license:             Apache-2.0
+copyright:           2019 Sam Boosalis
 license-file:        LICENSE
 
 --------------------------------------------------
 
 extra-source-files: README.md
+                    LICENSE
 
 --data-files:
 --  data/

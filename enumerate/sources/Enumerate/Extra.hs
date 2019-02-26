@@ -49,6 +49,38 @@ int2natural = fromInteger . toInteger
 --------------------------------------------------
 --------------------------------------------------
 
+{-|
+
+>>> zipWithIndicesL "abc" :: [(Int, Char)]
+[(0,'a'),(1,'b'),(2,'c')]
+
+--TODO prop> \xs -> zipWithIndicesL xs = fmap swp (zipWithIndicesR xs)
+
+-}
+
+zipWithIndicesL
+  :: forall i a. (Num i, Enum i)
+  => [a] -> [(i,a)]
+zipWithIndicesL xs = zip [0..] xs
+
+--------------------------------------------------
+
+{-|
+
+>>> zipWithIndicesR "abc" :: [(Char, Int)]
+[('a',0),('b',1),('c',2)]
+
+--TODO prop> \xs -> zipWithIndicesR xs = fmap swp (zipWithIndicesL xs)
+
+-}
+
+zipWithIndicesR
+  :: forall i a. (Num i, Enum i)
+  => [a] -> [(a,i)]
+zipWithIndicesR xs = zip xs [0..]
+
+--------------------------------------------------
+
 {-| convert a power set to an isomorphic matrix, sorting the entries.
 
 (for @doctest@)
@@ -137,6 +169,27 @@ rangeWith ordered = go
 {-# INLINE rangeWith #-}
 
 --------------------------------------------------
+
+-- {-| 
+
+-- >>> = indexWith [1..10]
+-- >>>  0
+-- False
+-- >>>  10
+-- True
+
+-- -}
+
+-- indexWith
+--   :: (Eq a)
+--   => [a] -> (a,a) -> a -> Bool
+-- indexWith ordered = go
+--   where
+
+--   go (a, c) b
+--     = _
+
+-- {-# INLINE indexWith #-}
 
 --------------------------------------------------
 
