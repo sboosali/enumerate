@@ -9,33 +9,32 @@
 
 module Enumerate.Extra
 
- ( module Enumerate.Extra
- , module Prelude.Spiros
+ ( module Enumerate.Prelude
+ , module Enumerate.Extra
  ) where
 
 --------------------------------------------------
 -- Imports ---------------------------------------
 --------------------------------------------------
 
+import Enumerate.Prelude
+
+--------------------------------------------------
+--------------------------------------------------
+
 import qualified "containers" Data.Set as Set
 
 --------------------------------------------------
---------------------------------------------------
 
 -- import Language.Haskell.TH.Syntax (Name,nameBase)
-import "base" Numeric.Natural
-
---------------------------------------------------
 
 import qualified "base" Data.List as List
 import qualified "base" Data.Ord  as Ord
 
---------------------------------------------------
---------------------------------------------------
-
-import Prelude.Spiros hiding ((:*:),C) -- shadows GHC.Generics
+import           "base" Numeric.Natural
 
 --------------------------------------------------
+-- Definitions -----------------------------------
 --------------------------------------------------
 
 nat2int :: Natural -> Int
@@ -148,6 +147,7 @@ dropEach values = Set.map dropOne values
 rangeWith
   :: (Eq a)
   => [a] -> (a,a) -> [a]
+
 rangeWith ordered = go
   where
 

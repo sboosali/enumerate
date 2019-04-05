@@ -106,14 +106,14 @@ toEnum_Enumerable as = \i -> (as ! i)
 
 -- i.e. (!) --TODO safe get:  (__fromJust__ "toEnum")
 
-{-# INLINE toEnum_Enumerable #-}
+{-# INLINEABLE toEnum_Enumerable #-}
 
 --------------------------------------------------
 
 fromEnum_Enumerable :: forall a. (Enumerable a, Ord a) => Map a Int -> (a -> Int)
 fromEnum_Enumerable as = \x -> (__fromJust__ "fromEnum") (Map.lookup x as)
 
-{-# INLINE fromEnum_Enumerable #-}
+{-# INLINEABLE fromEnum_Enumerable #-}
 
 --------------------------------------------------
 --------------------------------------------------
@@ -139,7 +139,7 @@ fromEnumDefault = fromEnum_Enumerable table_Enumerable
 minBound_Enumerable' :: forall a. (Enumerable a) => a 
 minBound_Enumerable' = minBound_Enumerable array_Enumerable
 
-{-# INLINE minBound_Enumerable' #-}
+{-# INLINEABLE minBound_Enumerable' #-}
 
 --TODO check core for sharing
 
@@ -148,7 +148,7 @@ minBound_Enumerable' = minBound_Enumerable array_Enumerable
 maxBound_Enumerable' :: forall a. (Enumerable a) => a
 maxBound_Enumerable' = maxBound_Enumerable array_Enumerable
 
-{-# INLINE maxBound_Enumerable' #-}
+{-# INLINEABLE maxBound_Enumerable' #-}
 
 --------------------------------------------------
 --------------------------------------------------
@@ -156,14 +156,14 @@ maxBound_Enumerable' = maxBound_Enumerable array_Enumerable
 toEnum_Enumerable' :: forall a. (Enumerable a) => (Int -> a)
 toEnum_Enumerable'   = toEnum_Enumerable   array_Enumerable
 
-{-# INLINE toEnum_Enumerable' #-}
+{-# INLINEABLE toEnum_Enumerable' #-}
 
 --------------------------------------------------
 
 fromEnum_Enumerable' :: forall a. (Enumerable a, Ord a) => (a -> Int)
 fromEnum_Enumerable' = fromEnum_Enumerable table_Enumerable
 
-{-# INLINE fromEnum_Enumerable' #-}
+{-# INLINEABLE fromEnum_Enumerable' #-}
 
 --------------------------------------------------
 --------------------------------------------------
@@ -171,7 +171,7 @@ fromEnum_Enumerable' = fromEnum_Enumerable table_Enumerable
 minBound_Enumerable :: forall a. (Enumerable a) => Array Int a -> a
 minBound_Enumerable as = (as ! 0) --TODO safe get:  (__fromJust__ "minBound")
 
-{-# INLINE minBound_Enumerable #-}
+{-# INLINEABLE minBound_Enumerable #-}
 
 --------------------------------------------------
 
@@ -184,7 +184,7 @@ maxBound_Enumerable as = (as ! (n-1))
 
 --TODO safe get:  (__fromJust__ "maxBound")
 
-{-# INLINE maxBound_Enumerable #-}
+{-# INLINEABLE maxBound_Enumerable #-}
 
 --------------------------------------------------
 -- « Ix » ----------------------------------------
@@ -202,7 +202,7 @@ range_Enumerable
 
 range_Enumerable = rangeWith enumerated
 
-{-# INLINE range_Enumerable #-}
+{-# INLINEABLE range_Enumerable #-}
 
 --------------------------------------------------
 
@@ -218,13 +218,13 @@ unsafeIndex_Enumerable
 
 unsafeIndex_Enumerable = _indexWith _enumerated
 
-{-# INLINE unsafeIndex_Enumerable #-}
+{-# INLINEABLE unsafeIndex_Enumerable #-}
 
 --------------------------------------------------
 
 {- | 
 
-"Returns 'True' if the given subscript lies in the range defined
+"Returns @True@ if the given subscript lies in the range defined
 by the bounding pair."
 
 -}
@@ -235,7 +235,7 @@ inRange_Enumerable
 
 inRange_Enumerable = _withinWith _enumerated
 
-{-# INLINE inRange_Enumerable #-}
+{-# INLINEABLE inRange_Enumerable #-}
 
 --------------------------------------------------
 -- Caching ---------------------------------------

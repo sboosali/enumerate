@@ -42,17 +42,17 @@ jobs: 6
 
 --------------------------------------------------
 
-repository stackage-lts-13.9
+repository stackage-lts-13.15
   url: https://www.stackage.org/lts-13.9
 
--- LTS Haskell 13.09 (ghc-8.6.3)
+-- LTS Haskell 13 (ghc-8.6.4)
 
 --------------------------------------------------
 
 repository stackage-lts-12.26
   url: https://www.stackage.org/lts-12.26
 
--- LTS Haskell 12.22 (ghc-8.4.4)
+-- LTS Haskell 12 (ghc-8.4.4)
 -- Published on 2018-12-09
 
 --------------------------------------------------
