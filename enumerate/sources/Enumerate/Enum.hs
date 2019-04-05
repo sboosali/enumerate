@@ -56,16 +56,18 @@ module Enumerate.Enum
  , minBound_Enumerable
  , maxBound_Enumerable
 
- -- * @Ix@ methods:
+ -- -- * @Ix@ methods:
 
- , range_Enumerable
- , unsafeIndex_Enumerable
- , inRange_Enumerable
+ -- , range_Enumerable
+ -- , unsafeIndex_Enumerable
+ -- , inRange_Enumerable
 
  -- * Caching
 
- , array_Enumerable
  , table_Enumerable
+ , index_Enumerable
+ , array_Enumerable
+ , sequence_Enumerable
 
  -- * Auxiliaries
 
@@ -90,12 +92,27 @@ import Enumerate.Extra
 -- Imports ---------------------------------------
 --------------------------------------------------
 
---TODO IntMap
-import qualified Data.Array as Array
-import Data.Array (Array, (!))
-import qualified Data.Map as Map
-import Data.Map (Map)
-import Prelude (error)
+import qualified "containers" Data.Map as Map
+import           "containers" Data.Map (Map)
+
+--------------------------------------------------
+
+import qualified "containers" Data.IntMap as IntMap
+import           "containers" Data.IntMap (IntMap)
+
+--------------------------------------------------
+
+import qualified "containers" Data.Sequence as Seq
+import           "containers" Data.Sequence (Seq)
+
+--------------------------------------------------
+
+import qualified "array" Data.Array as Array
+import           "array" Data.Array (Array, (!))
+
+--------------------------------------------------
+
+import qualified Prelude
 
 --------------------------------------------------
 -- « Enum » --------------------------------------
@@ -190,86 +207,67 @@ maxBound_Enumerable as = (as ! (n-1))
 -- « Ix » ----------------------------------------
 --------------------------------------------------
 
-{- |
+-- {- |
 
-"The list of values in the subrange defined by a bounding pair."
+-- "The list of values in the subrange defined by a bounding pair."
 
--}
+-- -}
 
-range_Enumerable
-  :: forall a. (Enumerable a, Ord a)
-  => (a,a) -> [a]
+-- range_Enumerable
+--   :: forall a. (Enumerable a, Ord a)
+--   => (a,a) -> [a]
 
-range_Enumerable = rangeWith enumerated
+-- range_Enumerable = rangeWith enumerated
 
-{-# INLINEABLE range_Enumerable #-}
+-- {-# INLINEABLE range_Enumerable #-}
 
---------------------------------------------------
+-- --------------------------------------------------
 
-{- |
+-- {- |
 
-"Like 'index', but without checking that the value is in range."
+-- "Like 'index', but without checking that the value is in range."
 
--}
+-- -}
 
-unsafeIndex_Enumerable
-  :: forall a. (Enumerable a, Ord a)
-  => (a,a) -> a -> Int
+-- unsafeIndex_Enumerable
+--   :: forall a. (Enumerable a, Ord a)
+--   => (a,a) -> a -> Int
 
-unsafeIndex_Enumerable = _indexWith _enumerated
+-- unsafeIndex_Enumerable = _indexWith _enumerated
 
-{-# INLINEABLE unsafeIndex_Enumerable #-}
+-- {-# INLINEABLE unsafeIndex_Enumerable #-}
 
---------------------------------------------------
+-- --------------------------------------------------
 
-{- | 
+-- {- | 
 
-"Returns @True@ if the given subscript lies in the range defined
-by the bounding pair."
+-- "Returns @True@ if the given subscript lies in the range defined
+-- by the bounding pair."
 
--}
+-- -}
 
-inRange_Enumerable
-  :: forall a. (Enumerable a, Ord a)
-  => (a,a) -> a -> Bool
+-- inRange_Enumerable
+--   :: forall a. (Enumerable a, Ord a)
+--   => (a,a) -> a -> Bool
 
-inRange_Enumerable = _withinWith _enumerated
+-- inRange_Enumerable = _withinWith _enumerated
 
-{-# INLINEABLE inRange_Enumerable #-}
+-- {-# INLINEABLE inRange_Enumerable #-}
 
 --------------------------------------------------
 -- Caching ---------------------------------------
 --------------------------------------------------
 
-{-| 
+{-| Create a mapping from enum values (@('Enumerable' a) => a@) to their indices (@Int@),
+given some type.
 
-Mapping from indices (@Int@) to values (@Enumerable a => @a@).
+'table_Enumerable' is the “inverse“ of 'index_Enumerable'.
 
--}
+== Examples
 
-array_Enumerable
- :: forall a. (Enumerable a)
- => Array Int a --TODO
-
-array_Enumerable = array
-
-  where
-
-  array :: Array Int a
-  array = Array.listArray bounds enumerated
-
-  bounds :: (Int, Int)
-  bounds = (0, n - 1)
-  
-  n = intCardinality ([] :: [a])
-
- --[TODO array_Enumerable] is array efficient?
-
---------------------------------------------------
-
-{-| 
-
-Mapping from enum values (@Enumerable a => a@) to their indices (@Int@).
+>>> table_Bool = table_Enumerable :: Map Bool Int
+>>> Map.toAscList table_Bool
+[(False,0),(True,1)]
 
 -}
 
@@ -293,6 +291,95 @@ table_Enumerable = table
   n = intCardinality ([] :: [a])
 
 --------------------------------------------------
+
+{-| Create a mapping from indices (@Int@) to values (@('Enumerable' a) => @a@),
+given some type.
+
+'index_Enumerable' is the “inverse“ of 'table_Enumerable'.
+
+== Examples
+
+>>> index_Bool = index_Enumerable :: IntMap Bool
+>>> IntMap.toAscList index_Bool
+[(0,False),(1,True)]
+
+-}
+
+index_Enumerable
+ :: forall a. (Enumerable a)
+ => IntMap a --TODO
+
+index_Enumerable = index'IntMap
+
+  where
+
+  index'IntMap :: IntMap a
+  index'IntMap = IntMap.fromList index'List
+
+  index'List :: [(Int, a)]
+  index'List = zip indices enumerated
+
+  indices :: [Int]
+  indices = [0 .. (n - 1)]
+  
+  n = intCardinality ([] :: [a])
+
+--------------------------------------------------
+
+{-| Create a mapping from indices (@Int@) to values (@('Enumerable' a) => @a@),
+given some type.
+
+== Examples
+
+>>> array_Bool = array_Enumerable :: Array Int Bool
+>>> array_Bool
+array (0,1) [(0,False),(1,True)]
+
+-}
+
+array_Enumerable
+ :: forall a. (Enumerable a)
+ => Array Int a
+
+array_Enumerable = array
+
+  where
+
+  array :: Array Int a
+  array = Array.listArray bounds enumerated
+
+  bounds :: (Int, Int)
+  bounds = (0, n - 1)
+  
+  n = intCardinality ([] :: [a])
+
+ --[TODO array_Enumerable] is array efficient?
+
+--------------------------------------------------
+
+{-| Create a mapping from indices (@Int@) to values (@('Enumerable' a) => @a@),
+given some type.
+
+== Examples
+
+>>> sequence_Bool = sequence_Enumerable :: Seq Bool
+>>> sequence_Bool
+fromList [False,True]
+
+-}
+
+sequence_Enumerable
+ :: forall a. (Enumerable a)
+ => Seq a
+
+sequence_Enumerable = seq'
+
+  where
+
+  seq' :: Seq a
+  seq' = Seq.fromList enumerated
+
+--------------------------------------------------
 -- Utilities -------------------------------------
 --------------------------------------------------
 
@@ -302,75 +389,28 @@ __fromJust__ name = maybe (__bug__ name) id
 --------------------------------------------------
 
 __bug__ :: String -> a
-__bug__ name = error (name ++ ": invalid Enumerable instance")
+__bug__ name = Prelude.error (name ++ ": invalid Enumerable instance")
 
 --TODO print typerep; add constraint, all types are Typeable
 
 --------------------------------------------------
-{- Notes -----------------------------------------
+-- Notes -----------------------------------------
+--------------------------------------------------
 
-from <http://hackage.haskell.org/package/base-4.12.0.0/docs/src/GHC.Arr.html#range>:
+{-
+----------------------------------------
 
-    {- ...
-    Note [Inlining index]
-    ~~~~~~~~~~~~~~~~~~~~~
-    We inline the 'index' operation,
-    
-     * Partly because it generates much faster code
-       (although bigger); see Trac #1216
-    
-     * Partly because it exposes the bounds checks to the simplifier which
-       might help a big.
-    
-    If you make a per-instance index method, you may consider inlining it.
-    
-    Note [Double bounds-checking of index values]
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    When you index an array, a!x, there are two possible bounds checks we might make:
-    
-      (A) Check that (inRange (bounds a) x) holds.
-    
-          (A) is checked in the method for 'index'
-    
-      (B) Check that (index (bounds a) x) lies in the range 0..n,
-          where n is the size of the underlying array
-    
-          (B) is checked in the top-level function (!), in safeIndex.
-    
-    Of course it *should* be the case that (A) holds iff (B) holds, but that
-    is a property of the particular instances of index, bounds, and inRange,
-    so GHC cannot guarantee it.
-    
-     * If you do (A) and not (B), then you might get a seg-fault,
-       by indexing at some bizarre location.  Trac #1610
-    
-     * If you do (B) but not (A), you may get no complaint when you index
-       an array out of its semantic bounds.  Trac #2120
-    
-    At various times we have had (A) and not (B), or (B) and not (A); both
-    led to complaints.  So now we implement *both* checks (Trac #2669).
-    
-    For 1-d, 2-d, and 3-d arrays of Int we have specialised instances to avoid this.
-    
-    Note [Out-of-bounds error messages]
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    The default method for 'index' generates hoplelessIndexError, because
-    Ix doesn't have Show as a superclass.  For particular base types we
-    can do better, so we override the default method for index.
-    -}
-    
-    -- Abstract these errors from the relevant index functions so that
-    -- the guts of the function will be small enough to inline.
-    
-    {-# NOINLINE indexError #-}
-    indexError :: Show a => (a,a) -> a -> String -> b
-    indexError rng i tp
-      = errorWithoutStackTrace (showString "Ix{" . showString tp . showString "}.index: Index " .
-               showParen True (showsPrec 0 i) .
-               showString " out of range " $
-               showParen True (showsPrec 0 rng) "")
-    
-    hopelessIndexError :: Int -- Try to use 'indexError' instead!
-    hopelessIndexError = errorWithoutStackTrace "Error in array index"
+fromFunction :: Int -> (Int -> a) -> Seq a
 
--------------------------------------------------}
+O(n). Convert a given sequence length and a function representing that sequence into a sequence.
+
+Since: containers-0.5.6.2
+
+----------------------------------------
+
+----------------------------------------
+-}
+
+--------------------------------------------------
+-- EOF -------------------------------------------
+--------------------------------------------------

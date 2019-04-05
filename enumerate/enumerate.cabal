@@ -226,7 +226,6 @@ common Haskell2020Library
  -----------------------------
 
  if flag(develop)
- 
     cpp-options: -DDEVELOP
                  -- ^ Define the « DEVELOP » symbol for CPP.
 
@@ -426,22 +425,22 @@ library
 
 ------------------------------
 
- exposed-modules:
-                 Enumerate
+ exposed-modules: Enumerate
 
-                 Enumerate.Types
-                 Enumerate.Enum
-                 Enumerate.Cardinality
-                 Enumerate.Between
-                 Enumerate.Modular
-                 Enumerate.Derived
+                  Enumerate.Types
+                  Enumerate.Enum
+--                  Enumerate.Ix
+                  Enumerate.Cardinality
+                  Enumerate.Between
+                  Enumerate.Modular
+                  Enumerate.Derived
 
-                 Enumerate.Extra
-                 Enumerate.Compatibility
-                 Enumerate.Prelude
+                  Enumerate.Extra
+                  Enumerate.Compatibility
+                  Enumerate.Prelude
 
-                 Enumerate.Example
-                 Enumerate.Test
+                  Enumerate.Example
+                  Enumerate.Test
 
   -- Enumerate.Domain
   -- Data.CoRec

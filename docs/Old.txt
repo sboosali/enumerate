@@ -1,0 +1,50 @@
+
+sequence_Enumerable
+ :: forall a. (Enumerable a)
+ => Seq a
+
+sequence_Enumerable = sequence
+
+  where
+
+  sequence :: Seq a
+  sequence = Seq.fromFunction n _
+
+  n = intCardinality ([] :: [a])
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------
+
+package *
+  documentation:            True
+  haddock-hyperlink-source: True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -44,16 +44,16 @@ main = do
   printBlank
   printDivider
 
-  putStrLn "Run DocTests within only these files:\n"
-  putStringsLine sources
+  -- putStrLn "Run DocTests within only these files:\n"
+  -- putStringsLine sources
 
-  printBlank
+  -- printBlank
 
-  putStrLn "and with these extensions (/ other compliler options):\n"
-  putStringsLine flags
+  -- putStrLn "and with these extensions (/ other compliler options):\n"
+  -- putStringsLine flags
 
-  printBlank
-  printDivider
+  -- printBlank
+  -- printDivider
 
   doctest (sources ++ flags)
 
@@ -82,7 +82,7 @@ flags = extensions ++ options
 
   options = compilerFlags $
       ""
-#if DEVELOP
+#ifdef DEVELOP
    ++ " defer-typed-holes"
 #endif
 

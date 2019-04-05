@@ -1,32 +1,36 @@
 --------------------------------------------------
---------------------------------------------------
-packages:
-  ./enumerate/
-  ./enumerate-function/
-
---------------------------------------------------
-optional-packages:
-  ../spiros/spiros/
-
---------------------------------------------------
--- LocalFlags (i.e. only for project/vendored packages)
+-- Project ---------------------------------------
 --------------------------------------------------
 
-documentation:            False
+packages: ./enumerate
+          ./enumerate-function
+
+--------------------------------------------------
+        
+optional-packages: ../spiros/spiros
+                   ./submodules/*
+
+--------------------------------------------------
+-- Components ------------------------------------
+--------------------------------------------------
+
+tests:         True
+benchmarks:    True
+documentation: False
+
+--------------------------------------------------
+-- Flags -----------------------------------------
+--------------------------------------------------
+
+profiling: False
+
 haddock-hyperlink-source: True
 
 --------------------------------------------------
--- GlobalFlags (i.e. only for installed/dependency packages)
---------------------------------------------------
 
----profiling:    True
----optimization: 2
-
---------------------------------------------------
-
-package *
-  documentation:            True
-  haddock-hyperlink-source: True
+package hsc2hs
+  documentation: False
+  -- hsc2hs's Haddocks are broken.
 
 --------------------------------------------------
 
@@ -35,15 +39,17 @@ constraints:
   foundation >=0.0.14
 
 --------------------------------------------------
--- Meta
+-- Settings --------------------------------------
 --------------------------------------------------
 
 jobs: 6
 
 --------------------------------------------------
+-- Repositories ----------------------------------
+--------------------------------------------------
 
 repository stackage-lts-13.15
-  url: https://www.stackage.org/lts-13.9
+  url: https://www.stackage.org/lts-13.15
 
 -- LTS Haskell 13 (ghc-8.6.4)
 
@@ -59,11 +65,13 @@ repository stackage-lts-12.26
 -- Notes -----------------------------------------
 --------------------------------------------------
 
---TODO with-compiler: /nix/store/gzsn9cig6pmy13374k62q8l4jah9siq7-ghcjs-8.4.0.1-with-packages/bin/ghcjs
---     -- from reflex-platform
---     compiler: ghcjs
+-- Schema for <<< cabal.project >>>:
+--
+-- <<< https://cabal.readthedocs.io/en/latest/nix-local-build.html#configuring-builds-with-cabal-project >>>.
 
--- by omitting a `compiler:` field in `cabal.project`,
+-- <<< compiler: >>> field:
+--
+-- By omitting a `compiler:` field in `cabal.project`,
 -- we can easily test multiple compiler versions by specifying that same field
 -- via the `-w` command line option
 -- (also see the `Makefile`'s `configure-8-2` target).
@@ -77,5 +85,11 @@ repository stackage-lts-12.26
 --
 -- 
 
---------------------------------------------------
+-- <<< optional-packages: >>> field:
+--
+-- <<< submodules/* >>> automatically detects any package
+-- cloned/unpacked within the <<< ./submodules >>> subdirectory.
 
+--------------------------------------------------
+-- EOF -------------------------------------------
+--------------------------------------------------
