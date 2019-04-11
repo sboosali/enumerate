@@ -135,6 +135,7 @@ index.html: documentation
 #------------------------------------------------#
 
 print-platform:
+
 	@$(Ghci) -e ":unset +t" -e "putStrLn System.Info.arch" -e "putStrLn System.Info.os" 2>/dev/null
 
 # e.g.

@@ -78,13 +78,18 @@ import           "containers" Data.Map (Map)
 
 --------------------------------------------------
 
+import qualified "containers" Data.Sequence as Seq
+import           "containers" Data.Sequence (Seq)
+
+--------------------------------------------------
+
 import qualified Prelude
 
 --------------------------------------------------
 -- Types -----------------------------------------
 --------------------------------------------------
 
-type BinarySearchTree a = (Int,a) -- TODO
+--type BinarySearchTree a = (Int,a) -- TODO
 
 -- Data.Map
 -- Data.IntMap
@@ -94,7 +99,7 @@ type BinarySearchTree a = (Int,a) -- TODO
 -- « Ix » ----------------------------------------
 --------------------------------------------------
 
-{- |
+{- | A (`Seq`-based) `range` implementation for an 'Enumerable' type.
 
 "The list of values in the subrange defined by a bounding pair."
 
@@ -104,11 +109,13 @@ range_Enumerable
   :: forall a. (Enumerable a, Ord a)
   => (a,a) -> [a]
 
-range_Enumerable = rangeWith enumerated
+range_Enumerable = range_Seq sequence_Enumerable
 
 {-# INLINEABLE range_Enumerable #-}
 
 --------------------------------------------------
+
+{-
 
 {- |
 
@@ -169,9 +176,64 @@ tree_Enumerable = tree
   
   n = intCardinality ([] :: [a])
 
+-}
+
 --------------------------------------------------
 -- Utilities -------------------------------------
 --------------------------------------------------
+
+{- | Return a `range` function, given a `Seq`uence.
+
+i.e. @range_Seq xs@ asssumes the `Seq`uence @(xs :: 'Seq' a)@ is monotonically increasing,
+w.r.t @('Ord' a)@ . You may call 'Seq.sort' on @xs@ to ensure this prerequisite.
+
+-}
+
+range_Seq
+  :: forall a. (Ord a)
+  => Seq a
+  -> ((a,a) -> [a])
+
+range_Seq xs = range_
+  where
+
+  range_ :: (a,a) -> [a]
+  range_ (i,k) =
+
+    if   (i <= k)
+    then toList js
+    else []
+
+    where
+
+      js = xs &
+        ( Seq.dropWhileL (`lessThan` i)
+        > Seq.takeWhileL (<= k)
+        )
+
+{-# INLINEABLE range_Seq #-}
+
+--------------------------------------------------
+
+{- | Return an `inRange` function, given a `Seq`uence.
+
+-}
+
+inRange_Seq
+  :: forall a. (Ord a)
+  => Seq a
+  -> ((a, a) -> a -> Bool)
+
+inRange_Seq xs = inRange_
+  where
+
+  inRange_ :: (a, a) -> a -> Bool
+  inRange_ (i,j) x = ys
+    where
+
+      ys = _ xs
+
+{-# INLINEABLE inRange_Seq #-}
 
 --------------------------------------------------
 -- Notes -----------------------------------------

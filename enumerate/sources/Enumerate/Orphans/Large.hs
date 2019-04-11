@@ -16,7 +16,7 @@ probable runtime non-termination).
 
 -}
 module Enumerate.Orphans.Large where
-import Enumerate.Extra
+import Enumerate.Utilities
 import Enumerate.Types
 
 import           Data.Word (Word32, Word64)

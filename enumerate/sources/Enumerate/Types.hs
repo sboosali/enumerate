@@ -82,7 +82,7 @@ module Enumerate.Types where
 
 --------------------------------------------------
 
-import Enumerate.Extra
+import Enumerate.Utilities
 
 --------------------------------------------------
 -- Imports ---------------------------------------

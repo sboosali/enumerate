@@ -18,7 +18,7 @@ module Enumerate.Cardinality where
 --------------------------------------------------
 --------------------------------------------------
 
-import Enumerate.Extra
+import Enumerate.Utilities
 --import Enumerate.Compatibility (MultiplyNats)
 
 --------------------------------------------------

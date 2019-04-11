@@ -7,7 +7,7 @@
 -}
 module Enumerate.Orphans.GHC where
 import Enumerate.Types
-import Enumerate.Extra
+import Enumerate.Utilities
 
 import System.Posix.Types (CIno,CMode)
 import GHC.Exts(Down(..),SpecConstrAnnotation(..))

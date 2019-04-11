@@ -7,10 +7,10 @@
 
 -}
 
-module Enumerate.Extra
+module Enumerate.Utilities
 
  ( module Enumerate.Prelude
- , module Enumerate.Extra
+ , module Enumerate.Utilities
  ) where
 
 --------------------------------------------------
@@ -30,8 +30,6 @@ import qualified "containers" Data.Set as Set
 
 import qualified "base" Data.List as List
 import qualified "base" Data.Ord  as Ord
-
-import           "base" Numeric.Natural
 
 --------------------------------------------------
 -- Definitions -----------------------------------

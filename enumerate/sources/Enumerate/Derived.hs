@@ -14,7 +14,7 @@ module Enumerate.Derived where
 --------------------------------------------------
 
 import Enumerate.Types
-import Enumerate.Extra
+import Enumerate.Utilities
 
 --------------------------------------------------
 -- Imports ---------------------------------------

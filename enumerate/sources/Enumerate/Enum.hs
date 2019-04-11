@@ -86,7 +86,7 @@ module Enumerate.Enum
 --------------------------------------------------
 
 import Enumerate.Types
-import Enumerate.Extra
+import Enumerate.Utilities
 
 --------------------------------------------------
 -- Imports ---------------------------------------

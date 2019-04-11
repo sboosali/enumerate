@@ -62,7 +62,7 @@ main = do
 --------------------------------------------------
 
 sources = modules2filepaths "hs" "sources" $
-  "Enumerate Enumerate.Types Enumerate.Enum Enumerate.Cardinality Enumerate.Between Enumerate.Modular Enumerate.Example Enumerate.Extra"
+  "Enumerate Enumerate.Types Enumerate.Enum Enumerate.Cardinality Enumerate.Between Enumerate.Modular Enumerate.Example Enumerate.Utilities"
 
 --------------------------------------------------
 
