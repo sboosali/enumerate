@@ -48,3 +48,40 @@ package *
 
 
 
+#------------------------------------------------#
+
+documentation: build
+
+	$(Cabal) new-haddock "all" --enable-documentation
+
+.PHONY: documentation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
