@@ -1,11 +1,12 @@
-cabal-version:       2.4
+cabal-version:       2.2
                      -- ^ « v2.2 » provides « common » stanzas.
+
 build-type:          Simple
 
 --------------------------------------------------
 
 name:                enumerate-function
-version:             0.3
+version:             0.3.2
 
                      -- ^ ❲ A.B.C.D ❳:
                      --

@@ -1,0 +1,58 @@
+--------------------------------------------------
+-- Compiler --------------------------------------
+--------------------------------------------------
+
+compiler: ghcjs
+
+--------------------------------------------------
+-- Project ---------------------------------------
+--------------------------------------------------
+
+packages: ./enumerate
+          ./enumerate-function
+
+--------------------------------------------------
+        
+optional-packages: ./submodules/*
+                   ../spiros/spiros
+
+--------------------------------------------------
+-- Repositories ----------------------------------
+--------------------------------------------------
+
+repository ghcjs-overlay
+  url: http://hackage-ghcjs-overlay.nomeata.de/
+
+  secure:        True
+  key-threshold: 0
+  root-keys:
+
+--------------------------------------------------
+-- Notes -----------------------------------------
+--------------------------------------------------
+
+-- by @nomeata ...
+--
+-- https://hackage-ghcjs-overlay.nomeata.de
+--
+-- this overlay holds these packages:
+--
+-- - ghcjs-base
+-- - reflex
+-- - reflex-dom (& reflex-dom-core)
+--
+-- when this configuration is in a cabal.project (versus a ~/.cabal/config), you must use cabal new-update, not cabal update.
+--
+-- Manually created: I pulled the github repositories, appended the current date to the version, ran cabal sdist to get source tarballs, ran
+--
+-- $ hackage-repo-tool create-keys --keys keys
+-- $ mkdir package/
+-- $ mv .../**/*.tar.gz package/
+-- $ hackage-repo-tool bootstrap --keys keys/ --repo 
+--
+-- and published this on Github Pages.
+--
+
+--------------------------------------------------
+-- EOF -------------------------------------------
+--------------------------------------------------
